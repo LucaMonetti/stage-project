@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using pricelist_manager.Server.Data;
 using pricelist_manager.Server.Interfaces;
+using pricelist_manager.Server.Middlewares;
 using pricelist_manager.Server.Repositories;
 
 namespace pricelist_manager.Server
@@ -40,6 +41,9 @@ namespace pricelist_manager.Server
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+
+            //Middlewares
+            app.UseMiddleware<ExceptionMiddleware>();
 
             app.UseHttpsRedirection();
 
