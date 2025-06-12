@@ -2,7 +2,7 @@
 {
     public class StorageUnavailableException : Exception
     {
-        public StorageUnavailableException()
+        public StorageUnavailableException() : base("The database is Unavailable.")
         {
         }
 

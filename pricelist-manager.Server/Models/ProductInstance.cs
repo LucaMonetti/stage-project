@@ -20,7 +20,7 @@ namespace pricelist_manager.Server.Models
         [Length(0, 200)]
         public string Description { get; set; } = String.Empty;
 
-        [Column("Type = decimal(10, 2")]
+        [Precision(10, 2)]
         public Decimal Price { get; set; } = Decimal.Zero;
     }
 }
