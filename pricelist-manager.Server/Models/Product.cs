@@ -1,18 +1,20 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace pricelist_manager.Server.Models
 {
+    [PrimaryKey(nameof(PricelistId), nameof(ProductCode))]
     public class Product
     {
-        [Key]
-        [ForeignKey(nameof(PricelistId))]
         public string PricelistId { get; set; } = String.Empty;
 
-        [Key]
         public string ProductCode { get; set; } = String.Empty;
 
         [ForeignKey(nameof(LatestVersion))]
         public int LatestVersion { get; set; } = 0;
+
+        [ForeignKey(nameof(PricelistId) + ", " + nameof(ProductCode) + ", " + nameof(LatestVersion))]
+        public ProductInstance Instance { get; set; } = null!;
     }
 }

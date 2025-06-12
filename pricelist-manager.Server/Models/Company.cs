@@ -17,7 +17,7 @@ namespace pricelist_manager.Server.Models
         public string Address { get; set; } = string.Empty;
 
         [StringLength(5, MinimumLength = 5, ErrorMessage = "Must have 5 digits.")]
-        public int PostalCode { get; set; } = 0;
+        public string PostalCode { get; set; } = string.Empty;
 
         [Length(2, 10)]
         public string Province { get; set; } = string.Empty;
