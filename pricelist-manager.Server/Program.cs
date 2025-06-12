@@ -1,4 +1,9 @@
 
+using Microsoft.EntityFrameworkCore;
+using pricelist_manager.Server.Data;
+using pricelist_manager.Server.Interfaces;
+using pricelist_manager.Server.Repositories;
+
 namespace pricelist_manager.Server
 {
     public class Program
@@ -10,9 +15,19 @@ namespace pricelist_manager.Server
             // Add services to the container.
 
             builder.Services.AddControllers();
+
+            // Database
+            builder.Services.AddDbContext<DataContext>(options =>
+            {
+                options.UseInMemoryDatabase("Temp");
+            });
+
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+
+            // Dependency Injecion
+            builder.Services.AddScoped<ICompanyRepository, CompanyRepository>();
 
             var app = builder.Build();
 
