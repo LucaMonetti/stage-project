@@ -1,0 +1,6 @@
+@pricelist_manager.Server_HostAddress = http://localhost:5297
+
+GET {{pricelist_manager.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
