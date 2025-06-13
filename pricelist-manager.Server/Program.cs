@@ -1,12 +1,17 @@
 
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using pricelist_manager.Server.Data;
 using pricelist_manager.Server.Interfaces;
 using pricelist_manager.Server.Middlewares;
+using pricelist_manager.Server.Models;
 using pricelist_manager.Server.Repositories;
 using Swashbuckle.AspNetCore.Filters;
+using System;
+using System.Text;
 
 namespace pricelist_manager.Server
 {
@@ -27,9 +32,44 @@ namespace pricelist_manager.Server
             });
 
             // Authentication
-            builder.Services.AddAuthentication();
-            builder.Services.AddIdentityApiEndpoints<IdentityUser>()
-                .AddEntityFrameworkStores<DataContext>();
+            builder.Services.AddIdentity<User, IdentityRole>(options =>
+            {
+                options.Password.RequiredLength = 6;
+                options.Password.RequireNonAlphanumeric = true;
+                options.Password.RequireDigit = true;
+                options.Password.RequireUppercase = true;
+                options.Password.RequireLowercase = true;
+
+                options.SignIn.RequireConfirmedPhoneNumber = false;
+                options.SignIn.RequireConfirmedAccount = false;
+                options.SignIn.RequireConfirmedEmail = false;
+            })
+                .AddEntityFrameworkStores<DataContext>()
+                .AddDefaultTokenProviders();
+
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = false,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = builder.Configuration["Jwt:Issuer"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
+                };
+            });
+
+            builder.Services.AddAuthorization(options =>
+            {
+                options.AddPolicy("AdminPolicy", policy => policy.RequireRole("Admin"));
+                options.AddPolicy("UserPolicy", policy => policy.RequireRole("User"));
+            });
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
@@ -65,12 +105,12 @@ namespace pricelist_manager.Server
 
             app.UseHttpsRedirection();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapControllers();
 
             app.MapFallbackToFile("/index.html");
-            app.MapIdentityApi<IdentityUser>();
 
             app.Run();
         }

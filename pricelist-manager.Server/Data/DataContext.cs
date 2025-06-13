@@ -5,7 +5,7 @@ using pricelist_manager.Server.Models;
 
 namespace pricelist_manager.Server.Data
 {
-    public class DataContext : IdentityDbContext<IdentityUser>
+    public class DataContext : IdentityDbContext<User>
     {
         public DataContext(DbContextOptions options) : base(options)
         {

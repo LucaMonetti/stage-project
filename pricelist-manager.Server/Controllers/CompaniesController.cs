@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using pricelist_manager.Server.Exceptions;
 using pricelist_manager.Server.Interfaces;
@@ -8,6 +9,7 @@ using System.Globalization;
 namespace pricelist_manager.Server.Controllers
 {
     [ApiController]
+    [Authorize(Roles = "Admin")]
     [Route("api/companies")]
     public class CompaniesController: ControllerBase
     {
