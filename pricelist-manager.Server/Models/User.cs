@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace pricelist_manager.Server.Models
 {
@@ -9,8 +11,10 @@ namespace pricelist_manager.Server.Models
         public string FirstName { get; set; } = string.Empty;
         [MaxLength(100)]
         public string LastName { get; set; } = string.Empty;
-        public bool IsAdmin { get; set; } = false;
+
+        [ForeignKey(nameof(Company))]
         public string CompanyId { get; set; } = string.Empty;
+        public Company Company { get; set; } = null!;
 
     }
 }

@@ -1,8 +1,11 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using pricelist_manager.Server.Data;
 using pricelist_manager.Server.DTOs;
+using pricelist_manager.Server.Helpers;
 using pricelist_manager.Server.Models;
+using System.Data;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -16,22 +19,30 @@ namespace pricelist_manager.Server.Controllers
         private readonly UserManager<User> UserManager;
         private readonly RoleManager<IdentityRole> RoleManager;
         private readonly IConfiguration Configuration;
+        private readonly DataContext Context;
 
-        public AccountsController(UserManager<User> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration)
+        public AccountsController(UserManager<User> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration, DataContext context)
         {
             UserManager = userManager;
             RoleManager = roleManager;
             Configuration = configuration;
+            Context = context;
         }
 
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDTO dto)
         {
+            // Basic Checks
+            if (!Roles.IsValidRole(dto.Role)) {
+                ModelState.AddModelError("", "Invalid role!");
+            }
+
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
+            // User creation
             var user = new User
             {
                 Id = Guid.NewGuid().ToString(),
@@ -41,13 +52,28 @@ namespace pricelist_manager.Server.Controllers
                 Email = dto.Email,
                 UserName = dto.Email
             };
+
+            using var transition = await Context.Database.BeginTransactionAsync();
+
             var res = await UserManager.CreateAsync(user, dto.Password);
 
             if (res.Errors.Any())
             {
+                await transition.RollbackAsync();
                 return BadRequest(res.Errors);
             }
 
+            // Add Roles
+            res = await UserManager.AddToRoleAsync(user, dto.Role);
+
+            if (res.Errors.Any())
+            {
+                await transition.RollbackAsync();
+                return BadRequest(res.Errors);
+            }
+
+            // Success Response
+            await transition.CommitAsync();
             return Ok(new {message = "User registered successfully!"});
         }
 
