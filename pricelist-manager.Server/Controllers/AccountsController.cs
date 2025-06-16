@@ -88,7 +88,7 @@ namespace pricelist_manager.Server.Controllers
             var user = await UserManager.FindByEmailAsync(dto.Email);
 
             if (user == null)
-                return NotFound("Use Not Found!");
+                return NotFound("User Not Found!");
 
             bool isPasswordCorrect = await UserManager.CheckPasswordAsync(user, dto.Password);
 
