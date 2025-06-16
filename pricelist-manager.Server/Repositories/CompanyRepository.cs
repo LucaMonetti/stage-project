@@ -7,14 +7,11 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace pricelist_manager.Server.Repositories
 {
-    public class CompanyRepository : ICompanyRepository
+    public class CompanyRepository : BaseRepository, ICompanyRepository
     {
-        private readonly DataContext Context;
 
-        public CompanyRepository(DataContext context)
-        {
-            Context = context;
-        }
+        public CompanyRepository(DataContext context) : base(context)
+        { }
 
         public async Task<bool> CreateAsync(Company entity)
         {
@@ -91,11 +88,6 @@ namespace pricelist_manager.Server.Repositories
             }
 
             return true;
-        }
-
-        private bool CanConnect()
-        {
-            return Context.Database.CanConnect();
         }
 
         private bool ExistsId(string id)
