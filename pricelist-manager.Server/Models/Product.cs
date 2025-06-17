@@ -7,7 +7,8 @@ namespace pricelist_manager.Server.Models
     [PrimaryKey(nameof(PricelistId), nameof(ProductCode))]
     public class Product
     {
-        public string PricelistId { get; set; } = String.Empty;
+        [Required]
+        public Guid PricelistId { get; set; }
 
         public string ProductCode { get; set; } = String.Empty;
 

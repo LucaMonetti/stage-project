@@ -17,6 +17,6 @@ namespace pricelist_manager.Server.Models
 
         [Required]
         public string CompanyId { get; set; } = string.Empty;
-        public Company Company { get; set; } = null!;
+        public Company? Company { get; set; } = null!;
     }
 }

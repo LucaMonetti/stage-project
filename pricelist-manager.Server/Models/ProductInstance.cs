@@ -7,8 +7,9 @@ namespace pricelist_manager.Server.Models
     [PrimaryKey(nameof(PricelistId), nameof(Id), nameof(Version))]
     public class ProductInstance
     {
+        [Required]
         [ForeignKey(nameof(PricelistId))]
-        public string PricelistId { get; set; } = String.Empty;
+        public Guid PricelistId { get; set; }
 
         public string Id { get; set; } = String.Empty;
 

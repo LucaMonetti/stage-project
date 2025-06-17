@@ -87,6 +87,9 @@ namespace pricelist_manager.Server
 
             // Dependency Injecion
             builder.Services.AddScoped<ICompanyRepository, CompanyRepository>();
+            builder.Services.AddScoped<IPricelistRepository, PricelistRepository>();
+            builder.Services.AddScoped<IProductRepository, ProductRepository>();
+            builder.Services.AddScoped<IProductInstanceRepository, ProductInstanceRepository>();
 
             var app = builder.Build();
 
