@@ -23,5 +23,7 @@ namespace pricelist_manager.Server.Models
 
         [Precision(10, 2)]
         public Decimal Price { get; set; } = Decimal.Zero;
+
+        public Product? Product { get; set; } = null!;
     }
 }

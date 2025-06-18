@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using pricelist_manager.Server.Data;
 
@@ -11,9 +12,11 @@ using pricelist_manager.Server.Data;
 namespace pricelist_manager.Server.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20250618073648_DeleteBehaviourProducts")]
+    partial class DeleteBehaviourProducts
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -232,6 +235,8 @@ namespace pricelist_manager.Server.Migrations
 
                     b.HasKey("PricelistId", "ProductCode");
 
+                    b.HasIndex("PricelistId", "ProductCode", "LatestVersion");
+
                     b.ToTable("Products");
                 });
 
@@ -404,6 +409,17 @@ namespace pricelist_manager.Server.Migrations
                         .IsRequired();
 
                     b.Navigation("Company");
+                });
+
+            modelBuilder.Entity("pricelist_manager.Server.Models.Product", b =>
+                {
+                    b.HasOne("pricelist_manager.Server.Models.ProductInstance", "Instance")
+                        .WithMany()
+                        .HasForeignKey("PricelistId", "ProductCode", "LatestVersion")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Instance");
                 });
 
             modelBuilder.Entity("pricelist_manager.Server.Models.ProductInstance", b =>

@@ -31,7 +31,7 @@ namespace pricelist_manager.Server.DTOs
                 PricelistId = product.PricelistId,
                 ProductCode = product.ProductCode,
                 LatestVersion = 0,
-                Instance = ToProductInstance(product)
+                Versions = [ToProductInstance(product)]
             };
         }
 

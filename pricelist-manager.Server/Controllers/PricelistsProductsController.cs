@@ -92,7 +92,7 @@ namespace pricelist_manager.Server.Controllers
             try
             {
                 Product oldProd = await ProductRepository.GetByIdAsync(pricelistId, productCode);
-                ProductInstance newInstance = UpdateProductDTO.MergeDTO(oldProd.Instance, dto);
+                ProductInstance newInstance = UpdateProductDTO.MergeDTO(oldProd.Versions.Last(), dto);
 
                 await ProductInstanceRepository.CreateAsync(newInstance);
 
@@ -108,6 +108,24 @@ namespace pricelist_manager.Server.Controllers
             catch (AlreadyExistException<ProductInstance> e)
             {
                 return Conflict(e.Message);
+            }
+        }
+
+        [HttpDelete("{productCode}")]
+        public async Task<IActionResult> Delete(Guid pricelistId, string productCode)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                var res = await ProductRepository.DeleteAsync(pricelistId, productCode);
+                return Ok(res);
+            } catch (NotFoundException<Product> e)
+            {
+                return NotFound(e.Message);
             }
         }
     }

@@ -15,7 +15,6 @@ namespace pricelist_manager.Server.Models
         [ForeignKey(nameof(LatestVersion))]
         public int LatestVersion { get; set; } = 0;
 
-        [ForeignKey(nameof(PricelistId) + ", " + nameof(ProductCode) + ", " + nameof(LatestVersion))]
-        public ProductInstance Instance { get; set; } = null!;
+        public ICollection<ProductInstance> Versions { get; set; } = [];
     }
 }

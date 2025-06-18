@@ -41,7 +41,9 @@ namespace pricelist_manager.Server.Repositories
         {
             if (!CanConnect()) throw new StorageUnavailableException();
 
-            var products = await Context.Products.Where(p => p.PricelistId == pricelistId).Include(p => p.Instance).ToListAsync();
+            var products = await Context.Products.Where(p => p.PricelistId == pricelistId).Include(p => p.Versions).ToListAsync();
+
+            TrimProductsVersion(products);
 
             return products;
         }
@@ -52,10 +54,12 @@ namespace pricelist_manager.Server.Repositories
 
             var product = await Context.Products
                                     .Where(p => p.ProductCode == productCode && p.PricelistId == pricelistId)
-                                    .Include(p => p.Instance)
+                                    .Include(p => p.Versions)
                                     .FirstOrDefaultAsync();
 
             if (product == null) throw new NotFoundException<Product>(productCode);
+
+            TrimProductVersion(product);
 
             return product;
         }
@@ -65,9 +69,11 @@ namespace pricelist_manager.Server.Repositories
             if (!CanConnect()) throw new StorageUnavailableException();
 
             var product = await Context.Products
-                                    .Where(p => p.Instance.Name.Contains(name))
-                                    .Include(p => p.Instance)
+                                    .Where(p => p.Versions.Last().Name.Contains(name))
+                                    .Include(p => p.Versions)
                                     .ToListAsync();
+
+            TrimProductsVersion(product);
 
             if (product == null) throw new NotFoundException<Product>(name);
 
@@ -80,8 +86,10 @@ namespace pricelist_manager.Server.Repositories
 
             var product = await Context.Products
                                     .Where(p => p.ProductCode == code)
-                                    .Include(p => p.Instance)
+                                    .Include(p => p.Versions)
                                     .ToListAsync();
+
+            TrimProductsVersion(product);
 
             if (product == null) throw new NotFoundException<Product>(code);
 
@@ -112,6 +120,20 @@ namespace pricelist_manager.Server.Repositories
             var res = await Context.SaveChangesAsync();
 
             return res >= 1;
+        }
+
+        private void TrimProductsVersion(List<Product> products)
+        {
+            foreach (var product in products)
+                TrimProductVersion(product);
+        }
+
+        private void TrimProductVersion(Product product)
+        {
+            foreach (var version in product.Versions)
+            {
+                version.Product = null!;
+            }
         }
     }
 }
