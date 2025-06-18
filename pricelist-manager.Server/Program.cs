@@ -90,6 +90,7 @@ namespace pricelist_manager.Server
             builder.Services.AddScoped<IPricelistRepository, PricelistRepository>();
             builder.Services.AddScoped<IProductRepository, ProductRepository>();
             builder.Services.AddScoped<IProductInstanceRepository, ProductInstanceRepository>();
+            builder.Services.AddScoped<IUserRepository, UserRepository>();
 
             var app = builder.Build();
 

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using pricelist_manager.Server.Exceptions;
 using pricelist_manager.Server.Interfaces;
 using pricelist_manager.Server.Models;
+using pricelist_manager.Server.Repositories;
 using System.Globalization;
 
 namespace pricelist_manager.Server.Controllers
@@ -14,10 +15,12 @@ namespace pricelist_manager.Server.Controllers
     public class CompaniesController: ControllerBase
     {
         private ICompanyRepository CompanyRepository;
+        private IUserRepository UserRepository;
 
-        public CompaniesController(ICompanyRepository CompanyRepository)
+        public CompaniesController(ICompanyRepository CompanyRepository, IUserRepository userRepository)
         {
             this.CompanyRepository = CompanyRepository;
+            UserRepository = userRepository;
         }
 
         [HttpGet]
@@ -48,6 +51,19 @@ namespace pricelist_manager.Server.Controllers
             {
                 return NotFound(e.Message);
             }
+        }
+
+        [HttpGet("{id}/accounts")]
+        public async Task<IActionResult> GetAccountByCompany(string id)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var res = await UserRepository.GetByCompany(id);
+
+            return Ok(res);
         }
 
         [HttpPost]

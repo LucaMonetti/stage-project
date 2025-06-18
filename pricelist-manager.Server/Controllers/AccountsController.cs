@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using pricelist_manager.Server.Data;
 using pricelist_manager.Server.DTOs;
 using pricelist_manager.Server.Helpers;
+using pricelist_manager.Server.Interfaces;
 using pricelist_manager.Server.Models;
 using System.Data;
 using System.IdentityModel.Tokens.Jwt;
@@ -18,15 +20,30 @@ namespace pricelist_manager.Server.Controllers
     {
         private readonly UserManager<User> UserManager;
         private readonly RoleManager<IdentityRole> RoleManager;
+        private readonly IUserRepository UserRepository;
         private readonly IConfiguration Configuration;
         private readonly DataContext Context;
 
-        public AccountsController(UserManager<User> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration, DataContext context)
+        public AccountsController(UserManager<User> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration, DataContext context, IUserRepository userRepository)
         {
             UserManager = userManager;
             RoleManager = roleManager;
             Configuration = configuration;
             Context = context;
+            UserRepository = userRepository;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var data = await UserRepository.GetAll();
+
+            return Ok(data);
         }
 
         [HttpPost("register")]
