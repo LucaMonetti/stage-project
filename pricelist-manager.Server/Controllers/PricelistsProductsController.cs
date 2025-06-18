@@ -9,7 +9,7 @@ using pricelist_manager.Server.Repositories;
 namespace pricelist_manager.Server.Controllers
 {
     [ApiController]
-    [Route("api/pricelists/{pricelistId:guid}/products")]
+    [Route("api/pricelists")]
     public class PricelistsProductsController : ControllerBase
     {
         private readonly IProductRepository ProductRepository;
@@ -21,7 +21,7 @@ namespace pricelist_manager.Server.Controllers
             ProductInstanceRepository = productInstanceRepository;
         }
 
-        [HttpGet]
+        [HttpGet("{pricelistId:guid}/products")]
         public async Task<IActionResult> GetAll(Guid pricelistId)
         {
             if (!ModelState.IsValid)
@@ -32,7 +32,7 @@ namespace pricelist_manager.Server.Controllers
             return Ok(data);
         }
 
-        [HttpGet("{productCode}")]
+        [HttpGet("{pricelistId:guid}/products/{productCode}")]
         public async Task<IActionResult> GetById(Guid pricelistId, string productCode)
         {
             if (!ModelState.IsValid)
@@ -49,17 +49,11 @@ namespace pricelist_manager.Server.Controllers
             }
         }
 
-        [HttpPost("{productCode}")]
-        public async Task<IActionResult> CreateProduct(Guid pricelistId, string productCode, [FromBody] CreateProductDTO dto)
+        [HttpPost("products")]
+        public async Task<IActionResult> CreateProduct([FromBody] CreateProductDTO dto)
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
-            }
-
-            if (pricelistId != dto.PricelistId || productCode != dto.ProductCode) 
-            {
-                ModelState.AddModelError("", "The IDs doesn't match!");
                 return BadRequest(ModelState);
             }
 
@@ -75,7 +69,7 @@ namespace pricelist_manager.Server.Controllers
             }
         }
 
-        [HttpPut("{productCode}")]
+        [HttpPut("{pricelistId:guid}/products/{productCode}")]
         public async Task<IActionResult> UpdateProduct(Guid pricelistId, string productCode, [FromBody] UpdateProductDTO dto)
         {
             if (!ModelState.IsValid)
@@ -111,7 +105,7 @@ namespace pricelist_manager.Server.Controllers
             }
         }
 
-        [HttpDelete("{productCode}")]
+        [HttpDelete("{pricelistId:guid}/products/{productCode}")]
         public async Task<IActionResult> Delete(Guid pricelistId, string productCode)
         {
             if (!ModelState.IsValid)
