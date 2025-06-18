@@ -96,7 +96,7 @@ namespace pricelist_manager.Server.Controllers
 
                 await ProductInstanceRepository.CreateAsync(newInstance);
 
-                oldProd.LatestVersion += 1;
+                oldProd.LatestVersion = newInstance.Version;    
 
                 var res = await ProductRepository.UpdateAsync(oldProd);
                 return Ok(res);

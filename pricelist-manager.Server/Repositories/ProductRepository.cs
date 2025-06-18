@@ -19,7 +19,7 @@ namespace pricelist_manager.Server.Repositories
 
             if (!(await existsIdAsync(entity.PricelistId, entity.ProductCode))) throw new NotFoundException<Product>(entity.ProductCode);
 
-            await Context.Products.AddAsync(entity);
+            Context.Products.Update(entity);
             var res = await Context.SaveChangesAsync();
 
             return res >= 1;
