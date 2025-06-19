@@ -2,6 +2,7 @@
 using Microsoft.Identity.Client;
 using pricelist_manager.Server.Data;
 using pricelist_manager.Server.Exceptions;
+using pricelist_manager.Server.Helpers.Statistics;
 using pricelist_manager.Server.Interfaces;
 using pricelist_manager.Server.Models;
 using System.Reflection;
@@ -134,6 +135,22 @@ namespace pricelist_manager.Server.Repositories
             {
                 version.Product = null!;
             }
+        }
+
+        public async Task<ProductStatistics> GetStatistics()
+        {
+            if (!CanConnect()) throw new StorageUnavailableException();
+
+            var uniqueProdCount = await Context.Products.Select(p => p.ProductCode).Distinct().CountAsync();
+            var prodInstanceCount = await Context.Products.CountAsync();
+
+            var data = new ProductStatistics
+            {
+                TotalUniqueProducts = uniqueProdCount,
+                ProductCount = prodInstanceCount,
+            };
+
+            return data;
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using pricelist_manager.Server.Models;
+﻿using pricelist_manager.Server.Helpers.Statistics;
+using pricelist_manager.Server.Models;
 
 namespace pricelist_manager.Server.Interfaces
 {
@@ -33,5 +34,7 @@ namespace pricelist_manager.Server.Interfaces
 
         /// <exception cref="StorageUnavailableException">The database is not available</exception>
         Task<Boolean> ExistsIdAsync(Guid pricelistId, string id);
+
+        Task<ProductStatistics> GetStatistics();
     }
 }
