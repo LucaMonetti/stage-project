@@ -1,7 +1,7 @@
 export interface BaseDBElement {
-    id: string;
+  id: string;
 }
 
 export interface BaseDBStatistics {
-    totalNumber: number,
+  totalNumber: number;
 }
