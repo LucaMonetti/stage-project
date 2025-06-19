@@ -4,12 +4,13 @@ import BasicLoader from "../../Loader/BasicLoader";
 
 import { FaBoxesStacked } from "react-icons/fa6";
 
-type Props = {
+type Props<T> = {
   title: string;
-  fetch: FetchData<BaseDBStatistics>;
+  fetch: FetchData<T>;
   description: string;
   color?: "blue" | "purple" | "yellow" | "green";
   Icon?: React.ComponentType<{ className?: string }>;
+  getBodyText: (item?: T) => string | undefined;
 };
 
 const headerVariant = {
@@ -26,13 +27,14 @@ const bodyVariant = {
   green: "text-green-300",
 };
 
-function ItemCounter({
+function ItemCounter<T>({
   title,
   fetch,
   description,
   color = "blue",
   Icon = FaBoxesStacked,
-}: Props) {
+  getBodyText,
+}: Props<T>) {
   return (
     <section className="flex-1 min-w-80 bg-gray-800 border-2 border-gray-700 rounded-md">
       <header className="p-4 flex gap-4 items-center text-xl">
@@ -46,7 +48,7 @@ function ItemCounter({
           <p className="text-red-500">{fetch.errorMsg}</p>
         ) : (
           <p className={`text-4xl ${bodyVariant[color]} font-bold`}>
-            {fetch.data?.totalNumber}
+            {getBodyText(fetch.data)}
           </p>
         )}
         <p className="mt-2 text-gray-400">{description}</p>

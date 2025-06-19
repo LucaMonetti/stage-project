@@ -46,7 +46,7 @@ function ItenCounterGroup() {
 
   return (
     <div className="flex flex-wrap gap-8 mt-8">
-      <ItemCounter
+      <ItemCounter<BaseDBStatistics>
         fetch={{
           isLoading: loadingProducts,
           errorMsg: errorProducts,
@@ -56,8 +56,9 @@ function ItenCounterGroup() {
         color="purple"
         description={"Aziende registrate nel sistema"}
         Icon={FaBuilding}
+        getBodyText={(item) => item?.totalNumber.toString()}
       />
-      <ItemCounter
+      <ItemCounter<BaseDBStatistics>
         fetch={{
           isLoading: loadingProducts,
           errorMsg: errorProducts,
@@ -67,8 +68,9 @@ function ItenCounterGroup() {
         color="green"
         description={"Totale listini creati"}
         Icon={FaListUl}
+        getBodyText={(item) => item?.totalNumber.toString()}
       />
-      <ItemCounter
+      <ItemCounter<BaseDBStatistics>
         fetch={{
           isLoading: loadingProducts,
           errorMsg: errorProducts,
@@ -77,6 +79,7 @@ function ItenCounterGroup() {
         title={"Prodotti"}
         color="blue"
         description={"Prodotti unici disponibili"}
+        getBodyText={(item) => item?.totalNumber.toString()}
       />
     </div>
   );
