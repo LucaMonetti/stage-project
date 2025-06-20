@@ -13,7 +13,6 @@ namespace pricelist_manager.Server.DTOs
         [Length(0, 200)]
         public string Description { get; set; } = String.Empty;
 
-        public string CompanyId { get; set; } = string.Empty;
         public Company? Company { get; set; } = null!;
 
         public ICollection<ProductDTO> Products { get; set; } = [];
@@ -25,7 +24,6 @@ namespace pricelist_manager.Server.DTOs
                 Id = pricelist.Id,
                 Name = pricelist.Name,
                 Description = pricelist.Description,
-                CompanyId = pricelist.CompanyId,
                 Company = pricelist.Company,
                 Products = ProductDTO.FromProducts(products, pricelist.CompanyId)
             };

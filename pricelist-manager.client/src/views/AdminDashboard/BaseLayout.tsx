@@ -1,16 +1,15 @@
 import { Outlet } from "react-router";
+import Sidebar from "../../components/Sidebar/Sidebar";
 
 const AdminDashboardLayout = () => {
-    return (
-        <div className="flex gap-8">
-            <aside>
-                <p>Sidebar</p>
-            </aside>
-            <main>
-                <Outlet />
-            </main>
-		</div>
-    );
+  return (
+    <div className="flex">
+      <Sidebar />
+      <main className="flex-1 py-4 px-8">
+        <Outlet />
+      </main>
+    </div>
+  );
 };
 
 export default AdminDashboardLayout;
