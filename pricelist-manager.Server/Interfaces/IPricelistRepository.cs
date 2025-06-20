@@ -1,8 +1,9 @@
-﻿using pricelist_manager.Server.Models;
+﻿using pricelist_manager.Server.DTOs.Statistics;
+using pricelist_manager.Server.Models;
 
 namespace pricelist_manager.Server.Interfaces
 {
-    public interface IPricelistRepository
+    public interface IPricelistRepository: IBaseRepository
     {
         /// <exception cref="StorageUnavailableException">The database is not available</exception>
         Task<ICollection<Pricelist>> GetAllAsync();
@@ -28,5 +29,8 @@ namespace pricelist_manager.Server.Interfaces
 
         /// <exception cref="StorageUnavailableException">The database is not available</exception>
         Task<Boolean> ExistsIdAsync(Guid id);
+
+        /// <exception cref="StorageUnavailableException">The database is not available</exception>
+        Task<PricelistStatistics> GetStatistics();
     }
 }

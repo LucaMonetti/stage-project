@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using pricelist_manager.Server.DTOs;
 using pricelist_manager.Server.Exceptions;
 using pricelist_manager.Server.Interfaces;
 using pricelist_manager.Server.Models;
@@ -10,16 +11,15 @@ using System.Globalization;
 namespace pricelist_manager.Server.Controllers
 {
     [ApiController]
-    [Authorize(Roles = "Admin")]
     [Route("api/companies")]
     public class CompaniesController: ControllerBase
     {
-        private ICompanyRepository CompanyRepository;
-        private IUserRepository UserRepository;
+        private readonly ICompanyRepository CompanyRepository;
+        private readonly IUserRepository UserRepository;
 
-        public CompaniesController(ICompanyRepository CompanyRepository, IUserRepository userRepository)
+        public CompaniesController(ICompanyRepository companyRepository, IUserRepository userRepository)
         {
-            this.CompanyRepository = CompanyRepository;
+            CompanyRepository = companyRepository;
             UserRepository = userRepository;
         }
 
@@ -54,7 +54,7 @@ namespace pricelist_manager.Server.Controllers
         }
 
         [HttpGet("{id}/accounts")]
-        public async Task<IActionResult> GetAccountByCompany(string id)
+        public async Task<ActionResult<ICollection<UserDTO>>> GetAccountByCompany(string id)
         {
             if (!ModelState.IsValid)
             {
@@ -63,7 +63,7 @@ namespace pricelist_manager.Server.Controllers
 
             var res = await UserRepository.GetByCompany(id);
 
-            return Ok(res);
+            return Ok(UserDTO.FromUsers(res));
         }
 
         [HttpPost]
@@ -88,7 +88,7 @@ namespace pricelist_manager.Server.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateProduct(string id, [FromBody] Company dto)
+        public async Task<IActionResult> Update(string id, [FromBody] Company dto)
         {
             if (id != dto.Id)
             {
@@ -113,7 +113,7 @@ namespace pricelist_manager.Server.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteProduct(string id)
+        public async Task<IActionResult> Delete(string id)
         {
             if (!ModelState.IsValid)
             {

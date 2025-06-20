@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using pricelist_manager.Server.DTOs;
 using pricelist_manager.Server.Exceptions;
 using pricelist_manager.Server.Interfaces;
 using pricelist_manager.Server.Models;
+using pricelist_manager.Server.Repositories;
 using System.Globalization;
 
 namespace pricelist_manager.Server.Controllers
@@ -12,26 +14,29 @@ namespace pricelist_manager.Server.Controllers
     [Route("api/pricelists")]
     public class PricelistsController: ControllerBase
     {
-        private IPricelistRepository PricelistRepository;
+        private readonly IPricelistRepository PricelistRepository;
+        private readonly IProductRepository ProductRepository;
 
-        public PricelistsController(IPricelistRepository pricelistRepository)
+        public PricelistsController(IPricelistRepository pricelistRepository, IProductRepository productRepository)
         {
             PricelistRepository = pricelistRepository;
+            ProductRepository = productRepository;
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<ActionResult<ICollection<PricelistDTO>>> GetAll()
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             var res = await PricelistRepository.GetAllAsync();
+            var prod = await ProductRepository.GetAllGroupPricelistAsync();
 
-            return Ok(res);
+            return Ok(PricelistDTO.FromPricelists(res, prod));
         }
 
         [HttpGet("{id:guid}")]
-        public async Task<IActionResult> GetById(Guid id)
+        public async Task<ActionResult<PricelistDTO>> GetById(Guid id)
         {
             if (!ModelState.IsValid)
             {
@@ -41,7 +46,9 @@ namespace pricelist_manager.Server.Controllers
             try
             {
                 var res = await PricelistRepository.GetByIdAsync(id);
-                return Ok(res);
+                var prod = await ProductRepository.GetAllAsync(id);
+
+                return Ok(PricelistDTO.FromPricelist(res, prod));
             }
             catch (NotFoundException<Pricelist> e)
             {

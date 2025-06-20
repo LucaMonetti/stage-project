@@ -1,4 +1,5 @@
-﻿using pricelist_manager.Server.Models;
+﻿using pricelist_manager.Server.DTOs.Statistics;
+using pricelist_manager.Server.Models;
 
 namespace pricelist_manager.Server.Interfaces
 {
@@ -6,6 +7,9 @@ namespace pricelist_manager.Server.Interfaces
     {
         /// <exception cref="StorageUnavailableException">The database is not available</exception>
         Task<ICollection<Product>> GetAllAsync(Guid pricelistId);
+
+        /// <exception cref="StorageUnavailableException">The database is not available</exception>
+        Task<ICollection<IGrouping<Guid, Product>>> GetAllGroupPricelistAsync();
 
         /// <exception cref="StorageUnavailableException">The database is not available</exception>
         /// <exception cref="NotFoundException">The Product doesn't exists.</exception>
@@ -33,5 +37,7 @@ namespace pricelist_manager.Server.Interfaces
 
         /// <exception cref="StorageUnavailableException">The database is not available</exception>
         Task<Boolean> ExistsIdAsync(Guid pricelistId, string id);
+
+        Task<ProductStatistics> GetStatistics();
     }
 }
