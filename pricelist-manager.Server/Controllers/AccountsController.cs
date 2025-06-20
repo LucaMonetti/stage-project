@@ -34,7 +34,7 @@ namespace pricelist_manager.Server.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<ActionResult<ICollection<UserDTO>>> GetAll()
         {
             if (!ModelState.IsValid)
             {
@@ -43,7 +43,7 @@ namespace pricelist_manager.Server.Controllers
 
             var data = await UserRepository.GetAll();
 
-            return Ok(data);
+            return Ok(UserDTO.FromUsers(data));
         }
 
         [HttpPost("register")]

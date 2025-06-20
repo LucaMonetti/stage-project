@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Client;
 using pricelist_manager.Server.Data;
+using pricelist_manager.Server.DTOs.Statistics;
 using pricelist_manager.Server.Exceptions;
-using pricelist_manager.Server.Helpers.Statistics;
 using pricelist_manager.Server.Interfaces;
 using pricelist_manager.Server.Models;
 using System.Reflection;
@@ -129,6 +129,13 @@ namespace pricelist_manager.Server.Repositories
                 TrimProductVersion(product);
         }
 
+        private void TrimProductsVersion(List<IGrouping<Guid, Product>> products)
+        {
+            foreach (var pricelist in products)
+                foreach (var product in pricelist)
+                    TrimProductVersion(product);
+        }
+
         private void TrimProductVersion(Product product)
         {
             foreach (var version in product.Versions)
@@ -146,11 +153,23 @@ namespace pricelist_manager.Server.Repositories
 
             var data = new ProductStatistics
             {
-                TotalUniqueProducts = uniqueProdCount,
-                ProductCount = prodInstanceCount,
+                UniqueCount = uniqueProdCount,
+                TotalRegistered = prodInstanceCount,
             };
 
             return data;
+        }
+
+        public async Task<ICollection<IGrouping<Guid, Product>>> GetAllGroupPricelistAsync()
+        {
+            if (!CanConnect()) throw new StorageUnavailableException();
+
+            var products = await Context.Products.Include(p => p.Versions).ToListAsync();
+            var groupedProd = products.GroupBy(p => p.PricelistId).ToList();
+
+            TrimProductsVersion(groupedProd);
+
+            return groupedProd;
         }
     }
 }

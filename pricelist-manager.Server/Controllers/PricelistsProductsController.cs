@@ -13,27 +13,37 @@ namespace pricelist_manager.Server.Controllers
     public class PricelistsProductsController : ControllerBase
     {
         private readonly IProductRepository ProductRepository;
+        private readonly IPricelistRepository PricelistRepository;
         private readonly IProductInstanceRepository ProductInstanceRepository;
 
-        public PricelistsProductsController(IProductRepository productRepository, IProductInstanceRepository productInstanceRepository)
+        public PricelistsProductsController(IProductRepository productRepository, IProductInstanceRepository productInstanceRepository, IPricelistRepository pricelistRepository)
         {
             ProductRepository = productRepository;
             ProductInstanceRepository = productInstanceRepository;
+            PricelistRepository = pricelistRepository;
         }
 
         [HttpGet("{pricelistId:guid}/products")]
-        public async Task<IActionResult> GetAll(Guid pricelistId)
+        public async Task<ActionResult<ICollection<ProductDTO>>> GetAll(Guid pricelistId)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var data = await ProductRepository.GetAllAsync(pricelistId);
+            try
+            {
+                var data = await ProductRepository.GetAllAsync(pricelistId);
+                var pricelist = await PricelistRepository.GetByIdAsync(pricelistId);
 
-            return Ok(data);
+                return Ok(ProductDTO.FromProducts(data, pricelist.CompanyId));
+            }
+            catch (NotFoundException<Pricelist> e)
+            {
+                return NotFound(e.Message);
+            }
         }
 
         [HttpGet("{pricelistId:guid}/products/{productCode}")]
-        public async Task<IActionResult> GetById(Guid pricelistId, string productCode)
+        public async Task<ActionResult<ProductDTO>> GetById(Guid pricelistId, string productCode)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -41,9 +51,15 @@ namespace pricelist_manager.Server.Controllers
             try
             {
                 var data = await ProductRepository.GetByIdAsync(pricelistId, productCode);
-                return Ok(data);
+                var pricelist = await PricelistRepository.GetByIdAsync(pricelistId);
+
+                return Ok(ProductDTO.FromProduct(data, pricelist.CompanyId));
             }
             catch (NotFoundException<Product> e)
+            {
+                return NotFound(e.Message);
+            }
+            catch (NotFoundException<Pricelist> e)
             {
                 return NotFound(e.Message);
             }

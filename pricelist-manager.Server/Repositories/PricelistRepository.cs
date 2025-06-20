@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using pricelist_manager.Server.Data;
+using pricelist_manager.Server.DTOs.Statistics;
 using pricelist_manager.Server.Exceptions;
 using pricelist_manager.Server.Interfaces;
 using pricelist_manager.Server.Models;
@@ -89,6 +90,20 @@ namespace pricelist_manager.Server.Repositories
             var res = await Context.SaveChangesAsync();
 
             return res >= 1;
+        }
+
+        public async Task<PricelistStatistics> GetStatistics()
+        {
+            if (!CanConnect()) throw new StorageUnavailableException();
+
+            var companyCount = await Context.Pricelists.CountAsync();
+
+            var res = new PricelistStatistics
+            {
+                TotalRegistered = companyCount,
+            };
+
+            return res;
         }
     }
 }

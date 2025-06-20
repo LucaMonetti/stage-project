@@ -8,7 +8,7 @@ namespace pricelist_manager.Server.DTOs
         public string Description { get; set; } = string.Empty;
         public decimal Price { get; set; } = Decimal.Zero;
 
-        public static ProductInstanceDTO FromProductInstance(ProductInstanceDTO? productInstance)
+        public static ProductInstanceDTO FromProductInstance(ProductInstance? productInstance)
         {
             return productInstance != null ? new ProductInstanceDTO
             {
@@ -17,6 +17,18 @@ namespace pricelist_manager.Server.DTOs
                 Description = productInstance.Description,
                 Price = productInstance.Price
             } : new ProductInstanceDTO();
+        }
+
+        public static ICollection<ProductInstanceDTO> FromProductInstances(ICollection<ProductInstance> productInstance)
+        {
+            ICollection<ProductInstanceDTO> products = [];
+
+            foreach (ProductInstance? product in productInstance)
+            {
+                products.Add(FromProductInstance(product));
+            }
+
+            return products;
         }
 
         public static ProductInstance ToProductInstance(ProductInstanceDTO productInstance, Guid pricelistId, string productCode)

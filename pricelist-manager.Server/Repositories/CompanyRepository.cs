@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using pricelist_manager.Server.Data;
+using pricelist_manager.Server.DTOs.Statistics;
 using pricelist_manager.Server.Exceptions;
 using pricelist_manager.Server.Interfaces;
 using pricelist_manager.Server.Models;
@@ -68,6 +69,20 @@ namespace pricelist_manager.Server.Repositories
             var res = await Context.Companies.FirstOrDefaultAsync(x => x.Id == id);
 
             if (res == null) throw new NotFoundException<Company>(id);
+
+            return res;
+        }
+
+        public async Task<CompanyStatistics> GetStatistics()
+        {
+            if (!CanConnect()) throw new StorageUnavailableException();
+
+            var companyCount = await Context.Companies.CountAsync();
+
+            var res = new CompanyStatistics
+            {
+                TotalRegistered = companyCount,
+            };
 
             return res;
         }

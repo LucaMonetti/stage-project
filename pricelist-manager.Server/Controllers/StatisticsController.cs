@@ -32,5 +32,44 @@ namespace pricelist_manager.Server.Controllers
 
             return Ok(data);
         }
+
+        [HttpGet("companies")]
+        public async Task<IActionResult> GetCompaniesStats()
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var data = await CompanyRepository.GetStatistics();
+
+            return Ok(data);
+        }
+
+        [HttpGet("accounts")]
+        public async Task<IActionResult> GetAccountsStats()
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var data = await UserRepository.GetStatistics();
+
+            return Ok(data);
+        }
+
+        [HttpGet("pricelists")]
+        public async Task<IActionResult> GetPricelistsStats()
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var data = await PricelistRepository.GetStatistics();
+
+            return Ok(data);
+        }
     }
 }
