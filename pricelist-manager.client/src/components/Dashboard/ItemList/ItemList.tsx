@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 import type { FetchData } from "../../../types";
-import type { Product } from "../../../models/Product";
 import BasicLoader from "../../Loader/BasicLoader";
 
 type Props<T extends any[]> = {

@@ -17,7 +17,7 @@ function ItenCounterGroup() {
         color="purple"
         description={"Aziende registrate nel sistema"}
         Icon={FaBuilding}
-        getBodyText={(item) => item?.totalUniqueProducts.toString()}
+        getBodyText={(item) => item?.totalRegistered.toString()}
       />
       <ItemCounter<ProductStatistics>
         fetch={prod}
@@ -25,14 +25,14 @@ function ItenCounterGroup() {
         color="green"
         description={"Totale listini creati"}
         Icon={FaListUl}
-        getBodyText={(item) => item?.totalUniqueProducts.toString()}
+        getBodyText={(item) => item?.totalRegistered.toString()}
       />
       <ItemCounter<ProductStatistics>
         fetch={prod}
         title={"Prodotti"}
         color="blue"
         description={"Prodotti unici disponibili"}
-        getBodyText={(item) => item?.totalUniqueProducts.toString()}
+        getBodyText={(item) => item?.uniqueCount.toString()}
       />
     </div>
   );

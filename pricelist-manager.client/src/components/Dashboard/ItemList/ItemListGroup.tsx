@@ -13,7 +13,7 @@ const ItemListGroup = () => {
       <ItemList<Product[]>
         title="Prodotti"
         fetch={prod}
-        getline={(item) => item.versions[0].name}
+        getline={(item) => item.currentInstance.name}
       />
     </div>
   );
