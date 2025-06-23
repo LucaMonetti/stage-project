@@ -1,7 +1,9 @@
 import type { FetchData } from "../../../types";
+import SimpleIconButton from "../../Buttons/SimpleButton";
 import BasicLoader from "../../Loader/BasicLoader";
 
 import { FaBoxesStacked } from "react-icons/fa6";
+import { FaPlus } from "react-icons/fa6";
 
 type Props<T> = {
   title: string;
@@ -10,6 +12,7 @@ type Props<T> = {
   color?: "blue" | "purple" | "yellow" | "green";
   Icon?: React.ComponentType<{ className?: string }>;
   getBodyText: (item?: T) => string | undefined;
+  createLink: string;
 };
 
 const headerVariant = {
@@ -33,12 +36,21 @@ function ItemCounter<T>({
   color = "blue",
   Icon = FaBoxesStacked,
   getBodyText,
+  createLink,
 }: Props<T>) {
   return (
     <section className="flex-1 min-w-80 bg-gray-800 border-2 border-gray-700 rounded-md">
-      <header className="p-4 flex gap-4 items-center text-xl">
-        <Icon className={`${headerVariant[color]}`} />
-        <h2 className="text-md font-medium">{title}</h2>
+      <header className="p-4 flex items-center justify-between text-xl">
+        <div className="flex gap-4 items-center">
+          <Icon className={`${headerVariant[color]}`} />
+          <h2 className="text-md font-medium">{title}</h2>
+        </div>
+        <SimpleIconButton
+          route={createLink}
+          Icon={FaPlus}
+          color={color}
+          className="text-sm"
+        />
       </header>
       <main className="px-4 pb-4">
         {fetch.isLoading ? (

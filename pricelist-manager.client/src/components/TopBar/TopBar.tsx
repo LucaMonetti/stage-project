@@ -2,7 +2,7 @@ import MenuLink from "./MenuLink";
 
 function TopBar() {
   return (
-    <header className="sticky top-0 left-0 border-b-2 border-gray-800 bg-gray-900">
+    <header className="sticky top-0 left-0 border-b-2 border-gray-800 bg-gray-900 z-50">
       <div className="max-w-8xl px-8 mx-auto flex justify-between items-center h-16">
         <nav>
           <ul className="flex gap-3">

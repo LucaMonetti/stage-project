@@ -11,8 +11,6 @@ const ItemListGroup = () => {
   );
   const pricelists = useFetch("api/pricelists", PricelistArraySchema);
 
-  console.log(pricelists);
-
   const companies = useFetch("api/companies", CompanyArraySchema);
 
   return (

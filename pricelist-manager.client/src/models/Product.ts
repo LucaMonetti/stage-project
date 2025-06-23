@@ -26,6 +26,18 @@ export const ProductArraySchema = z.array(ProductSchema);
 
 export type Product = z.infer<typeof ProductSchema>;
 
+// Create Product
+
+export const CreateProductSchema = z.object({
+  pricelistId: z.guid(),
+  productCode: z.string(),
+  name: z.string(),
+  description: z.string(),
+  price: z.number().nonnegative(),
+});
+
+export type CreateProduct = z.infer<typeof CreateProductSchema>;
+
 // Product Statistics
 export const ProductStatisticsSchema = z.object({
   totalRegistered: z.int(),
