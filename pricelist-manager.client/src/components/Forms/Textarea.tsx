@@ -1,4 +1,9 @@
-import type { FieldValues, Path, UseFormRegister } from "react-hook-form";
+import type {
+  FieldValues,
+  Path,
+  RegisterOptions,
+  UseFormRegister,
+} from "react-hook-form";
 
 type Props<T extends FieldValues> = {
   id: Path<T>;
@@ -7,6 +12,8 @@ type Props<T extends FieldValues> = {
   className?: string;
   isResizable?: boolean;
   register: UseFormRegister<T>;
+  registerOptions?: RegisterOptions<T, Path<T>>;
+  error?: string;
 };
 
 function Textarea<T extends FieldValues>({
@@ -16,6 +23,8 @@ function Textarea<T extends FieldValues>({
   className,
   isResizable = false,
   register,
+  registerOptions,
+  error,
 }: Props<T>) {
   return (
     <>
@@ -25,10 +34,15 @@ function Textarea<T extends FieldValues>({
         className={`border-2 border-gray-700 rounded px-4 py-2 bg-gray-900 ${className} ${
           !isResizable ? "resize-none" : ""
         }`}
-        {...register(id)}
+        {...register(id, registerOptions)}
       >
         {placeholder?.trim()}
       </textarea>
+      {error && (
+        <div>
+          <p className="text-red-600">{error}</p>
+        </div>
+      )}
     </>
   );
 }

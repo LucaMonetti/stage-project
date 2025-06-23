@@ -81,7 +81,7 @@ namespace pricelist_manager.Server.Controllers
                 return Ok(res);
             } catch (AlreadyExistException<Product> e)
             {
-                return Conflict(e.Message);
+                return Conflict(new { message = e.Message});
             }
         }
 

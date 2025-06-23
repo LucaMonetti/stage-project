@@ -29,11 +29,15 @@ export type Product = z.infer<typeof ProductSchema>;
 // Create Product
 
 export const CreateProductSchema = z.object({
-  pricelistId: z.guid(),
-  productCode: z.string(),
-  name: z.string(),
+  pricelistId: z.guid("Necessario selezionare un listino prezzi!"),
+  productCode: z
+    .string()
+    .min(1, "Necessario inserire il nome codice dell'Articolo!"),
+  name: z.string().min(1, "Necessario inserire il nome dell'Articolo!"),
   description: z.string(),
-  price: z.number().nonnegative(),
+  price: z
+    .number("Necessario inserire un valore per il prezzo!")
+    .nonnegative("Il prezzo non può essere negativo!"),
 });
 
 export type CreateProduct = z.infer<typeof CreateProductSchema>;

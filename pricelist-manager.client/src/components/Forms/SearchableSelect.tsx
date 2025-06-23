@@ -6,6 +6,7 @@ import {
   type Control,
   type FieldValues,
   type Path,
+  type RegisterOptions,
 } from "react-hook-form";
 
 // Tailwind-inspired custom styles for react-select
@@ -59,6 +60,8 @@ const customStyles = {
 type Props<T extends FieldValues> = {
   id: Path<T>;
   control: Control<T, any, T>;
+  registerOptions?: RegisterOptions<T, Path<T>>;
+  error?: string;
 };
 
 type Option = {
@@ -66,7 +69,12 @@ type Option = {
   value: string;
 };
 
-function SearchableSelect<T extends FieldValues>({ id, control }: Props<T>) {
+function SearchableSelect<T extends FieldValues>({
+  id,
+  control,
+  error,
+  registerOptions,
+}: Props<T>) {
   const pricelists = useFetch("/api/pricelists", PricelistArraySchema);
   const options =
     pricelists.data?.map((i) => ({
@@ -88,27 +96,35 @@ function SearchableSelect<T extends FieldValues>({ id, control }: Props<T>) {
   };
 
   return (
-    <Controller
-      control={control}
-      name={id}
-      render={({ field: { onChange, onBlur, value, name, ref } }) => (
-        <AsyncSelect<Option, false>
-          cacheOptions
-          loadOptions={loadOptions}
-          onChange={(selected) => onChange(selected?.value ?? "")}
-          onBlur={onBlur}
-          value={options.find((opt) => opt.value === value) || null}
-          name={name}
-          ref={ref}
-          classNames={{
-            option: () => "custom-select-option",
-          }}
-          defaultOptions
-          placeholder="Ricerca in corso"
-          styles={customStyles}
-        />
+    <div className="flex flex-col gap-2">
+      <Controller
+        control={control}
+        name={id}
+        rules={registerOptions}
+        render={({ field: { onChange, onBlur, value, name, ref } }) => (
+          <AsyncSelect<Option, false>
+            cacheOptions
+            loadOptions={loadOptions}
+            onChange={(selected) => onChange(selected?.value ?? "")}
+            onBlur={onBlur}
+            value={options.find((opt) => opt.value === value) || null}
+            name={name}
+            ref={ref}
+            classNames={{
+              option: () => "custom-select-option",
+            }}
+            defaultOptions
+            placeholder="Ricerca in corso"
+            styles={customStyles}
+          />
+        )}
+      />
+      {error && (
+        <div>
+          <p className="text-red-600">{error}</p>
+        </div>
       )}
-    />
+    </div>
   );
 }
 
