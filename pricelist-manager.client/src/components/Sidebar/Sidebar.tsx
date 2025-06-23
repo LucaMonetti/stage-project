@@ -2,10 +2,10 @@ import { Link } from "react-router-dom";
 
 const Sidebar = () => {
   return (
-    <aside className="min-w-64 p-8 flex flex-col justify-between border-transparent border-r-gray-700 border-2">
-      <ul className="flex flex-col gap-4 flex-1">
+    <aside className="min-w-64 p-8 h-[calc(100vh-64px)] flex flex-col justify-between border-transparent border-r-gray-700 border-2 fixed top-16">
+      <ul className="flex flex-col gap-4">
         <li>
-          <Link to={"adminDashboard"}>Home</Link>
+          <Link to={"/admin-dashboard"}>Home</Link>
         </li>
         <li>
           <Link to={"products"}>Prodotti</Link>
@@ -21,7 +21,7 @@ const Sidebar = () => {
         </li>
       </ul>
 
-      <Link to={"settings"}>Impostazioni</Link>
+      <Link to={"/settings"}>Impostazioni</Link>
     </aside>
   );
 };

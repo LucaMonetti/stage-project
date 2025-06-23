@@ -2,8 +2,8 @@ import MenuLink from "./MenuLink";
 
 function TopBar() {
   return (
-    <header className="px-8 py-4 sticky top-0 left-0 border-b-2 border-gray-800 bg-gray-900">
-      <div className="max-w-8xl mx-auto flex justify-between items-center">
+    <header className="sticky top-0 left-0 border-b-2 border-gray-800 bg-gray-900">
+      <div className="max-w-8xl px-8 mx-auto flex justify-between items-center h-16">
         <nav>
           <ul className="flex gap-3">
             <MenuLink url="/" title="Home" />
