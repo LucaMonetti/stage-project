@@ -27,16 +27,16 @@ namespace pricelist_manager.Server.DTOs
             };
         }
 
-        public static ICollection<PricelistNoProdsDTO> FromPricelists(ICollection<Pricelist> pricelists)
+        public static ICollection<PricelistNoProdsDTO> FromPricelists(ICollection<Pricelist> pricelistCollection)
         {
-            ICollection<PricelistNoProdsDTO> pricelist = [];
+            ICollection<PricelistNoProdsDTO> pricelists = [];
 
-            for (int i = 0; i < pricelists.Count; i++)
+            foreach (var pricelist in pricelistCollection)
             {
-                pricelist.Add(FromPricelist(pricelists.ElementAt(i)));
+                pricelists.Add(FromPricelist(pricelist));
             }
 
-            return pricelist;
+            return pricelists;
         }
     }
 
@@ -57,16 +57,16 @@ namespace pricelist_manager.Server.DTOs
             };
         }
 
-        public static ICollection<PricelistDTO> FromPricelists(ICollection<Pricelist> pricelists, ICollection<IGrouping<Guid, Product>> products)
+        public static ICollection<PricelistDTO> FromPricelists(ICollection<Pricelist> pricelistCollection, ICollection<IGrouping<Guid, Product>> products)
         {
-            ICollection<PricelistDTO> pricelist = [];
+            ICollection<PricelistDTO> pricelists = [];
 
-            for (int i = 0; i < pricelists.Count; i++) 
+            for (int i = 0; i < pricelistCollection.Count; i++) 
             {
-                pricelist.Add(FromPricelist(pricelists.ElementAt(i), [.. products.ElementAt(i)]));
+                pricelists.Add(FromPricelist(pricelistCollection.ElementAt(i), [.. products.ElementAt(i)]));
             }
 
-            return pricelist;
+            return pricelists;
         }
     }
 }

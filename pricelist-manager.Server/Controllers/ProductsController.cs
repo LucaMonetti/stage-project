@@ -12,12 +12,12 @@ namespace pricelist_manager.Server.Controllers
     public class ProductsController : ControllerBase
     {
         private readonly IProductRepository ProductRepository;
-        private readonly IProductInstanceRepository productInstanceRepository;
+        private readonly IProductInstanceRepository ProductInstanceRepository;
 
         public ProductsController(IProductRepository productRepository, IProductInstanceRepository productInstanceRepository)
         {
             ProductRepository = productRepository;
-            this.productInstanceRepository = productInstanceRepository;
+            ProductInstanceRepository = productInstanceRepository;
         }
 
         [HttpGet]
@@ -26,16 +26,9 @@ namespace pricelist_manager.Server.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            try
-            {
-                var data = await ProductRepository.GetAllProductsWithPricelistsAsync();
+            var data = await ProductRepository.GetAllProductsWithPricelistsAsync();
 
-                return Ok(ProductWithPricelistDTO.FromProducts(data));
-            }
-            catch (NotFoundException<Pricelist> e)
-            {
-                return NotFound(e.Message);
-            }
+            return Ok(ProductWithPricelistDTO.FromProducts(data));
         }
     }
 }

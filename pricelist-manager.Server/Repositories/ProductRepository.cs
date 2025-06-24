@@ -20,10 +20,10 @@ namespace pricelist_manager.Server.Repositories
 
             return await Context.Products
                 .Include(p => p.Versions)
-                .Join(Context.Pricelists,
-                      product => product.PricelistId,
-                      pricelist => pricelist.Id,
-                      (product, pricelist) => new ProductWithPricelist(product, pricelist))
+                .Select(product => new ProductWithPricelist(
+                    product,
+                    Context.Pricelists.First(pricelist => pricelist.Id == product.PricelistId)
+                ))
                 .ToListAsync();
         }
 
