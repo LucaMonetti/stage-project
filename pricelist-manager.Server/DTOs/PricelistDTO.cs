@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace pricelist_manager.Server.DTOs
 {
-    public class PricelistDTO
+    public class PricelistNoProdsDTO
     {
         public Guid Id { get; set; }
 
@@ -16,6 +16,32 @@ namespace pricelist_manager.Server.DTOs
         public string CompanyId { get; set; } = string.Empty;
         public Company? Company { get; set; } = null!;
 
+        public static PricelistNoProdsDTO FromPricelist(Pricelist pricelist)
+        {
+            return new PricelistNoProdsDTO
+            {
+                Id = pricelist.Id,
+                Name = pricelist.Name,
+                Description = pricelist.Description,
+                Company = pricelist.Company,
+            };
+        }
+
+        public static ICollection<PricelistNoProdsDTO> FromPricelists(ICollection<Pricelist> pricelists)
+        {
+            ICollection<PricelistNoProdsDTO> pricelist = [];
+
+            for (int i = 0; i < pricelists.Count; i++)
+            {
+                pricelist.Add(FromPricelist(pricelists.ElementAt(i)));
+            }
+
+            return pricelist;
+        }
+    }
+
+    public class PricelistDTO : PricelistNoProdsDTO
+    {
         public ICollection<ProductDTO> Products { get; set; } = [];
 
         public static PricelistDTO FromPricelist(Pricelist pricelist, ICollection<Product> products)

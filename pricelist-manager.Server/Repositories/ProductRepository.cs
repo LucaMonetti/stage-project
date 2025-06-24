@@ -14,6 +14,19 @@ namespace pricelist_manager.Server.Repositories
         public ProductRepository(DataContext dataContext) : base(dataContext)
         {}
 
+        public async Task<ICollection<ProductWithPricelist>> GetAllProductsWithPricelistsAsync()
+        {
+            if (!CanConnect()) throw new StorageUnavailableException();
+
+            return await Context.Products
+                .Include(p => p.Versions)
+                .Join(Context.Pricelists,
+                      product => product.PricelistId,
+                      pricelist => pricelist.Id,
+                      (product, pricelist) => new ProductWithPricelist(product, pricelist))
+                .ToListAsync();
+        }
+
         public async Task<bool> UpdateAsync(Product entity)
         {
             if (!CanConnect()) throw new StorageUnavailableException();
