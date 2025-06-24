@@ -6,6 +6,7 @@ type Props = {
   Icon?: React.ComponentType<{ className?: string }>;
   text?: string;
   className?: string;
+  disabled?: boolean;
 };
 
 const bgColor = {
@@ -20,6 +21,7 @@ const FormButton = ({
   Icon,
   color,
   className = "",
+  disabled,
   text = "Aggiungi",
 }: Props) => {
   return (
@@ -27,6 +29,7 @@ const FormButton = ({
       type="submit"
       form={formId}
       className={`p-2 rounded flex gap-2 items-center ${bgColor[color]} ${className}`}
+      {...(disabled ? { disabled: true } : "")}
     >
       {Icon && <Icon className="text-white" />}
       {text}

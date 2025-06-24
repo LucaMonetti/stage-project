@@ -6,6 +6,7 @@ import AdminDashboardView from "../views/AdminDashboard/AdminDashboardView";
 import CreateProductForm from "../views/AdminDashboard/CreateProduct/CreateProduct";
 import ProductsListView from "../views/AdminDashboard/Products/ProductsListView";
 import SingleProductView from "../views/AdminDashboard/Products/Single/SingleView";
+import EditProductForm from "../views/AdminDashboard/Edit/EditProduct";
 
 const router = createBrowserRouter([
   {
@@ -46,6 +47,20 @@ const router = createBrowserRouter([
                   {
                     path: "products/:productCode",
                     Component: SingleProductView,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            path: "edit",
+            children: [
+              {
+                path: "pricelists/:pricelistId",
+                children: [
+                  {
+                    path: "products/:productCode",
+                    Component: EditProductForm,
                   },
                 ],
               },

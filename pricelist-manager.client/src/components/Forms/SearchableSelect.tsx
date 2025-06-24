@@ -62,6 +62,7 @@ type Props<T extends FieldValues> = {
   control: Control<T, any, T>;
   registerOptions?: RegisterOptions<T, Path<T>>;
   error?: string;
+  prevValue?: string;
 };
 
 type Option = {
@@ -74,6 +75,7 @@ function SearchableSelect<T extends FieldValues>({
   control,
   error,
   registerOptions,
+  prevValue,
 }: Props<T>) {
   const pricelists = useFetch("/api/pricelists", PricelistArraySchema);
   const options =
@@ -101,7 +103,9 @@ function SearchableSelect<T extends FieldValues>({
         control={control}
         name={id}
         rules={registerOptions}
-        render={({ field: { onChange, onBlur, value, name, ref } }) => (
+        render={({
+          field: { onChange, onBlur, value = prevValue, name, ref },
+        }) => (
           <AsyncSelect<Option, false>
             cacheOptions
             loadOptions={loadOptions}

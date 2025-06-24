@@ -7,10 +7,12 @@ import Textarea from "../Textarea";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useRef } from "react";
+import isEqual from "lodash.isequal";
 
 type Props = {
   className?: string;
   id?: string;
+  values?: ProductFormData;
 };
 
 export type ProductFormData = {
@@ -21,12 +23,13 @@ export type ProductFormData = {
   price: number;
 };
 
-const ProductForm = ({ className, id }: Props) => {
+const ProductForm = ({ className, id, values }: Props) => {
   const {
     register,
     handleSubmit,
     control,
     setError,
+    reset,
     formState: { errors },
   } = useForm<ProductFormData>({
     mode: "all",
@@ -35,16 +38,27 @@ const ProductForm = ({ className, id }: Props) => {
   const errorDiv = useRef<HTMLDivElement>(null);
 
   const onSubmit: SubmitHandler<ProductFormData> = async (data) => {
-    try {
-      const endpoint = `/api/pricelists/products`;
+    let endpoint = `/api/pricelists/products`;
+    let options = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    };
 
-      const response = await fetch(endpoint, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
+    if (values) {
+      endpoint = `/api/pricelists/${values.pricelistId}/products/${values.productCode}`;
+      options.method = "PUT";
+
+      if (isEqual(values, data)) {
+        console.log("Equals");
+        return;
+      }
+    }
+
+    try {
+      const response = await fetch(endpoint, options);
 
       // More explicit status checking
       if (response.status >= 400) {
@@ -81,6 +95,12 @@ const ProductForm = ({ className, id }: Props) => {
     }
   };
 
+  useEffect(() => {
+    if (values) {
+      reset(values);
+    }
+  }, [values]);
+
   return (
     <form
       className={`flex flex-col gap-4 ${className}`}
@@ -104,6 +124,7 @@ const ProductForm = ({ className, id }: Props) => {
           registerOptions={{
             required: "Necessario selezionare un listino!",
           }}
+          prevValue={values ? values.pricelistId : undefined}
         />
         <Input
           type="text"
@@ -114,6 +135,7 @@ const ProductForm = ({ className, id }: Props) => {
           registerOptions={{
             required: "Necessario inserire il codice del prodotto!",
           }}
+          value={values ? values.productCode : undefined}
         />
       </Fieldset>
       <Fieldset name="Informazioni Articolo">
@@ -126,6 +148,7 @@ const ProductForm = ({ className, id }: Props) => {
           registerOptions={{
             required: "Necessario inserire il nome dell'Articolo!",
           }}
+          value={values ? values.name : undefined}
         />
         <Input
           type="number"
@@ -137,12 +160,14 @@ const ProductForm = ({ className, id }: Props) => {
             required: "Necessario inserire il prezzo dell'Articolo!",
           }}
           error={errors["price"]?.message}
+          value={values ? values.price : undefined}
         />
         <Textarea
           id="description"
           label="Descrizione Articolo"
           register={register}
           error={errors["description"]?.message}
+          value={values ? values.description : undefined}
         />
       </Fieldset>
     </form>

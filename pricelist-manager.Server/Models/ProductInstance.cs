@@ -4,14 +4,13 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace pricelist_manager.Server.Models
 {
-    [PrimaryKey(nameof(PricelistId), nameof(Id), nameof(Version))]
+    [PrimaryKey(nameof(PricelistId), nameof(ProductCode), nameof(Version))]
     public class ProductInstance
     {
         [Required]
-        [ForeignKey(nameof(PricelistId))]
         public Guid PricelistId { get; set; }
 
-        public string Id { get; set; } = String.Empty;
+        public string ProductCode { get; set; } = String.Empty;
 
         public int Version { get; set; } = 0;
 

@@ -48,7 +48,7 @@ namespace pricelist_manager.Server.Repositories
 
         private async Task<bool> existsIdAsync(Guid pricelistId, string productCode)
         {
-            return await Context.ProductInstances.AnyAsync(pi => pi.PricelistId == pricelistId && pi.Id == productCode);
+            return await Context.ProductInstances.AnyAsync(pi => pi.PricelistId == pricelistId && pi.ProductCode == productCode);
         }
 
         public async Task<ICollection<Product>> GetAllAsync(Guid pricelistId)

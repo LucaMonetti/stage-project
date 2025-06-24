@@ -27,23 +27,10 @@ namespace pricelist_manager.Server.DTOs
             return new UpdateProductDTO
             {
                 PricelistId = product.PricelistId,
-                ProductCode = product.Id,
+                ProductCode = product.ProductCode,
                 Name = product.Name,
                 Description = product.Description,
                 Price = product.Price,
-            };
-        }
-
-        public static ProductInstance MergeDTO(ProductInstance product, UpdateProductDTO dto)
-        {
-            return new ProductInstance
-            {
-                Name = dto.Name ?? product.Name,
-                Description = dto.Description ?? product.Description,
-                Price = dto.Price ?? product.Price,
-                Id = product.Id,
-                PricelistId = product.PricelistId,
-                Version = product.Version + 1,
             };
         }
     }

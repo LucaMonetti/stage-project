@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import type {
   FieldValues,
   Path,
@@ -14,6 +15,7 @@ type Props<T extends FieldValues> = {
   register: UseFormRegister<T>;
   registerOptions?: RegisterOptions<T, Path<T>>;
   error?: string;
+  value?: string | number;
 };
 
 function Input<T extends FieldValues>({
@@ -25,7 +27,15 @@ function Input<T extends FieldValues>({
   register,
   registerOptions,
   error,
+  value,
 }: Props<T>) {
+  const [data, setData] = useState("");
+
+  useEffect(() => {
+    console.log(value);
+    if (value) setData(String(value));
+  }, [value]);
+
   return (
     <div className="flex flex-col gap-2">
       <label htmlFor={id}>{label}</label>
@@ -34,6 +44,8 @@ function Input<T extends FieldValues>({
         placeholder={placeholder}
         className={`border-2 border-gray-700 rounded px-4 py-2 bg-gray-900 ${className}`}
         {...register(id, registerOptions)}
+        value={data}
+        onChange={(e) => setData(e.target.value)}
       />
       {error && (
         <div>

@@ -125,11 +125,33 @@ namespace pricelist_manager.Server.Controllers
             try
             {
                 Product oldProd = await ProductRepository.GetByIdAsync(pricelistId, productCode);
-                ProductInstance newInstance = UpdateProductDTO.MergeDTO(oldProd.Versions.Last(), dto);
 
-                await ProductInstanceRepository.CreateAsync(newInstance);
+                // DEBUG: Log what we found
+                Console.WriteLine($"Found Product: PricelistId={oldProd.PricelistId}, ProductCode={oldProd.ProductCode}");
 
-                oldProd.LatestVersion = newInstance.Version;    
+                var newVersion = new ProductInstance
+                {
+                    PricelistId = oldProd.PricelistId,
+                    ProductCode = oldProd.ProductCode,
+                    Version = oldProd.LatestVersion + 1,
+                    Name = dto.Name ?? "",
+                    Description = dto.Description ?? "",
+                    Price = dto.Price ?? Decimal.Zero
+                };
+
+                // DEBUG: Log what we're trying to insert
+                Console.WriteLine($"Inserting ProductInstance: PricelistId={newVersion.PricelistId}, ProductCode={newVersion.ProductCode}, Version={newVersion.Version}");
+
+                await ProductInstanceRepository.CreateAsync(newVersion);
+
+                oldProd.LatestVersion = newVersion.Version;
+
+                Console.WriteLine($"Here we are before {oldProd.Versions.Count.ToString()}");
+
+                oldProd.Versions.Add(newVersion);
+
+                Console.WriteLine($"Here we are after {oldProd.Versions.Count.ToString()}");
+
 
                 var res = await ProductRepository.UpdateAsync(oldProd);
                 return Ok(res);

@@ -14,6 +14,7 @@ type Props<T extends FieldValues> = {
   register: UseFormRegister<T>;
   registerOptions?: RegisterOptions<T, Path<T>>;
   error?: string;
+  value?: string;
 };
 
 function Textarea<T extends FieldValues>({
@@ -25,6 +26,7 @@ function Textarea<T extends FieldValues>({
   register,
   registerOptions,
   error,
+  value,
 }: Props<T>) {
   return (
     <>
@@ -35,6 +37,7 @@ function Textarea<T extends FieldValues>({
           !isResizable ? "resize-none" : ""
         }`}
         {...register(id, registerOptions)}
+        value={value || undefined}
       >
         {placeholder?.trim()}
       </textarea>
