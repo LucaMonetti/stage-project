@@ -1,5 +1,6 @@
 ﻿
 using pricelist_manager.Server.Models;
+using System.ComponentModel.Design;
 
 namespace pricelist_manager.Server.DTOs
 {
@@ -54,6 +55,38 @@ namespace pricelist_manager.Server.DTOs
                 TotalVersions = product.Versions.Count,
                 Versions = ProductInstanceDTO.FromProductInstances(product.Versions)
             };
+        }
+    }
+
+    public class ProductWithPricelistDTO : ProductWithVersionsDTO
+    {
+        public PricelistNoProdsDTO Pricelist { get; set; } = null!;
+
+        public static ProductWithPricelistDTO FromProduct(ProductWithPricelist product)
+        {
+            return new ProductWithPricelistDTO
+            {
+                PricelistId = product.PricelistId,
+                ProductCode = product.ProductCode,
+                LatestVersion = product.LatestVersion,
+                CurrentInstance = ProductInstanceDTO.FromProductInstance(product.Versions.Last()),
+                CompanyId = product.Pricelist.CompanyId,
+                TotalVersions = product.Versions.Count,
+                Versions = ProductInstanceDTO.FromProductInstances(product.Versions),
+                Pricelist = PricelistNoProdsDTO.FromPricelist(product.Pricelist)
+            };
+        }
+
+        public static ICollection<ProductWithPricelistDTO> FromProducts(ICollection<ProductWithPricelist> products)
+        {
+            ICollection<ProductWithPricelistDTO> prods = [];
+
+            foreach (var product in products)
+            {
+                prods.Add(FromProduct(product));
+            }
+
+            return prods;
         }
     }
 }
