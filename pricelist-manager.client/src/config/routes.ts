@@ -5,6 +5,7 @@ import AdminDashboardLayout from "../views/AdminDashboard/BaseLayout";
 import AdminDashboardView from "../views/AdminDashboard/AdminDashboardView";
 import CreateProductForm from "../views/AdminDashboard/CreateProduct/CreateProduct";
 import ProductsListView from "../views/AdminDashboard/Products/ProductsListView";
+import SingleProductView from "../views/AdminDashboard/Products/Single/SingleView";
 
 const router = createBrowserRouter([
   {
@@ -29,7 +30,26 @@ const router = createBrowserRouter([
           },
           {
             path: "products",
-            Component: ProductsListView,
+            children: [
+              {
+                index: true,
+                Component: ProductsListView,
+              },
+            ],
+          },
+          {
+            path: "pricelists",
+            children: [
+              {
+                path: ":pricelistId",
+                children: [
+                  {
+                    path: "products/:productCode",
+                    Component: SingleProductView,
+                  },
+                ],
+              },
+            ],
           },
         ],
       },

@@ -5,6 +5,7 @@ type Props = {
   color: "blue" | "purple" | "yellow" | "green";
   Icon: React.ComponentType<{ className?: string }>;
   className?: string;
+  text?: string;
 };
 
 const bgColor = {
@@ -14,10 +15,20 @@ const bgColor = {
   green: "bg-green-600",
 };
 
-const SimpleIconButton = ({ route, Icon, color, className = "" }: Props) => {
+const SimpleIconButton = ({
+  route,
+  Icon,
+  color,
+  className = "",
+  text,
+}: Props) => {
   return (
-    <Link to={route} className={`p-2 rounded ${bgColor[color]} ${className}`}>
+    <Link
+      to={route}
+      className={`p-2 rounded flex items-center gap-2 ${bgColor[color]} ${className}`}
+    >
       <Icon className="text-white" />
+      {text && <p>{text}</p>}
     </Link>
   );
 };

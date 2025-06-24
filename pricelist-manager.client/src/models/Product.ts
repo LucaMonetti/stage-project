@@ -37,6 +37,16 @@ export const ProductWithPricelistArraySchema = z.array(
 
 export type ProductWitPricelist = z.infer<typeof ProductWithPricelistSchema>;
 
+export const ProductWithVersionsSchema = ProductSchema.extend({
+  versions: ProductInstanceArraySchema,
+});
+
+export const ProductWithVersionsArraySchema = z.array(
+  ProductWithVersionsSchema
+);
+
+export type ProductWithVersion = z.infer<typeof ProductWithVersionsSchema>;
+
 // Create Product
 
 export const CreateProductSchema = z.object({

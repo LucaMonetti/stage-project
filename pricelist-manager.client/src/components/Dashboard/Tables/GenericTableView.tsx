@@ -24,7 +24,7 @@ export interface Column<T> {
 export interface TableConfig<T> {
   enableLink: boolean;
   baseUrl: string;
-  columnId: keyof T;
+  columnId: Record<string, keyof T>;
 }
 
 function GenericTableView<T extends Record<string, any>>({
@@ -35,7 +35,7 @@ function GenericTableView<T extends Record<string, any>>({
   config = {
     enableLink: true,
     baseUrl: "",
-    columnId: keyField,
+    columnId: {},
   },
 }: Prods<T>) {
   const navigate = useNavigate();
@@ -59,11 +59,16 @@ function GenericTableView<T extends Record<string, any>>({
   const handleClickRow = (e: React.MouseEvent, row: T) => {
     e.preventDefault();
 
-    navigate(
-      `${config.baseUrl != "" ? config.baseUrl + "/" : ""}${String(
-        getValue(config.columnId, row)
-      )}`
-    );
+    let endpoint = config.baseUrl;
+
+    for (const [columnKey, propertyKey] of Object.entries(config.columnId)) {
+      endpoint = endpoint.replace(
+        columnKey,
+        String(getValue(propertyKey, row))
+      );
+    }
+
+    navigate(endpoint);
   };
 
   return (
@@ -76,7 +81,7 @@ function GenericTableView<T extends Record<string, any>>({
               <tr>
                 {columns.map((column) => (
                   <th
-                    key={String("ciao")}
+                    key={String(column.key)}
                     className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
                       column.headerClassName || ""
                     }`}

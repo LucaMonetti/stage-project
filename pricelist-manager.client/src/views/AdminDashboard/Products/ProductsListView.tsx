@@ -54,9 +54,9 @@ const ProductsListView = () => {
         data={products}
         columns={columns}
         config={{
-          baseUrl: "",
+          baseUrl: "/admin-dashboard/pricelists/:pid/products/:pcode",
           enableLink: true,
-          columnId: "productCode",
+          columnId: { ":pid": "pricelistId", ":pcode": "productCode" },
         }}
         keyField="productCode"
       />
