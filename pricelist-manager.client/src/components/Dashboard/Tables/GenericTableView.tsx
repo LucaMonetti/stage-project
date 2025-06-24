@@ -1,4 +1,3 @@
-import type { Product } from "../../../models/Product";
 import type { FetchData } from "../../../types";
 import BasicLoader from "../../Loader/BasicLoader";
 
@@ -13,9 +12,16 @@ export interface Column<T> {
   key: keyof T;
   header: string;
   render?: (value: any, row: T) => React.ReactNode;
+  headerClassName?: string;
   className?: string;
   mobileLabel?: string;
   hideOnMobile?: boolean;
+}
+
+export interface TableConfig<T> {
+  enableLink: boolean;
+  baseUrl: string;
+  columnId: keyof T;
 }
 
 function GenericTableView<T extends Record<string, any>>({
@@ -24,9 +30,14 @@ function GenericTableView<T extends Record<string, any>>({
   keyField,
   className,
 }: Prods<T>) {
-  const renderCellValue = (column: Column<T>, row: T) => {
-    const value = row[column.key];
-    return column.render ? column.render(value, row) : value;
+  const renderCellValue = (column: Column<T>, row: T): React.ReactNode => {
+    let keys: (keyof T)[] = (column.key as string).split(".");
+    let value = row;
+
+    keys.forEach((key) => {
+      value = value[key];
+    });
+    return column.render ? column.render(value, row) : String(value ?? "");
   };
 
   return (
@@ -39,9 +50,9 @@ function GenericTableView<T extends Record<string, any>>({
               <tr>
                 {columns.map((column) => (
                   <th
-                    key={String(column.key)}
+                    key={String("ciao")}
                     className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
-                      column.className || ""
+                      column.headerClassName || ""
                     }`}
                   >
                     {column.header}
@@ -63,7 +74,9 @@ function GenericTableView<T extends Record<string, any>>({
                 {data.data.map((row, index) => (
                   <tr
                     key={String(row[keyField])}
-                    className={index % 2 === 0 ? "bg-gray-900" : "bg-gray-800"}
+                    className={`${
+                      index % 2 === 0 ? "bg-gray-900" : "bg-gray-800"
+                    } hover:bg-blue-950`}
                   >
                     {columns.map((column) => (
                       <td
@@ -77,35 +90,6 @@ function GenericTableView<T extends Record<string, any>>({
                     ))}
                   </tr>
                 ))}
-
-                {data.data.map((product, index) => (
-                  <tr
-                    key={product.productCode}
-                    className={index % 2 === 0 ? "bg-gray-900" : "bg-gray-800"}
-                  >
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">
-                      {product.productCode}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-white">
-                      {product.pricelistId}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-white">
-                      {product.currentInstance.name}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-white max-w-xs truncate">
-                      {product.currentInstance.description}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-white max-w-xs truncate">
-                      {product.totalVersions}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-white font-semibold">
-                      {product.currentInstance.price.toFixed(2)} €
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-white">
-                      {product.companyId}
-                    </td>
-                  </tr>
-                ))}
               </tbody>
             ) : (
               <tbody>
@@ -117,75 +101,6 @@ function GenericTableView<T extends Record<string, any>>({
               </tbody>
             )}
           </table>
-        </div>
-
-        {/* Mobile Cards */}
-        <div className="md:hidden">
-          {products.isLoading ? (
-            <div className="px-6 py-4">
-              <BasicLoader />
-            </div>
-          ) : products.data && products.data.length > 0 ? (
-            <>
-              {products.data.map((product) => (
-                <div
-                  key={product.productCode}
-                  className="bg-gray-900 border-b border-gray-700 p-4"
-                >
-                  <div className="flex justify-between items-start mb-2">
-                    <h3 className="text-lg font-medium text-white">
-                      {product.currentInstance.name}
-                    </h3>
-                    <span className="text-lg font-semibold text-green-600">
-                      ${product.currentInstance.price.toFixed(2)}
-                    </span>
-                  </div>
-
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <span className="text-sm font-medium text-gray-500">
-                        Product Code:
-                      </span>
-                      <span className="text-sm text-white">
-                        {product.productCode}
-                      </span>
-                    </div>
-
-                    <div className="flex justify-between">
-                      <span className="text-sm font-medium text-gray-500">
-                        Pricelist ID:
-                      </span>
-                      <span className="text-sm text-white">
-                        {product.pricelistId}
-                      </span>
-                    </div>
-
-                    <div className="flex justify-between">
-                      <span className="text-sm font-medium text-gray-500">
-                        Company ID:
-                      </span>
-                      <span className="text-sm text-white">
-                        {product.companyId}
-                      </span>
-                    </div>
-
-                    <div className="mt-2">
-                      <span className="text-sm font-medium text-gray-500">
-                        Description:
-                      </span>
-                      <p className="text-sm text-white mt-1">
-                        {product.currentInstance.description}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </>
-          ) : (
-            <p className="px-6 py-4 text-sm text-gray-500">
-              Non sono stati registrati prodotti all'interno del database!
-            </p>
-          )}
         </div>
       </div>
     </div>
