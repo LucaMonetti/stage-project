@@ -1,11 +1,14 @@
+import { Link, useNavigate } from "react-router";
 import type { FetchData } from "../../../types";
 import BasicLoader from "../../Loader/BasicLoader";
+import type { MouseEventHandler } from "react";
 
 type Prods<T> = {
   data: FetchData<T[]>;
   columns: Column<T>[];
   keyField: keyof T;
   className?: string;
+  config?: TableConfig<T>;
 };
 
 export interface Column<T> {
@@ -29,15 +32,38 @@ function GenericTableView<T extends Record<string, any>>({
   columns,
   keyField,
   className,
+  config = {
+    enableLink: true,
+    baseUrl: "",
+    columnId: keyField,
+  },
 }: Prods<T>) {
+  const navigate = useNavigate();
+
   const renderCellValue = (column: Column<T>, row: T): React.ReactNode => {
-    let keys: (keyof T)[] = (column.key as string).split(".");
+    let value = getValue(column.key as string, row);
+    return column.render ? column.render(value, row) : String(value ?? "");
+  };
+
+  const getValue = (key: keyof T, row: T) => {
+    let keys: (keyof T)[] = (key as string).split(".");
     let value = row;
 
     keys.forEach((key) => {
       value = value[key];
     });
-    return column.render ? column.render(value, row) : String(value ?? "");
+
+    return value;
+  };
+
+  const handleClickRow = (e: React.MouseEvent, row: T) => {
+    e.preventDefault();
+
+    navigate(
+      `${config.baseUrl != "" ? config.baseUrl + "/" : ""}${String(
+        getValue(config.columnId, row)
+      )}`
+    );
   };
 
   return (
@@ -73,6 +99,15 @@ function GenericTableView<T extends Record<string, any>>({
               <tbody className="bg-gray-900 divide-y divide-gray-700">
                 {data.data.map((row, index) => (
                   <tr
+                    onClick={
+                      config.enableLink
+                        ? (
+                            e: React.MouseEvent<HTMLTableRowElement, MouseEvent>
+                          ) => {
+                            handleClickRow(e, row);
+                          }
+                        : undefined
+                    }
                     key={String(row[keyField])}
                     className={`${
                       index % 2 === 0 ? "bg-gray-900" : "bg-gray-800"

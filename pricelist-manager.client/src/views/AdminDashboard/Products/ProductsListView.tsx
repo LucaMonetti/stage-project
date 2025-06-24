@@ -1,13 +1,12 @@
 import GenericTableView from "../../../components/Dashboard/Tables/GenericTableView";
-import TableView from "../../../components/Dashboard/Tables/TableView";
 import { useFetch } from "../../../hooks/useFetch";
-import { ProductArraySchema, type Product } from "../../../models/Product";
+import {
+  ProductWithPricelistArraySchema,
+  type Product,
+} from "../../../models/Product";
 
 const ProductsListView = () => {
-  const products = useFetch(
-    "/api/pricelists/3fa85f64-5717-4562-b3fc-2c963f66afa6/products",
-    ProductArraySchema
-  );
+  const products = useFetch("/api/products", ProductWithPricelistArraySchema);
 
   const columns = [
     {
@@ -20,8 +19,8 @@ const ProductsListView = () => {
       header: "Name",
     },
     {
-      key: "pricelistId" as keyof Product,
-      header: "Pricelist ID",
+      key: "pricelist.name" as keyof Product,
+      header: "Pricelist",
       mobileLabel: "Pricelist",
       className: "text-gray-500",
     },
@@ -54,6 +53,11 @@ const ProductsListView = () => {
       <GenericTableView
         data={products}
         columns={columns}
+        config={{
+          baseUrl: "",
+          enableLink: true,
+          columnId: "productCode",
+        }}
         keyField="productCode"
       />
     </div>

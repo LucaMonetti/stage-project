@@ -3,12 +3,19 @@ import { CompanySchema } from "./Company";
 import { ProductArraySchema } from "./Product";
 
 // Pricelist
-export const PricelistSchema = z.object({
+export const PricelistNoProdsSchema = z.object({
   id: z.guid(),
   name: z.string(),
   description: z.string(),
+});
+
+export type PricelistNoProds = z.infer<typeof PricelistNoProdsSchema>;
+
+export const PricelistNoProdsArraySchema = z.array(PricelistNoProdsSchema);
+
+export const PricelistSchema = PricelistNoProdsSchema.extend({
   company: CompanySchema,
-  products: ProductArraySchema,
+  products: ProductArraySchema.optional(),
 });
 
 export type Pricelist = z.infer<typeof PricelistSchema>;

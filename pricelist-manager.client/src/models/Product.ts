@@ -1,4 +1,5 @@
 import { z } from "zod/v4";
+import { PricelistNoProdsSchema } from "./Pricelist";
 
 // Product Instance
 export const ProductInstanceSchema = z.object({
@@ -25,6 +26,16 @@ export const ProductSchema = z.object({
 export const ProductArraySchema = z.array(ProductSchema);
 
 export type Product = z.infer<typeof ProductSchema>;
+
+export const ProductWithPricelistSchema = ProductSchema.extend({
+  pricelist: z.lazy(() => PricelistNoProdsSchema),
+});
+
+export const ProductWithPricelistArraySchema = z.array(
+  ProductWithPricelistSchema
+);
+
+export type ProductWitPricelist = z.infer<typeof ProductWithPricelistSchema>;
 
 // Create Product
 
