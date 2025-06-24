@@ -17,4 +17,18 @@ namespace pricelist_manager.Server.Models
 
         public ICollection<ProductInstance> Versions { get; set; } = [];
     }
+
+    public class ProductWithPricelist : Product
+    {
+        public Pricelist Pricelist { get; set; } = null!;
+
+        public ProductWithPricelist(Product product, Pricelist pricelist)
+        {
+            PricelistId = product.PricelistId;
+            ProductCode = product.ProductCode;
+            Pricelist = pricelist;
+            LatestVersion = product.LatestVersion;
+            Versions = product.Versions;
+        }
+    }
 }
