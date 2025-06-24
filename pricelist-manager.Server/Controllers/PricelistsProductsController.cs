@@ -65,6 +65,29 @@ namespace pricelist_manager.Server.Controllers
             }
         }
 
+        [HttpGet("{pricelistId:guid}/products/{productCode}/versions")]
+        public async Task<ActionResult<ProductWithVersionsDTO>> GetVersionsById(Guid pricelistId, string productCode)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                var data = await ProductRepository.GetByIdAsync(pricelistId, productCode);
+                var pricelist = await PricelistRepository.GetByIdAsync(pricelistId);
+
+                return Ok(ProductWithVersionsDTO.FromProduct(data, pricelist.CompanyId));
+            }
+            catch (NotFoundException<Product> e)
+            {
+                return NotFound(e.Message);
+            }
+            catch (NotFoundException<Pricelist> e)
+            {
+                return NotFound(e.Message);
+            }
+        }
+
         [HttpPost("products")]
         public async Task<IActionResult> CreateProduct([FromBody] CreateProductDTO dto)
         {
