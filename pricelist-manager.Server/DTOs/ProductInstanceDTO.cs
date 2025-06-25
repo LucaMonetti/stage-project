@@ -36,7 +36,7 @@ namespace pricelist_manager.Server.DTOs
             return new ProductInstance
             {
                 PricelistId = pricelistId,
-                Id = productCode,
+                ProductCode = productCode,
                 Version = productInstance.Version,
                 Name = productInstance.Name,
                 Description = productInstance.Description,

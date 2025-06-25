@@ -40,7 +40,7 @@ namespace pricelist_manager.Server.DTOs
             return new ProductInstance
             {
                 PricelistId = product.PricelistId,
-                Id = product.ProductCode,
+                ProductCode = product.ProductCode,
                 Name = product.Name,
                 Description = product.Description,
                 Price = product.Price,

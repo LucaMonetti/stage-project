@@ -24,9 +24,15 @@ namespace pricelist_manager.Server.Data
             builder.Entity<Product>()
                 .HasMany(p => p.Versions)
                 .WithOne(pi => pi.Product)
-                .HasForeignKey(pi => new { pi.PricelistId, Id = pi.Id })
+                .HasForeignKey(pi => new { pi.PricelistId, Id = pi.ProductCode})
                 .HasPrincipalKey(p => new { p.PricelistId, Id = p.ProductCode })
                 .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<ProductInstance>()
+                .HasOne(pi => pi.Product)
+                .WithMany(p => p.Versions)
+                .HasForeignKey(pi => new { pi.PricelistId, pi.ProductCode })
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

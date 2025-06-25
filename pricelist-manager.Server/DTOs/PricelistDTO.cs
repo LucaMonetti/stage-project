@@ -13,7 +13,6 @@ namespace pricelist_manager.Server.DTOs
         [Length(0, 200)]
         public string Description { get; set; } = String.Empty;
 
-        public string CompanyId { get; set; } = string.Empty;
         public Company? Company { get; set; } = null!;
 
         public static PricelistNoProdsDTO FromPricelist(Pricelist pricelist)
@@ -51,19 +50,21 @@ namespace pricelist_manager.Server.DTOs
                 Id = pricelist.Id,
                 Name = pricelist.Name,
                 Description = pricelist.Description,
-                CompanyId = pricelist.CompanyId,
                 Company = pricelist.Company,
                 Products = ProductDTO.FromProducts(products, pricelist.CompanyId)
             };
         }
 
-        public static ICollection<PricelistDTO> FromPricelists(ICollection<Pricelist> pricelistCollection, ICollection<IGrouping<Guid, Product>> products)
+        public static ICollection<PricelistDTO> FromPricelists(ICollection<Pricelist> pricelistCollection, ICollection<IGrouping<Guid, Product>> productsByPricelistId)
         {
             ICollection<PricelistDTO> pricelists = [];
 
-            for (int i = 0; i < pricelistCollection.Count; i++) 
+            for (int i = 0; i < pricelistCollection.Count; i++)
             {
-                pricelists.Add(FromPricelist(pricelistCollection.ElementAt(i), [.. products.ElementAt(i)]));
+                if (productsByPricelistId.ElementAtOrDefault(i) != null)
+                    pricelists.Add(FromPricelist(pricelistCollection.ElementAt(i), [.. productsByPricelistId.ElementAtOrDefault(i)]));
+                else
+                    pricelists.Add(FromPricelist(pricelistCollection.ElementAt(i), []));
             }
 
             return pricelists;

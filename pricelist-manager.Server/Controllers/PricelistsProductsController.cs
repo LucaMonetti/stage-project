@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using pricelist_manager.Server.Data;
 using pricelist_manager.Server.DTOs;
 using pricelist_manager.Server.Exceptions;
 using pricelist_manager.Server.Interfaces;
@@ -15,12 +16,14 @@ namespace pricelist_manager.Server.Controllers
         private readonly IProductRepository ProductRepository;
         private readonly IPricelistRepository PricelistRepository;
         private readonly IProductInstanceRepository ProductInstanceRepository;
+        private readonly DataContext Context;
 
-        public PricelistsProductsController(IProductRepository productRepository, IProductInstanceRepository productInstanceRepository, IPricelistRepository pricelistRepository)
+        public PricelistsProductsController(IProductRepository productRepository, IProductInstanceRepository productInstanceRepository, IPricelistRepository pricelistRepository, DataContext context)
         {
             ProductRepository = productRepository;
             ProductInstanceRepository = productInstanceRepository;
             PricelistRepository = pricelistRepository;
+            Context = context;
         }
 
         [HttpGet("{pricelistId:guid}/products")]
@@ -65,6 +68,29 @@ namespace pricelist_manager.Server.Controllers
             }
         }
 
+        [HttpGet("{pricelistId:guid}/products/{productCode}/versions")]
+        public async Task<ActionResult<ProductWithVersionsDTO>> GetVersionsById(Guid pricelistId, string productCode)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                var data = await ProductRepository.GetByIdAsync(pricelistId, productCode);
+                var pricelist = await PricelistRepository.GetByIdAsync(pricelistId);
+
+                return Ok(ProductWithVersionsDTO.FromProduct(data, pricelist.CompanyId));
+            }
+            catch (NotFoundException<Product> e)
+            {
+                return NotFound(e.Message);
+            }
+            catch (NotFoundException<Pricelist> e)
+            {
+                return NotFound(e.Message);
+            }
+        }
+
         [HttpPost("products")]
         public async Task<IActionResult> CreateProduct([FromBody] CreateProductDTO dto)
         {
@@ -81,7 +107,7 @@ namespace pricelist_manager.Server.Controllers
                 return Ok(res);
             } catch (AlreadyExistException<Product> e)
             {
-                return Conflict(e.Message);
+                return Conflict(new { message = e.Message});
             }
         }
 
@@ -102,11 +128,16 @@ namespace pricelist_manager.Server.Controllers
             try
             {
                 Product oldProd = await ProductRepository.GetByIdAsync(pricelistId, productCode);
-                ProductInstance newInstance = UpdateProductDTO.MergeDTO(oldProd.Versions.Last(), dto);
+
+                ProductInstance newInstance = UpdateProductDTO.CreateInstanceFromDTO(dto, oldProd.LatestVersion + 1);
+
+                // Clear Context
+                Context.ChangeTracker.Clear();
 
                 await ProductInstanceRepository.CreateAsync(newInstance);
 
-                oldProd.LatestVersion = newInstance.Version;    
+                oldProd.LatestVersion = newInstance.Version;
+                oldProd.Versions.Add(newInstance);
 
                 var res = await ProductRepository.UpdateAsync(oldProd);
                 return Ok(res);

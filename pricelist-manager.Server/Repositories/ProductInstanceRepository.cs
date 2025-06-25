@@ -14,7 +14,7 @@ namespace pricelist_manager.Server.Repositories
         {
             if (!CanConnect()) throw new StorageUnavailableException();
 
-            var productInstances = await Context.ProductInstances.Where(pi => pi.PricelistId == pricelistId && pi.Id == productCode).ToListAsync();
+            var productInstances = await Context.ProductInstances.Where(pi => pi.PricelistId == pricelistId && pi.ProductCode == productCode).ToListAsync();
 
             if (!productInstances.Any()) throw new NotFoundException<Product>(productCode);
 
@@ -25,7 +25,7 @@ namespace pricelist_manager.Server.Repositories
         {
             if (!CanConnect()) throw new StorageUnavailableException();
 
-            var productInstance = await Context.ProductInstances.Where(pi => pi.PricelistId == pricelistId && pi.Id == productCode).FirstOrDefaultAsync();
+            var productInstance = await Context.ProductInstances.Where(pi => pi.PricelistId == pricelistId && pi.ProductCode == productCode).FirstOrDefaultAsync();
 
             if (productInstance == null) throw new NotFoundException<ProductInstance>(version);
 

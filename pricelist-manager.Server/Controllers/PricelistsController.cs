@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using pricelist_manager.Server.Data;
 using pricelist_manager.Server.DTOs;
 using pricelist_manager.Server.Exceptions;
 using pricelist_manager.Server.Interfaces;
@@ -16,11 +17,13 @@ namespace pricelist_manager.Server.Controllers
     {
         private readonly IPricelistRepository PricelistRepository;
         private readonly IProductRepository ProductRepository;
+        private readonly DataContext Context;
 
-        public PricelistsController(IPricelistRepository pricelistRepository, IProductRepository productRepository)
+        public PricelistsController(IPricelistRepository pricelistRepository, IProductRepository productRepository, DataContext context)
         {
             PricelistRepository = pricelistRepository;
             ProductRepository = productRepository;
+            Context = context;
         }
 
         [HttpGet]

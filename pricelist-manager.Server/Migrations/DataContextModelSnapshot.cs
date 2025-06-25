@@ -240,7 +240,7 @@ namespace pricelist_manager.Server.Migrations
                     b.Property<Guid>("PricelistId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Id")
+                    b.Property<string>("ProductCode")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("Version")
@@ -258,7 +258,7 @@ namespace pricelist_manager.Server.Migrations
                         .HasPrecision(10, 2)
                         .HasColumnType("decimal(10,2)");
 
-                    b.HasKey("PricelistId", "Id", "Version");
+                    b.HasKey("PricelistId", "ProductCode", "Version");
 
                     b.ToTable("ProductInstances");
                 });
@@ -410,8 +410,8 @@ namespace pricelist_manager.Server.Migrations
                 {
                     b.HasOne("pricelist_manager.Server.Models.Product", "Product")
                         .WithMany("Versions")
-                        .HasForeignKey("PricelistId", "Id")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("PricelistId", "ProductCode")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Product");
