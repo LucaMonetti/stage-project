@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using pricelist_manager.Server.Data;
 using pricelist_manager.Server.DTOs;
 using pricelist_manager.Server.Exceptions;
 using pricelist_manager.Server.Interfaces;
@@ -15,12 +16,14 @@ namespace pricelist_manager.Server.Controllers
         private readonly IProductRepository ProductRepository;
         private readonly IPricelistRepository PricelistRepository;
         private readonly IProductInstanceRepository ProductInstanceRepository;
+        private readonly DataContext Context;
 
-        public PricelistsProductsController(IProductRepository productRepository, IProductInstanceRepository productInstanceRepository, IPricelistRepository pricelistRepository)
+        public PricelistsProductsController(IProductRepository productRepository, IProductInstanceRepository productInstanceRepository, IPricelistRepository pricelistRepository, DataContext context)
         {
             ProductRepository = productRepository;
             ProductInstanceRepository = productInstanceRepository;
             PricelistRepository = pricelistRepository;
+            Context = context;
         }
 
         [HttpGet("{pricelistId:guid}/products")]
@@ -126,32 +129,15 @@ namespace pricelist_manager.Server.Controllers
             {
                 Product oldProd = await ProductRepository.GetByIdAsync(pricelistId, productCode);
 
-                // DEBUG: Log what we found
-                Console.WriteLine($"Found Product: PricelistId={oldProd.PricelistId}, ProductCode={oldProd.ProductCode}");
+                ProductInstance newInstance = UpdateProductDTO.CreateInstanceFromDTO(dto, oldProd.LatestVersion + 1);
 
-                var newVersion = new ProductInstance
-                {
-                    PricelistId = oldProd.PricelistId,
-                    ProductCode = oldProd.ProductCode,
-                    Version = oldProd.LatestVersion + 1,
-                    Name = dto.Name ?? "",
-                    Description = dto.Description ?? "",
-                    Price = dto.Price ?? Decimal.Zero
-                };
+                // Clear Context
+                Context.ChangeTracker.Clear();
 
-                // DEBUG: Log what we're trying to insert
-                Console.WriteLine($"Inserting ProductInstance: PricelistId={newVersion.PricelistId}, ProductCode={newVersion.ProductCode}, Version={newVersion.Version}");
+                await ProductInstanceRepository.CreateAsync(newInstance);
 
-                await ProductInstanceRepository.CreateAsync(newVersion);
-
-                oldProd.LatestVersion = newVersion.Version;
-
-                Console.WriteLine($"Here we are before {oldProd.Versions.Count.ToString()}");
-
-                oldProd.Versions.Add(newVersion);
-
-                Console.WriteLine($"Here we are after {oldProd.Versions.Count.ToString()}");
-
+                oldProd.LatestVersion = newInstance.Version;
+                oldProd.Versions.Add(newInstance);
 
                 var res = await ProductRepository.UpdateAsync(oldProd);
                 return Ok(res);

@@ -1,4 +1,5 @@
-﻿using pricelist_manager.Server.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using pricelist_manager.Server.Models;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -19,7 +20,7 @@ namespace pricelist_manager.Server.DTOs
         [StringLength(200)]
         public string? Description { get; set; }
 
-        [Range(0, double.MaxValue)]
+        [Precision(10, 2)]
         public decimal? Price { get; set; }
 
         public static UpdateProductDTO FromProductInstance(ProductInstance product)
@@ -31,6 +32,19 @@ namespace pricelist_manager.Server.DTOs
                 Name = product.Name,
                 Description = product.Description,
                 Price = product.Price,
+            };
+        }
+
+        public static ProductInstance CreateInstanceFromDTO(UpdateProductDTO dto, int version)
+        {
+            return new ProductInstance
+            {
+                PricelistId = dto.PricelistId,
+                ProductCode = dto.ProductCode,
+                Description = dto.Description ?? "",
+                Name = dto.Name ?? "",
+                Price = dto.Price ?? Decimal.Zero,
+                Version = version
             };
         }
     }
