@@ -5,10 +5,7 @@ import { ProductArraySchema, type Product } from "../../../models/Product";
 import ItemList from "./ItemList";
 
 const ItemListGroup = () => {
-  const products = useFetch(
-    "api/pricelists/3fa85f64-5717-4562-b3fc-2c963f66afa7/products",
-    ProductArraySchema
-  );
+  const products = useFetch("api/products", ProductArraySchema);
   const pricelists = useFetch("api/pricelists", PricelistArraySchema);
 
   const companies = useFetch("api/companies", CompanyArraySchema);

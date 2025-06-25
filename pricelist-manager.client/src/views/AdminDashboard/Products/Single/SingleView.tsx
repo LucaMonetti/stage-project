@@ -89,8 +89,8 @@ const SingleProductView = () => {
 
       <div className="p-4 rounded border-2 border-gray-700 col-start-1 col-end-5 flex flex-col justify-between gap-2 flex-wrap-reverse">
         <h2 className="uppercase font-bold text-gray-500">Versioni</h2>
-        <ul>
-          {product.data?.versions.map((version) => (
+        <ul className="flex flex-col gap-4">
+          {product.data?.versions.reverse().map((version) => (
             <li
               key={version.version}
               className={`relative border-l-4 rounded bg-gray-700 py-2 pl-10 pr-4 ${
