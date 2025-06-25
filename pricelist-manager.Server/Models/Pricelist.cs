@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace pricelist_manager.Server.Models
 {
@@ -17,6 +18,10 @@ namespace pricelist_manager.Server.Models
 
         [Required]
         public string CompanyId { get; set; } = string.Empty;
+
+        [ForeignKey(nameof(CompanyId))]
         public Company? Company { get; set; } = null!;
+
+        public virtual ICollection<Product> Products { get; set; } = [];
     }
 }

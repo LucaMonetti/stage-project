@@ -14,17 +14,18 @@ namespace pricelist_manager.Server.Repositories
         public ProductRepository(DataContext dataContext) : base(dataContext)
         {}
 
-        public async Task<ICollection<ProductWithPricelist>> GetAllProductsWithPricelistsAsync()
+        public async Task<ICollection<Product>> GetAllProductsWithPricelistsAsync()
         {
             if (!CanConnect()) throw new StorageUnavailableException();
 
-            return await Context.Products
+            var res = await Context.Products
                 .Include(p => p.Versions)
-                .Select(product => new ProductWithPricelist(
-                    product,
-                    Context.Pricelists.First(pricelist => pricelist.Id == product.PricelistId)
-                ))
+                .Include(p => p.Pricelist)
                 .ToListAsync();
+
+            Console.Write($"DEBUG: Repository {res.Count},[0] {res.ElementAt(0).Versions.Count}");
+
+            return res;
         }
 
         public async Task<bool> UpdateAsync(Product entity)
@@ -48,14 +49,14 @@ namespace pricelist_manager.Server.Repositories
 
         private async Task<bool> existsIdAsync(Guid pricelistId, string productCode)
         {
-            return await Context.ProductInstances.AnyAsync(pi => pi.PricelistId == pricelistId && pi.ProductCode == productCode);
+            return await Context.Products.AnyAsync(pi => pi.PricelistId == pricelistId && pi.ProductCode == productCode);
         }
 
         public async Task<ICollection<Product>> GetAllAsync(Guid pricelistId)
         {
             if (!CanConnect()) throw new StorageUnavailableException();
 
-            var products = await Context.Products.Where(p => p.PricelistId == pricelistId).Include(p => p.Versions).ToListAsync();
+            var products = await Context.Products.Where(p => p.PricelistId == pricelistId).Include(p => p.Versions.OrderByDescending(v => v.Version)).ToListAsync();
 
             TrimProductsVersion(products);
 

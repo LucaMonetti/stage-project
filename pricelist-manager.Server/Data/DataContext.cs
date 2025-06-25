@@ -17,6 +17,17 @@ namespace pricelist_manager.Server.Data
         public DbSet<ProductInstance> ProductInstances { get; set; }
         public DbSet<Pricelist> Pricelists { get; set; }
 
+        public override int SaveChanges()
+        {
+            foreach (var entry in ChangeTracker.Entries<Product>())
+            {
+                if (entry.State == EntityState.Added)
+                {
+                    entry.Entity.Id = $"{entry.Entity.CompanyId}-{entry.Entity.ProductCode}";
+                }
+            }
+            return base.SaveChanges();
+        }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -24,15 +35,14 @@ namespace pricelist_manager.Server.Data
             builder.Entity<Product>()
                 .HasMany(p => p.Versions)
                 .WithOne(pi => pi.Product)
-                .HasForeignKey(pi => new { pi.PricelistId, Id = pi.ProductCode})
-                .HasPrincipalKey(p => new { p.PricelistId, Id = p.ProductCode })
-                .OnDelete(DeleteBehavior.Cascade);
+                .HasForeignKey(pi => pi.ProductId)
+                .HasPrincipalKey(p => p.Id)
+                .OnDelete(DeleteBehavior.NoAction);
 
             builder.Entity<ProductInstance>()
                 .HasOne(pi => pi.Product)
                 .WithMany(p => p.Versions)
-                .HasForeignKey(pi => new { pi.PricelistId, pi.ProductCode })
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

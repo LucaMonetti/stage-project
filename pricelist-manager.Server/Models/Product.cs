@@ -4,31 +4,25 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace pricelist_manager.Server.Models
 {
-    [PrimaryKey(nameof(PricelistId), nameof(ProductCode))]
     public class Product
     {
-        [Required]
-        public Guid PricelistId { get; set; }
+        public string Id { get; set; } = "";
 
-        public string ProductCode { get; set; } = String.Empty;
+        public required string ProductCode { get; set; }
+        public required string CompanyId { get; set; }
 
-        [ForeignKey(nameof(LatestVersion))]
         public int LatestVersion { get; set; } = 0;
 
+        [NotMapped]
+        public ProductInstance? CurrentInstance =>
+        Versions?.FirstOrDefault(v => v.Version == LatestVersion);
+
+        [ForeignKey(nameof(Id))]
         public ICollection<ProductInstance> Versions { get; set; } = [];
-    }
 
-    public class ProductWithPricelist : Product
-    {
-        public Pricelist Pricelist { get; set; } = null!;
+        public Guid PricelistId { get; set; }
 
-        public ProductWithPricelist(Product product, Pricelist pricelist)
-        {
-            PricelistId = product.PricelistId;
-            ProductCode = product.ProductCode;
-            Pricelist = pricelist;
-            LatestVersion = product.LatestVersion;
-            Versions = product.Versions;
-        }
+        [ForeignKey(nameof(PricelistId))]
+        public virtual Pricelist Pricelist { get; set; } = null!;
     }
 }

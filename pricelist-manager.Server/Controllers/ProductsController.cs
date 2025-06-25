@@ -21,14 +21,14 @@ namespace pricelist_manager.Server.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<ICollection<ProductWithPricelistDTO>>> GetAll()
+        public async Task<ActionResult<ICollection<ProductDTO>>> GetAll()
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             var data = await ProductRepository.GetAllProductsWithPricelistsAsync();
 
-            return Ok(ProductWithPricelistDTO.FromProducts(data));
+            return Ok(ProductDTO.FromProducts(data));
         }
     }
 }

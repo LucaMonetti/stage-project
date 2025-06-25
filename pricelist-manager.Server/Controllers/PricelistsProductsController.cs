@@ -35,9 +35,8 @@ namespace pricelist_manager.Server.Controllers
             try
             {
                 var data = await ProductRepository.GetAllAsync(pricelistId);
-                var pricelist = await PricelistRepository.GetByIdAsync(pricelistId);
 
-                return Ok(ProductDTO.FromProducts(data, pricelist.CompanyId));
+                return Ok(ProductDTO.FromProducts(data));
             }
             catch (NotFoundException<Pricelist> e)
             {
@@ -54,22 +53,17 @@ namespace pricelist_manager.Server.Controllers
             try
             {
                 var data = await ProductRepository.GetByIdAsync(pricelistId, productCode);
-                var pricelist = await PricelistRepository.GetByIdAsync(pricelistId);
 
-                return Ok(ProductDTO.FromProduct(data, pricelist.CompanyId));
+                return Ok(ProductDTO.FromProduct(data));
             }
             catch (NotFoundException<Product> e)
-            {
-                return NotFound(e.Message);
-            }
-            catch (NotFoundException<Pricelist> e)
             {
                 return NotFound(e.Message);
             }
         }
 
         [HttpGet("{pricelistId:guid}/products/{productCode}/versions")]
-        public async Task<ActionResult<ProductWithVersionsDTO>> GetVersionsById(Guid pricelistId, string productCode)
+        public async Task<ActionResult<ProductDTO>> GetVersionsById(Guid pricelistId, string productCode)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -77,15 +71,10 @@ namespace pricelist_manager.Server.Controllers
             try
             {
                 var data = await ProductRepository.GetByIdAsync(pricelistId, productCode);
-                var pricelist = await PricelistRepository.GetByIdAsync(pricelistId);
 
-                return Ok(ProductWithVersionsDTO.FromProduct(data, pricelist.CompanyId));
+                return Ok(ProductDTO.FromProduct(data));
             }
             catch (NotFoundException<Product> e)
-            {
-                return NotFound(e.Message);
-            }
-            catch (NotFoundException<Pricelist> e)
             {
                 return NotFound(e.Message);
             }
@@ -103,6 +92,7 @@ namespace pricelist_manager.Server.Controllers
 
             try
             {
+                //var res = await ProductInstanceRepository.CreateAsync(data.CurrentInstance);
                 var res = await ProductRepository.CreateAsync(data);
                 return Ok(res);
             } catch (AlreadyExistException<Product> e)
@@ -119,7 +109,7 @@ namespace pricelist_manager.Server.Controllers
                 return BadRequest(ModelState);
             }
 
-            if (pricelistId != dto.PricelistId || productCode != dto.ProductCode)
+            if (productCode != dto.ProductId)
             {
                 ModelState.AddModelError("", "The IDs doesn't match!");
                 return BadRequest(ModelState);
@@ -127,9 +117,9 @@ namespace pricelist_manager.Server.Controllers
 
             try
             {
-                Product oldProd = await ProductRepository.GetByIdAsync(pricelistId, productCode);
+                Product oldProd = await ProductRepository.GetByIdAsync(pricelistId, productCode.Split("-")[1]);
 
-                ProductInstance newInstance = UpdateProductDTO.CreateInstanceFromDTO(dto, oldProd.LatestVersion + 1);
+                ProductInstance newInstance = UpdateProductDTO.TurnIntoInstance(dto, oldProd.LatestVersion + 1);
 
                 // Clear Context
                 Context.ChangeTracker.Clear();

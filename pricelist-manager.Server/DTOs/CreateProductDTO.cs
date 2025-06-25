@@ -1,4 +1,5 @@
-﻿using pricelist_manager.Server.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using pricelist_manager.Server.Models;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -6,22 +7,18 @@ namespace pricelist_manager.Server.DTOs
 {
     public class CreateProductDTO
     {
-        [Required]
         public required string ProductCode { get; set; }
+        public required string CompanyId { get; set; }
 
-        [Required]
-        [ForeignKey(nameof(PricelistId))]
         public Guid PricelistId { get; set; }
 
-        [Required]
         [StringLength(100)]
         public string Name { get; set; } = string.Empty;
 
         [StringLength(200)]
         public string Description { get; set; } = string.Empty;
 
-        [Required]
-        [Range(0, double.MaxValue)]
+        [Precision(10, 2)]
         public decimal Price { get; set; }
 
         public static Product ToProduct(CreateProductDTO product)
@@ -30,6 +27,7 @@ namespace pricelist_manager.Server.DTOs
             {
                 PricelistId = product.PricelistId,
                 ProductCode = product.ProductCode,
+                CompanyId = product.CompanyId,
                 LatestVersion = 0,
                 Versions = [ToProductInstance(product)]
             };
@@ -39,8 +37,7 @@ namespace pricelist_manager.Server.DTOs
         {
             return new ProductInstance
             {
-                PricelistId = product.PricelistId,
-                ProductCode = product.ProductCode,
+                ProductId = $"{product.CompanyId}-{product.ProductCode}",
                 Name = product.Name,
                 Description = product.Description,
                 Price = product.Price,

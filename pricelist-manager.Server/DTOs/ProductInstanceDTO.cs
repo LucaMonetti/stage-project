@@ -3,6 +3,7 @@ namespace pricelist_manager.Server.DTOs
 {
     public class ProductInstanceDTO
     {
+        public string ProductId = "";
         public int Version { get; set; } = 0;
         public string Name { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
@@ -12,6 +13,7 @@ namespace pricelist_manager.Server.DTOs
         {
             return productInstance != null ? new ProductInstanceDTO
             {
+                ProductId = productInstance.ProductId,
                 Version = productInstance.Version,
                 Name = productInstance.Name,
                 Description = productInstance.Description,
@@ -35,8 +37,7 @@ namespace pricelist_manager.Server.DTOs
         {
             return new ProductInstance
             {
-                PricelistId = pricelistId,
-                ProductCode = productCode,
+                ProductId = productInstance.ProductId,
                 Version = productInstance.Version,
                 Name = productInstance.Name,
                 Description = productInstance.Description,

@@ -3,7 +3,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace pricelist_manager.Server.DTOs
 {
-    public class PricelistNoProdsDTO
+
+    public class PricelistDTO
     {
         public Guid Id { get; set; }
 
@@ -15,35 +16,9 @@ namespace pricelist_manager.Server.DTOs
 
         public Company? Company { get; set; } = null!;
 
-        public static PricelistNoProdsDTO FromPricelist(Pricelist pricelist)
-        {
-            return new PricelistNoProdsDTO
-            {
-                Id = pricelist.Id,
-                Name = pricelist.Name,
-                Description = pricelist.Description,
-                Company = pricelist.Company,
-            };
-        }
+        public ICollection<ProductDTO>? Products { get; set; } = null!;
 
-        public static ICollection<PricelistNoProdsDTO> FromPricelists(ICollection<Pricelist> pricelistCollection)
-        {
-            ICollection<PricelistNoProdsDTO> pricelists = [];
-
-            foreach (var pricelist in pricelistCollection)
-            {
-                pricelists.Add(FromPricelist(pricelist));
-            }
-
-            return pricelists;
-        }
-    }
-
-    public class PricelistDTO : PricelistNoProdsDTO
-    {
-        public ICollection<ProductDTO> Products { get; set; } = [];
-
-        public static PricelistDTO FromPricelist(Pricelist pricelist, ICollection<Product> products)
+        public static PricelistDTO FromPricelist(Pricelist pricelist, ICollection<Product>? products = null!)
         {
             return new PricelistDTO
             {
@@ -51,7 +26,7 @@ namespace pricelist_manager.Server.DTOs
                 Name = pricelist.Name,
                 Description = pricelist.Description,
                 Company = pricelist.Company,
-                Products = ProductDTO.FromProducts(products, pricelist.CompanyId)
+                Products = ProductDTO.FromProducts(products ?? [])
             };
         }
 
@@ -64,7 +39,7 @@ namespace pricelist_manager.Server.DTOs
                 if (productsByPricelistId.ElementAtOrDefault(i) != null)
                     pricelists.Add(FromPricelist(pricelistCollection.ElementAt(i), [.. productsByPricelistId.ElementAtOrDefault(i)]));
                 else
-                    pricelists.Add(FromPricelist(pricelistCollection.ElementAt(i), []));
+                    pricelists.Add(FromPricelist(pricelistCollection.ElementAt(i)));
             }
 
             return pricelists;

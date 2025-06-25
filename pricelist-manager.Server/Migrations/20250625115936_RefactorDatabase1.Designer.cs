@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using pricelist_manager.Server.Data;
 
@@ -11,9 +12,11 @@ using pricelist_manager.Server.Data;
 namespace pricelist_manager.Server.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20250625115936_RefactorDatabase1")]
+    partial class RefactorDatabase1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -242,6 +245,9 @@ namespace pricelist_manager.Server.Migrations
 
                     b.HasIndex("PricelistId");
 
+                    b.HasIndex("Id", "LatestVersion")
+                        .IsUnique();
+
                     b.ToTable("Products");
                 });
 
@@ -258,7 +264,7 @@ namespace pricelist_manager.Server.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Id")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -269,6 +275,8 @@ namespace pricelist_manager.Server.Migrations
                         .HasColumnType("decimal(10,2)");
 
                     b.HasKey("ProductId", "Version");
+
+                    b.HasIndex("Id");
 
                     b.ToTable("ProductInstances");
                 });
@@ -424,18 +432,22 @@ namespace pricelist_manager.Server.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("pricelist_manager.Server.Models.ProductInstance", "CurrentInstance")
+                        .WithOne("Product")
+                        .HasForeignKey("pricelist_manager.Server.Models.Product", "Id", "LatestVersion")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CurrentInstance");
+
                     b.Navigation("Pricelist");
                 });
 
             modelBuilder.Entity("pricelist_manager.Server.Models.ProductInstance", b =>
                 {
-                    b.HasOne("pricelist_manager.Server.Models.Product", "Product")
+                    b.HasOne("pricelist_manager.Server.Models.Product", null)
                         .WithMany("Versions")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Product");
+                        .HasForeignKey("Id");
                 });
 
             modelBuilder.Entity("pricelist_manager.Server.Models.User", b =>
@@ -457,6 +469,11 @@ namespace pricelist_manager.Server.Migrations
             modelBuilder.Entity("pricelist_manager.Server.Models.Product", b =>
                 {
                     b.Navigation("Versions");
+                });
+
+            modelBuilder.Entity("pricelist_manager.Server.Models.ProductInstance", b =>
+                {
+                    b.Navigation("Product");
                 });
 #pragma warning restore 612, 618
         }

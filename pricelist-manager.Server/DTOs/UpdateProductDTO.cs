@@ -7,43 +7,36 @@ namespace pricelist_manager.Server.DTOs
 {
     public class UpdateProductDTO
     {
-        [Required]
-        public required string ProductCode { get; set; }
-
-        [Required]
-        [ForeignKey(nameof(PricelistId))]
-        public required Guid PricelistId { get; set; }
+        public required string ProductId { get; set; } = string.Empty;
 
         [StringLength(100)]
-        public string? Name { get; set; }
+        public string Name { get; set; } = string.Empty;
 
         [StringLength(200)]
-        public string? Description { get; set; }
+        public string Description { get; set; } = string.Empty;
 
         [Precision(10, 2)]
-        public decimal? Price { get; set; }
+        public decimal Price { get; set; }
 
         public static UpdateProductDTO FromProductInstance(ProductInstance product)
         {
             return new UpdateProductDTO
             {
-                PricelistId = product.PricelistId,
-                ProductCode = product.ProductCode,
+                ProductId = product.ProductId,
                 Name = product.Name,
                 Description = product.Description,
-                Price = product.Price,
+                Price = product.Price
             };
         }
 
-        public static ProductInstance CreateInstanceFromDTO(UpdateProductDTO dto, int version)
+        public static ProductInstance TurnIntoInstance(UpdateProductDTO dto, int version)
         {
             return new ProductInstance
             {
-                PricelistId = dto.PricelistId,
-                ProductCode = dto.ProductCode,
-                Description = dto.Description ?? "",
-                Name = dto.Name ?? "",
-                Price = dto.Price ?? Decimal.Zero,
+                ProductId = dto.ProductId,
+                Description = dto.Description,
+                Name = dto.Name,
+                Price = dto.Price,
                 Version = version
             };
         }
