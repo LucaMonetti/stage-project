@@ -1,7 +1,7 @@
 import { useFetch } from "../../../hooks/useFetch";
 import { CompanyArraySchema } from "../../../models/Company";
 import { PricelistArraySchema } from "../../../models/Pricelist";
-import { ProductArraySchema, type Product } from "../../../models/Product";
+import { ProductArraySchema } from "../../../models/Product";
 import ItemList from "./ItemList";
 
 const ItemListGroup = () => {
@@ -19,10 +19,12 @@ const ItemListGroup = () => {
         getCallout={(item) => item.id}
       />
       <ItemList
-        title="Pricelist"
+        title="Listini"
         fetch={pricelists}
         getline={(item) => item.name}
-        getCallout={(item) => item.products.length.toString()}
+        getCallout={(item) =>
+          item.products ? item.products.length.toString() : "0"
+        }
       />
       <ItemList
         title="Prodotti"
