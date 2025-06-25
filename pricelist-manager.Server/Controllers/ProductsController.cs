@@ -30,5 +30,103 @@ namespace pricelist_manager.Server.Controllers
 
             return Ok(ProductDTO.FromProducts(data));
         }
+
+        [HttpGet("{productId}")]
+        public async Task<ActionResult<ICollection<ProductDTO>>> GetById(string productId)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                var data = await ProductRepository.GetByIdAsync(productId);
+
+                return Ok(ProductDTO.FromProduct(data));
+            }
+            catch (NotFoundException<Product> e)
+            {
+                return NotFound(e.Message);
+            }
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<ICollection<ProductDTO>>> Create([FromBody] CreateProductDTO dto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            Product data = CreateProductDTO.ToProduct(dto);
+
+            try
+            {
+                var res = await ProductRepository.CreateAsync(data);
+                return Ok(res);
+            }
+            catch (AlreadyExistException<Product> e)
+            {
+                return Conflict(new { message = e.Message });
+            }
+        }
+
+        [HttpPut("{productId}")]
+        public async Task<IActionResult> Update(string productId, [FromBody] UpdateProductDTO dto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            if (productId != dto.ProductId)
+            {
+                ModelState.AddModelError("", "The IDs doesn't match!");
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                Product oldProd = await ProductRepository.GetByIdAsync(productId);
+
+                ProductInstance newInstance = UpdateProductDTO.TurnIntoInstance(dto, oldProd.LatestVersion + 1);
+
+                ProductRepository.ClearTracking();
+
+                await ProductInstanceRepository.CreateAsync(newInstance);
+
+                oldProd.LatestVersion = newInstance.Version;
+                oldProd.Versions.Add(newInstance);
+
+                var res = await ProductRepository.UpdateAsync(oldProd);
+                return Ok(res);
+            }
+            catch (NotFoundException<Product> e)
+            {
+                return NotFound(e.Message);
+            }
+            catch (AlreadyExistException<ProductInstance> e)
+            {
+                return Conflict(e.Message);
+            }
+        }
+
+        [HttpDelete("{productId}")]
+        public async Task<IActionResult> Delete(string productId)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                var res = await ProductRepository.DeleteAsync(productId);
+                return Ok(res);
+            }
+            catch (NotFoundException<Product> e)
+            {
+                return NotFound(e.Message);
+            }
+        }
     }
 }

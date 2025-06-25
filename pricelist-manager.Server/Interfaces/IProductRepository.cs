@@ -3,7 +3,7 @@ using pricelist_manager.Server.Models;
 
 namespace pricelist_manager.Server.Interfaces
 {
-    public interface IProductRepository
+    public interface IProductRepository: IBaseRepository
     {
         /// <exception cref="StorageUnavailableException">The database is not available</exception>
         Task<ICollection<Product>> GetAllProductsWithPricelistsAsync();
@@ -16,7 +16,7 @@ namespace pricelist_manager.Server.Interfaces
 
         /// <exception cref="StorageUnavailableException">The database is not available</exception>
         /// <exception cref="NotFoundException">The Product doesn't exists.</exception>
-        Task<Product> GetByIdAsync(Guid pricelistId, string productCode);
+        Task<Product> GetByIdAsync(string productId);
 
         /// <exception cref="StorageUnavailableException">The database is not available</exception>
         /// <exception cref="NotFoundException">The Product doesn't exists.</exception>
@@ -25,6 +25,10 @@ namespace pricelist_manager.Server.Interfaces
         /// <exception cref="StorageUnavailableException">The database is not available</exception>
         /// <exception cref="NotFoundException">The Product doesn't exists.</exception>
         Task<ICollection<Product>> GetByCodeAsync(string code);
+
+        /// <exception cref="StorageUnavailableException">The database is not available</exception>
+        /// <exception cref="NotFoundException">The Product doesn't exists.</exception>
+        Task<ICollection<Product>> GetByCompany(string company);
 
         /// <exception cref="StorageUnavailableException">The database is not available</exception>
         /// <exception cref="AlreadyExistsException">The Product already exists.</exception>
@@ -36,10 +40,10 @@ namespace pricelist_manager.Server.Interfaces
 
         /// <exception cref="StorageUnavailableException">The database is not available</exception>
         /// <exception cref="NotFoundException">The Product doesn't exists.</exception>
-        Task<Boolean> DeleteAsync(Guid pricelistId, string productId);
+        Task<Boolean> DeleteAsync(string productId);
 
         /// <exception cref="StorageUnavailableException">The database is not available</exception>
-        Task<Boolean> ExistsIdAsync(Guid pricelistId, string id);
+        Task<Boolean> ExistsIdAsync(string productId);
 
         Task<ProductStatistics> GetStatistics();
     }

@@ -60,7 +60,7 @@ namespace pricelist_manager.Server.Repositories
             return pricelists;
         }
 
-        public async Task<ICollection<Pricelist>> GetAllByCompanyAsync(string companyId)
+        public async Task<ICollection<Pricelist>> GetByCompanyAsync(string companyId)
         {
             if (!CanConnect()) throw new StorageUnavailableException();
 

@@ -59,6 +59,24 @@ namespace pricelist_manager.Server.Controllers
             }
         }
 
+        [HttpGet("{pricelistId:guid}/products")]
+        public async Task<ActionResult<ICollection<ProductDTO>>> GetAll(Guid pricelistId)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                var data = await ProductRepository.GetAllAsync(pricelistId);
+
+                return Ok(ProductDTO.FromProducts(data));
+            }
+            catch (NotFoundException<Pricelist> e)
+            {
+                return NotFound(e.Message);
+            }
+        }
+
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] Pricelist dto)
         {

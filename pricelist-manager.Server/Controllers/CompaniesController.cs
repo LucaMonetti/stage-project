@@ -15,12 +15,16 @@ namespace pricelist_manager.Server.Controllers
     public class CompaniesController: ControllerBase
     {
         private readonly ICompanyRepository CompanyRepository;
+        private readonly IProductRepository ProductRepository;
+        private readonly IPricelistRepository PricelistRepository;
         private readonly IUserRepository UserRepository;
 
-        public CompaniesController(ICompanyRepository companyRepository, IUserRepository userRepository)
+        public CompaniesController(ICompanyRepository companyRepository, IUserRepository userRepository, IProductRepository productRepository, IPricelistRepository pricelistRepository)
         {
             CompanyRepository = companyRepository;
             UserRepository = userRepository;
+            ProductRepository = productRepository;
+            PricelistRepository = pricelistRepository;
         }
 
         [HttpGet]
@@ -64,6 +68,33 @@ namespace pricelist_manager.Server.Controllers
             var res = await UserRepository.GetByCompany(id);
 
             return Ok(UserDTO.FromUsers(res));
+        }
+
+        [HttpGet("{id}/products")]
+        public async Task<ActionResult<ICollection<ProductDTO>>> GetProductsByCompany(string id)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var res = await ProductRepository.GetByCompany(id);
+
+            return Ok(ProductDTO.FromProducts(res));
+        }
+
+        [HttpGet("{id}/pricelists")]
+        public async Task<ActionResult<ICollection<ProductDTO>>> GetPricelistsByCompany(string id)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var res = await PricelistRepository.GetByCompanyAsync(id);
+            var prod = await ProductRepository.GetAllGroupPricelistAsync();
+
+            return Ok(PricelistDTO.FromPricelists(res, prod));
         }
 
         [HttpPost]

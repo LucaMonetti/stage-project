@@ -16,5 +16,10 @@ namespace pricelist_manager.Server.Repositories
         {
             return Context.Database.CanConnect();
         }
+
+        public void ClearTracking()
+        {
+            Context.ChangeTracker.Clear();
+        }
     }
 }
