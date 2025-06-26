@@ -8,6 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using pricelist_manager.Server.Data;
 using pricelist_manager.Server.Interfaces;
+using pricelist_manager.Server.Mappers;
 using pricelist_manager.Server.Middlewares;
 using pricelist_manager.Server.Models;
 using pricelist_manager.Server.Repositories;
@@ -110,6 +111,18 @@ namespace pricelist_manager.Server
             builder.Services.AddScoped<IProductRepository, ProductRepository>();
             builder.Services.AddScoped<IProductInstanceRepository, ProductInstanceRepository>();
             builder.Services.AddScoped<IUserRepository, UserRepository>();
+
+            builder.Services.AddScoped<IProductMappingService, ProductMappingService>();
+            builder.Services.AddScoped<IProductLiteMappingService, ProductLiteMappingService>();
+            builder.Services.AddScoped<IProductInstanceMappingService, ProductInstanceMappingService>();
+
+            builder.Services.AddScoped<ICompanyMappingService, CompanyMappingService>();
+            builder.Services.AddScoped<ICompanyLiteMappingService, CompanyLiteMappingService>();
+
+            builder.Services.AddScoped<IPricelistMappingService, PricelistMappingService>();
+            builder.Services.AddScoped<IPricelistLiteMappingService, PricelistLiteMappingService>();
+
+
 
             var app = builder.Build();
 

@@ -14,19 +14,25 @@ namespace pricelist_manager.Server.Controllers.V1
     [ApiController]
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/companies")]
-    public class CompaniesController: ControllerBase
+    public class CompaniesController : ControllerBase
     {
         private readonly ICompanyRepository CompanyRepository;
         private readonly IProductRepository ProductRepository;
         private readonly IPricelistRepository PricelistRepository;
         private readonly IUserRepository UserRepository;
+        private readonly ICompanyMappingService CompanyMapping;
+        private readonly IProductMappingService ProductMapping;
+        private readonly IPricelistMappingService PricelistMapping;
 
-        public CompaniesController(ICompanyRepository companyRepository, IUserRepository userRepository, IProductRepository productRepository, IPricelistRepository pricelistRepository)
+        public CompaniesController(ICompanyRepository companyRepository, IUserRepository userRepository, IProductRepository productRepository, IPricelistRepository pricelistRepository, ICompanyMappingService companyMapping, IProductMappingService productMapping, IPricelistMappingService pricelistMapping)
         {
             CompanyRepository = companyRepository;
             UserRepository = userRepository;
             ProductRepository = productRepository;
             PricelistRepository = pricelistRepository;
+            CompanyMapping = companyMapping;
+            ProductMapping = productMapping;
+            PricelistMapping = pricelistMapping;
         }
 
         [HttpGet]
@@ -37,7 +43,7 @@ namespace pricelist_manager.Server.Controllers.V1
 
             var res = await CompanyRepository.GetAllAsync();
 
-            return Ok(res);
+            return Ok(CompanyMapping.MapToDTOs(res));
         }
 
         [HttpGet("{id}")]
@@ -51,7 +57,7 @@ namespace pricelist_manager.Server.Controllers.V1
             try
             {
                 var res = await CompanyRepository.GetByIdAsync(id);
-                return Ok(res);
+                return Ok(CompanyMapping.MapToDTO(res));
             }
             catch (NotFoundException<Company> e)
             {
@@ -82,7 +88,7 @@ namespace pricelist_manager.Server.Controllers.V1
 
             var res = await ProductRepository.GetByCompany(id);
 
-            return Ok(ProductDTO.FromProducts(res));
+            return Ok(ProductMapping.MapToDTOs(res));
         }
 
         [HttpGet("{id}/pricelists")]
@@ -94,9 +100,8 @@ namespace pricelist_manager.Server.Controllers.V1
             }
 
             var res = await PricelistRepository.GetByCompanyAsync(id);
-            var prod = await ProductRepository.GetAllGroupPricelistAsync();
 
-            return Ok(PricelistDTO.FromPricelists(res, prod));
+            return Ok(PricelistMapping.MapToDTOs(res));
         }
 
         [HttpPost]

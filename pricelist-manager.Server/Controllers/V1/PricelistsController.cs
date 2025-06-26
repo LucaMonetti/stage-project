@@ -19,13 +19,16 @@ namespace pricelist_manager.Server.Controllers.V1
     {
         private readonly IPricelistRepository PricelistRepository;
         private readonly IProductRepository ProductRepository;
-        private readonly DataContext Context;
 
-        public PricelistsController(IPricelistRepository pricelistRepository, IProductRepository productRepository, DataContext context)
+        private readonly IProductMappingService ProductMapping;
+        private readonly IPricelistMappingService PricelistMapping;
+
+        public PricelistsController(IPricelistRepository pricelistRepository, IProductRepository productRepository, IPricelistMappingService pricelistMappingService, IProductMappingService productMappingService )
         {
             PricelistRepository = pricelistRepository;
             ProductRepository = productRepository;
-            Context = context;
+            ProductMapping = productMappingService;
+            PricelistMapping = pricelistMappingService;
         }
 
         [HttpGet]
@@ -35,9 +38,8 @@ namespace pricelist_manager.Server.Controllers.V1
                 return BadRequest(ModelState);
 
             var res = await PricelistRepository.GetAllAsync();
-            var prod = await ProductRepository.GetAllGroupPricelistAsync();
 
-            return Ok(PricelistDTO.FromPricelists(res, prod));
+            return Ok(PricelistMapping.MapToDTOs(res));
         }
 
         [HttpGet("{id:guid}")]
@@ -51,9 +53,8 @@ namespace pricelist_manager.Server.Controllers.V1
             try
             {
                 var res = await PricelistRepository.GetByIdAsync(id);
-                var prod = await ProductRepository.GetAllAsync(id);
 
-                return Ok(PricelistDTO.FromPricelist(res, prod));
+                return Ok(PricelistMapping.MapToDTO(res));
             }
             catch (NotFoundException<Pricelist> e)
             {
@@ -69,9 +70,9 @@ namespace pricelist_manager.Server.Controllers.V1
 
             try
             {
-                var data = await ProductRepository.GetAllAsync(pricelistId);
+                var res = await ProductRepository.GetAllAsync(pricelistId);
 
-                return Ok(ProductDTO.FromProducts(data));
+                return Ok(ProductMapping.MapToDTOs(res));
             }
             catch (NotFoundException<Pricelist> e)
             {

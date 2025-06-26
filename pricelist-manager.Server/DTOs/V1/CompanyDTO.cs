@@ -4,8 +4,7 @@ using System.Linq.Expressions;
 
 namespace pricelist_manager.Server.DTOs.V1
 {
-    public class CompanyDTO
-    {
+    public class CompanyLiteDTO {
         [Length(1, 10)]
         public required string Id { get; set; }
 
@@ -29,39 +28,12 @@ namespace pricelist_manager.Server.DTOs.V1
 
         [Length(7, 7)]
         public string InterfaceColor { get; set; } = string.Empty;
+    }
 
-        public ICollection<ProductDTO>? Products { get; set; } = null!;
-        public ICollection<PricelistDTO>? Pricelists { get; set; } = null!;
-
-
-        public static CompanyDTO FromCompany(Company company, ICollection<ProductDTO>? products = null!, ICollection<PricelistDTO>? pricelists = null!)
-        {
-            return new CompanyDTO
-            {
-                Id = company.Id,
-                Name = company.Name,
-                Address = company.Address,
-                InterfaceColor = company.InterfaceColor,
-                LogoUri = company.LogoUri,
-                Phone = company.Phone,
-                PostalCode = company.PostalCode,
-                Province = company.Province,
-                Pricelists = pricelists,
-                Products = products
-            };
-        }
-
-        public static ICollection<CompanyDTO> FromCompanies(ICollection<(Company company, ICollection<ProductDTO>? products, ICollection<PricelistDTO>? pricelists)> elements)
-        {
-            ICollection<CompanyDTO> data = [];
-
-            foreach (var element in elements)
-            {
-                data.Add(FromCompany(element.company, element.products, element.pricelists));
-            }
-
-            return data;
-        }
+    public class CompanyDTO : CompanyLiteDTO
+    {
+        public ICollection<ProductLiteDTO>? Products { get; set; } = null!;
+        public ICollection<PricelistLiteDTO>? Pricelists { get; set; } = null!;
     }
 
 }

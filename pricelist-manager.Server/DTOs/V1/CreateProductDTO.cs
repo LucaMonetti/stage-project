@@ -26,30 +26,6 @@ namespace pricelist_manager.Server.DTOs.V1
 
         public string AccountingControl { get; set; } = string.Empty;
         public string CDA { get; set; } = string.Empty;
-        public string SalesItem { get; set; } = string.Empty;
-
-        public static Product ToProduct(CreateProductDTO product)
-        {
-            return new Product
-            {
-                PricelistId = product.PricelistId,
-                ProductCode = product.ProductCode,
-                CompanyId = product.CompanyId,
-                LatestVersion = 0,
-                Versions = [ToProductInstance(product)]
-            };
-        }
-
-        public static ProductInstance ToProductInstance(CreateProductDTO product)
-        {
-            return new ProductInstance
-            {
-                ProductId = $"{product.CompanyId}-{product.ProductCode}",
-                Name = product.Name,
-                Description = product.Description,
-                Price = product.Price,
-                Version = 0
-            };
-        }
+        public string SalesItem { get; set; } = string.Empty;        
     }
 }

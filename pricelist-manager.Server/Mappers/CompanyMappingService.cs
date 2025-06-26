@@ -1,0 +1,44 @@
+﻿using pricelist_manager.Server.DTOs.V1;
+using pricelist_manager.Server.Interfaces;
+using pricelist_manager.Server.Models;
+
+namespace pricelist_manager.Server.Mappers
+{
+    public class CompanyMappingService : ICompanyMappingService
+    {
+        private readonly IProductLiteMappingService ProductMapping;
+        private readonly IPricelistLiteMappingService PricelistMapping;
+
+        public CompanyMappingService(IProductLiteMappingService productMapping, IPricelistLiteMappingService pricelistMapping)
+        {
+            ProductMapping = productMapping;
+            PricelistMapping = pricelistMapping;
+        }
+
+        public CompanyDTO MapToDTO(Company company)
+        {
+            ArgumentNullException.ThrowIfNull(company);
+
+            return new CompanyDTO
+            {
+                Id = company.Id,
+                Name = company.Name,
+                Address = company.Address,
+                InterfaceColor = company.InterfaceColor,
+                LogoUri = company.LogoUri,
+                Phone = company.Phone,
+                PostalCode = company.PostalCode,
+                Province = company.Province,
+                Pricelists = PricelistMapping.MapToLiteDTOs(company.Pricelists),
+                Products = ProductMapping.MapToLiteDTOs(company.Products)
+            };
+        }
+
+        public ICollection<CompanyDTO> MapToDTOs(ICollection<Company> companies)
+        {
+            ArgumentNullException.ThrowIfNull(companies);
+
+            return [.. companies.Select(c => MapToDTO(c))];
+        }
+    }
+}

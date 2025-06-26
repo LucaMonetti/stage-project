@@ -55,7 +55,7 @@ namespace pricelist_manager.Server.Repositories
         {
             if (!CanConnect()) throw new StorageUnavailableException();
 
-            var pricelists = await Context.Pricelists.Include(p => p.Company).ToListAsync();
+            var pricelists = await Context.Pricelists.ToListAsync();
 
             return pricelists;
         }

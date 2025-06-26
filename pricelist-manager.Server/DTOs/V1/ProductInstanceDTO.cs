@@ -12,49 +12,5 @@ namespace pricelist_manager.Server.DTOs.V1
         public string AccountingControl { get; set; } = string.Empty;
         public string CDA { get; set; } = string.Empty;
         public string SalesItem { get; set; } = string.Empty;
-
-        public static ProductInstanceDTO FromProductInstance(ProductInstance? productInstance)
-        {
-            return productInstance != null ? new ProductInstanceDTO
-            {
-                ProductId = productInstance.ProductId,
-                Version = productInstance.Version,
-                Name = productInstance.Name,
-                Description = productInstance.Description,
-                Price = productInstance.Price,
-                Cost = productInstance.Cost,
-                AccountingControl = productInstance.AccountingControl,
-                CDA = productInstance.CDA,
-                SalesItem = productInstance.SalesItem
-            } : new ProductInstanceDTO();
-        }
-
-        public static ICollection<ProductInstanceDTO> FromProductInstances(ICollection<ProductInstance> productInstance)
-        {
-            ICollection<ProductInstanceDTO> products = [];
-
-            foreach (ProductInstance? product in productInstance)
-            {
-                products.Add(FromProductInstance(product));
-            }
-
-            return products;
-        }
-
-        public static ProductInstance ToProductInstance(ProductInstanceDTO productInstance, Guid pricelistId, string productCode)
-        {
-            return new ProductInstance
-            {
-                ProductId = productInstance.ProductId,
-                Version = productInstance.Version,
-                Name = productInstance.Name,
-                Description = productInstance.Description,
-                Price = productInstance.Price,
-                AccountingControl= productInstance.AccountingControl,
-                CDA = productInstance.CDA,
-                SalesItem = productInstance.SalesItem,
-                Cost = productInstance.Cost
-            };
-        }
     }
 }

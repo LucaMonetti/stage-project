@@ -5,6 +5,7 @@ using pricelist_manager.Server.Exceptions;
 using pricelist_manager.Server.Interfaces;
 using pricelist_manager.Server.Models;
 using pricelist_manager.Server.Repositories;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace pricelist_manager.Server.Controllers.V1
 {
@@ -15,11 +16,15 @@ namespace pricelist_manager.Server.Controllers.V1
     {
         private readonly IProductRepository ProductRepository;
         private readonly IProductInstanceRepository ProductInstanceRepository;
+        private readonly IProductMappingService ProductMapping;
+        private readonly IProductInstanceMappingService ProductInstanceMapping;
 
-        public ProductsController(IProductRepository productRepository, IProductInstanceRepository productInstanceRepository)
+        public ProductsController(IProductRepository productRepository, IProductInstanceRepository productInstanceRepository, IProductMappingService productMapping, IProductInstanceMappingService productInstanceMapping)
         {
             ProductRepository = productRepository;
             ProductInstanceRepository = productInstanceRepository;
+            ProductMapping = productMapping;
+            ProductInstanceMapping = productInstanceMapping;
         }
 
         [HttpGet]
@@ -30,7 +35,7 @@ namespace pricelist_manager.Server.Controllers.V1
 
             var data = await ProductRepository.GetAllProductsWithPricelistsAsync();
 
-            return Ok(ProductDTO.FromProducts(data));
+            return Ok(ProductMapping.MapToDTOs(data));
         }
 
         [HttpGet("{productId}")]
@@ -43,7 +48,7 @@ namespace pricelist_manager.Server.Controllers.V1
             {
                 var data = await ProductRepository.GetByIdAsync(productId);
 
-                return Ok(ProductDTO.FromProduct(data));
+                return Ok(ProductMapping.MapToDTO(data));
             }
             catch (NotFoundException<Product> e)
             {
@@ -59,7 +64,7 @@ namespace pricelist_manager.Server.Controllers.V1
                 return BadRequest(ModelState);
             }
 
-            Product data = CreateProductDTO.ToProduct(dto);
+            Product data = ProductMapping.MapToProduct(dto);
 
             try
             {
@@ -90,7 +95,7 @@ namespace pricelist_manager.Server.Controllers.V1
             {
                 Product oldProd = await ProductRepository.GetByIdAsync(productId);
 
-                ProductInstance newInstance = UpdateProductDTO.TurnIntoInstance(dto, oldProd.LatestVersion + 1);
+                ProductInstance newInstance = ProductInstanceMapping.MapToProductInstance(dto, oldProd.LatestVersion + 1);
 
                 ProductRepository.ClearTracking();
 

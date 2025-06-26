@@ -24,5 +24,8 @@ namespace pricelist_manager.Server.Models
 
         [ForeignKey(nameof(PricelistId))]
         public virtual Pricelist Pricelist { get; set; } = null!;
+
+        [ForeignKey(nameof(CompanyId))]
+        public virtual Company Company { get; set; } = null!;
     }
 }
