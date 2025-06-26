@@ -77,7 +77,7 @@ function SearchableSelect<T extends FieldValues>({
   registerOptions,
   prevValue,
 }: Props<T>) {
-  const pricelists = useFetch("/api/pricelists", PricelistArraySchema);
+  const pricelists = useFetch("pricelists", PricelistArraySchema);
   const options =
     pricelists.data?.map((i) => ({
       label: `${i.company.id} - ${i.name}`,

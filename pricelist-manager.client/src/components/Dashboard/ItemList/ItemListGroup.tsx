@@ -5,10 +5,9 @@ import { ProductArraySchema } from "../../../models/Product";
 import ItemList from "./ItemList";
 
 const ItemListGroup = () => {
-  const products = useFetch("api/products", ProductArraySchema);
-  const pricelists = useFetch("api/pricelists", PricelistArraySchema);
-
-  const companies = useFetch("api/companies", CompanyArraySchema);
+  const products = useFetch("products", ProductArraySchema);
+  const pricelists = useFetch("pricelists", PricelistArraySchema);
+  const companies = useFetch("companies", CompanyArraySchema);
 
   return (
     <div className="flex flex-col flex-wrap gap-8 mt-8">

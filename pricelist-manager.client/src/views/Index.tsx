@@ -1,7 +1,5 @@
 function HomeView() {
-  return (
-    <p>Hello world!</p>
-  );
+  return <p>Hello world!</p>;
 }
 
 export default HomeView;

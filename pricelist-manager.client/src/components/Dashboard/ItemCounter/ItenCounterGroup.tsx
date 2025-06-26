@@ -1,18 +1,15 @@
 import { useFetch } from "../../../hooks/useFetch";
-import { CompanyStatisticsSchema } from "../../../models/Company";
-import { PricelistStatisticsSchema } from "../../../models/Pricelist";
-import { ProductStatisticsSchema } from "../../../models/Product";
+import { CompanyStatisticsSchema } from "../../../models/CompanyStatistics";
+import { PricelistStatisticsSchema } from "../../../models/PricelistStatistics";
+import { ProductStatisticsSchema } from "../../../models/ProductStatistics";
 import ItemCounter from "./ItemCounter";
 import { FaBuilding, FaListUl } from "react-icons/fa6";
 
 function ItenCounterGroup() {
-  const products = useFetch("api/statistics/products", ProductStatisticsSchema);
-  const companies = useFetch(
-    "api/statistics/companies",
-    CompanyStatisticsSchema
-  );
+  const products = useFetch("statistics/products", ProductStatisticsSchema);
+  const companies = useFetch("statistics/companies", CompanyStatisticsSchema);
   const pricelists = useFetch(
-    "api/statistics/pricelists",
+    "statistics/pricelists",
     PricelistStatisticsSchema
   );
 

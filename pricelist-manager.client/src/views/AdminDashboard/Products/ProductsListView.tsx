@@ -1,12 +1,9 @@
 import GenericTableView from "../../../components/Dashboard/Tables/GenericTableView";
 import { useFetch } from "../../../hooks/useFetch";
-import {
-  ProductWithPricelistArraySchema,
-  type Product,
-} from "../../../models/Product";
+import { ProductArraySchema, type Product } from "../../../models/Product";
 
 const ProductsListView = () => {
-  const products = useFetch("/api/products", ProductWithPricelistArraySchema);
+  const products = useFetch("products", ProductArraySchema);
 
   const columns = [
     {

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import type { FetchData } from "../types";
-import type { z, ZodSafeParseSuccess, ZodType } from "zod/v4";
+import type { z, ZodType } from "zod/v4";
 
 const API_OPTIONS = {
   GET: {
@@ -22,6 +22,7 @@ export function useFetch<TSchema extends ZodType>(
   endpoint: string,
   schema: TSchema,
   method: "GET" | "POST" = "GET",
+  apiVersion?: string,
   body?: z.infer<TSchema>
 ): FetchData<z.infer<TSchema>> {
   const [data, setData] = useState<z.infer<TSchema>>();
@@ -33,7 +34,10 @@ export function useFetch<TSchema extends ZodType>(
   const fetchData = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch(endpoint, API_OPTIONS[method]);
+      const response = await fetch(
+        `/api/${apiVersion ?? "v1"}/${endpoint}`,
+        API_OPTIONS[method]
+      );
 
       if (!response.ok) {
         throw new Error("Failed to fetch API!");

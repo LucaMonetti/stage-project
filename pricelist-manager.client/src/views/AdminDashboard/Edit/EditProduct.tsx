@@ -6,14 +6,11 @@ import ProductForm, {
 
 import { FaPlus } from "react-icons/fa6";
 import { useFetch } from "../../../hooks/useFetch";
-import { ProductWithVersionsSchema } from "../../../models/Product";
+import { ProductSchema } from "../../../models/Product";
 
 const EditProductForm = () => {
-  const { pricelistId, productCode } = useParams();
-  const product = useFetch(
-    `/api/pricelists/${pricelistId}/products/${productCode}/versions`,
-    ProductWithVersionsSchema
-  );
+  const { productId } = useParams();
+  const product = useFetch(`products/${productId}`, ProductSchema);
 
   let edit;
 

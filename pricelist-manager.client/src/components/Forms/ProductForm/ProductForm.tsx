@@ -1,4 +1,4 @@
-import { CreateProductSchema } from "../../../models/Product";
+import { CreateProductSchema } from "../../../models/CreateProduct";
 import Fieldset from "../Fieldset";
 import Input from "../Input";
 import SearchableSelect from "../SearchableSelect";
@@ -21,6 +21,10 @@ export type ProductFormData = {
   name: string;
   description: string;
   price: number;
+  cost: number;
+  cda: string;
+  accountingControl: string;
+  salesItem: string;
 };
 
 const ProductForm = ({ className, id, values }: Props) => {
@@ -162,12 +166,50 @@ const ProductForm = ({ className, id, values }: Props) => {
           error={errors["price"]?.message}
           value={values ? values.price : undefined}
         />
+        <Input
+          type="number"
+          id="cost"
+          label="Costo Articolo"
+          register={register}
+          registerOptions={{
+            valueAsNumber: true,
+            required: "Necessario inserire il costo dell'Articolo!",
+          }}
+          error={errors["cost"]?.message}
+          value={values ? values.cost : undefined}
+        />
         <Textarea
           id="description"
           label="Descrizione Articolo"
           register={register}
           error={errors["description"]?.message}
           value={values ? values.description : undefined}
+        />
+      </Fieldset>
+      <Fieldset name="Informazioni Contabili">
+        <Input
+          type="text"
+          id="name"
+          label="Mastrino"
+          register={register}
+          error={errors["accountingControl"]?.message}
+          value={values ? values.accountingControl : undefined}
+        />
+        <Input
+          type="text"
+          id="name"
+          label="CDA"
+          register={register}
+          error={errors["cda"]?.message}
+          value={values ? values.name : undefined}
+        />
+        <Input
+          type="text"
+          id="name"
+          label="Voce vendita"
+          register={register}
+          error={errors["salesItem"]?.message}
+          value={values ? values.salesItem : undefined}
         />
       </Fieldset>
     </form>

@@ -1,9 +1,9 @@
-import type { Product } from "../../../models/Product";
+import type { ProductLite } from "../../../models/Product";
 import type { FetchData } from "../../../types";
 import BasicLoader from "../../Loader/BasicLoader";
 
 type Prods = {
-  products: FetchData<Product[]>;
+  products: FetchData<ProductLite[]>;
 };
 
 const TableView = ({ products }: Prods) => {

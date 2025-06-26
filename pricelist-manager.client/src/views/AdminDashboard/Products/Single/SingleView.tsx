@@ -1,22 +1,13 @@
-import { useNavigate, useParams } from "react-router";
+import { useParams } from "react-router";
 import { useFetch } from "../../../../hooks/useFetch";
-import {
-  ProductSchema,
-  ProductWithVersionsSchema,
-} from "../../../../models/Product";
+import { ProductSchema } from "../../../../models/Product";
 import BasicLoader from "../../../../components/Loader/BasicLoader";
 import SimpleIconButton from "../../../../components/Buttons/SimpleButton";
 import { FaPencil, FaDownload } from "react-icons/fa6";
-import { PricelistSchema } from "../../../../models/Pricelist";
 
 const SingleProductView = () => {
-  const { pricelistId, productCode } = useParams();
-  const product = useFetch(
-    `/api/pricelists/${pricelistId}/products/${productCode}/versions`,
-    ProductWithVersionsSchema
-  );
-
-  const pricelist = useFetch(`/api/pricelists/${pricelistId}`, PricelistSchema);
+  const { productId } = useParams();
+  const product = useFetch(`products/${productId}`, ProductSchema);
 
   if (product.isLoading) {
     return (
@@ -45,7 +36,7 @@ const SingleProductView = () => {
             Icon={FaPencil}
             color="purple"
             text="Modifica"
-            route={`/admin-dashboard/edit/pricelists/${pricelistId}/products/${productCode}`}
+            route={`/admin-dashboard/edit/products/${productId}`}
             className="sm:flex-1"
           />
           <SimpleIconButton
@@ -75,14 +66,14 @@ const SingleProductView = () => {
         <h2 className="uppercase font-bold text-gray-500">Listino</h2>
         <dl className="grid grid-cols-[1fr] sm:grid-cols-[auto_1fr] [&>dd]:border-b-2 sm:[&>*]:border-b-2 [&>*]:border-gray-700 [&>dt]:pt-4 [&>dd]:pb-4 sm:[&>dt]:pt-2 sm:[&>dt]:pb-2 sm:[&>dd]:pt-2 sm:[&>dd]:pb-2 [&>*:nth-last-child(-n+2)]:border-b-0 [&>dt]:uppercase [&>dt]:font-medium [&>dt]:text-gray-500">
           <dt>Nome:</dt>
-          <dd>{pricelist.data?.name}</dd>
+          <dd>{product.data?.pricelist.name}</dd>
 
           <dt>Codice:</dt>
-          <dd>{pricelist.data?.id}</dd>
+          <dd>{product.data?.pricelist.id}</dd>
 
           <dt>Azienda:</dt>
           <dd>
-            {pricelist.data?.company.id} - {pricelist.data?.company.name}
+            {product.data?.company.id} - {product.data?.company.name}
           </dd>
         </dl>
       </div>
