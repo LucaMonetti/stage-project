@@ -19,6 +19,15 @@ namespace pricelist_manager.Server.Models
 
         [Precision(10, 2)]
         public Decimal Price { get; set; } = Decimal.Zero;
+        
+        [Precision(10, 2)]
+        public Decimal Cost { get; set; } = Decimal.Zero;
+
+        public string AccountingControl { get; set; } = String.Empty;
+
+        public string CDA {  get; set; } = String.Empty;
+
+        public string SalesItem { get; set; } = String.Empty;
 
         public Product? Product { get; set; } = null!;
     }

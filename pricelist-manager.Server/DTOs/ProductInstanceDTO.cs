@@ -8,6 +8,10 @@ namespace pricelist_manager.Server.DTOs
         public string Name { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public decimal Price { get; set; } = Decimal.Zero;
+        public Decimal Cost { get; set; } = Decimal.Zero;
+        public string AccountingControl { get; set; } = String.Empty;
+        public string CDA { get; set; } = String.Empty;
+        public string SalesItem { get; set; } = String.Empty;
 
         public static ProductInstanceDTO FromProductInstance(ProductInstance? productInstance)
         {
@@ -17,7 +21,11 @@ namespace pricelist_manager.Server.DTOs
                 Version = productInstance.Version,
                 Name = productInstance.Name,
                 Description = productInstance.Description,
-                Price = productInstance.Price
+                Price = productInstance.Price,
+                Cost = productInstance.Cost,
+                AccountingControl = productInstance.AccountingControl,
+                CDA = productInstance.CDA,
+                SalesItem = productInstance.SalesItem
             } : new ProductInstanceDTO();
         }
 
@@ -41,7 +49,11 @@ namespace pricelist_manager.Server.DTOs
                 Version = productInstance.Version,
                 Name = productInstance.Name,
                 Description = productInstance.Description,
-                Price = productInstance.Price
+                Price = productInstance.Price,
+                AccountingControl= productInstance.AccountingControl,
+                CDA = productInstance.CDA,
+                SalesItem = productInstance.SalesItem,
+                Cost = productInstance.Cost
             };
         }
     }

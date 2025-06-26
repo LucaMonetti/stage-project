@@ -10,16 +10,23 @@ namespace pricelist_manager.Server.DTOs
         public required string ProductCode { get; set; }
         public required string CompanyId { get; set; }
 
-        public Guid PricelistId { get; set; }
+        public required Guid PricelistId { get; set; }
 
         [StringLength(100)]
-        public string Name { get; set; } = string.Empty;
+        public required string Name { get; set; }
 
         [StringLength(200)]
         public string Description { get; set; } = string.Empty;
 
         [Precision(10, 2)]
-        public decimal Price { get; set; }
+        public decimal Price { get; set; } = Decimal.Zero;
+
+        [Precision(10, 2)]
+        public Decimal Cost { get; set; } = Decimal.Zero;
+
+        public string AccountingControl { get; set; } = String.Empty;
+        public string CDA { get; set; } = String.Empty;
+        public string SalesItem { get; set; } = String.Empty;
 
         public static Product ToProduct(CreateProductDTO product)
         {

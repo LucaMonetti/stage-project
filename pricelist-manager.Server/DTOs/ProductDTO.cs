@@ -22,8 +22,6 @@ namespace pricelist_manager.Server.DTOs
 
         public static ProductDTO FromProduct(Product product, CompanyDTO? company = null!)
         {
-            Console.WriteLine($"DEBUG V2: {product.Versions.Count}");
-
             return new ProductDTO
             {
                 PricelistId = product.PricelistId,
