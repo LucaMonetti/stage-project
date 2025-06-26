@@ -59,14 +59,14 @@ namespace pricelist_manager.Server.Repositories
         {
             if (!CanConnect()) throw new StorageUnavailableException();
 
-            return await Context.Companies.ToListAsync();
+            return await Context.Companies.Include(c => c.Products).ThenInclude(p => p.Versions).Include(c => c.Pricelists).ToListAsync();
         }
 
         public async Task<Company> GetByIdAsync(string id)
         {
             if (!CanConnect()) throw new StorageUnavailableException();
 
-            var res = await Context.Companies.FirstOrDefaultAsync(x => x.Id == id);
+            var res = await Context.Companies.Include(c => c.Products).ThenInclude(p => p.Versions).Include(c => c.Pricelists).FirstOrDefaultAsync(x => x.Id == id);
 
             if (res == null) throw new NotFoundException<Company>(id);
 

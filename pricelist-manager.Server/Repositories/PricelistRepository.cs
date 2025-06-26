@@ -55,7 +55,7 @@ namespace pricelist_manager.Server.Repositories
         {
             if (!CanConnect()) throw new StorageUnavailableException();
 
-            var pricelists = await Context.Pricelists.ToListAsync();
+            var pricelists = await Context.Pricelists.Include(p => p.Products).ThenInclude(p => p.Versions).Include(p => p.Company).ToListAsync();
 
             return pricelists;
         }
@@ -64,7 +64,7 @@ namespace pricelist_manager.Server.Repositories
         {
             if (!CanConnect()) throw new StorageUnavailableException();
 
-            var pricelists = await Context.Pricelists.Where(p => p.CompanyId == companyId).Include(p => p.Company).ToListAsync();
+            var pricelists = await Context.Pricelists.Where(p => p.CompanyId == companyId).Include(p => p.Products).ThenInclude(p => p.Versions).Include(p => p.Company).ToListAsync();
 
             return pricelists;
         }
@@ -73,7 +73,7 @@ namespace pricelist_manager.Server.Repositories
         {
             if (!CanConnect()) throw new StorageUnavailableException();
 
-            var pricelist = await Context.Pricelists.Include(p => p.Company).FirstOrDefaultAsync(p => p.Id == id);
+            var pricelist = await Context.Pricelists.Include(p => p.Products).ThenInclude(p => p.Versions).Include(p => p.Company).FirstOrDefaultAsync(p => p.Id == id);
 
             if (pricelist == null) throw new NotFoundException<Pricelist>(id);
 

@@ -33,7 +33,7 @@ namespace pricelist_manager.Server.Controllers.V1
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var data = await ProductRepository.GetAllProductsWithPricelistsAsync();
+            var data = await ProductRepository.GetAllAsync();
 
             return Ok(ProductMapping.MapToDTOs(data));
         }

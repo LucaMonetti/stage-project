@@ -6,10 +6,10 @@ namespace pricelist_manager.Server.Interfaces
     public interface IProductRepository: IBaseRepository
     {
         /// <exception cref="StorageUnavailableException">The database is not available</exception>
-        Task<ICollection<Product>> GetAllProductsWithPricelistsAsync();
+        Task<ICollection<Product>> GetAllAsync();
 
         /// <exception cref="StorageUnavailableException">The database is not available</exception>
-        Task<ICollection<Product>> GetAllAsync(Guid pricelistId);
+        Task<ICollection<Product>> GetByPricelistAsync(Guid pricelistId);
 
         /// <exception cref="StorageUnavailableException">The database is not available</exception>
         Task<ICollection<IGrouping<Guid, Product>>> GetAllGroupPricelistAsync();

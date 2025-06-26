@@ -14,20 +14,6 @@ namespace pricelist_manager.Server.Repositories
         public ProductRepository(DataContext dataContext) : base(dataContext)
         {}
 
-        public async Task<ICollection<Product>> GetAllProductsWithPricelistsAsync()
-        {
-            if (!CanConnect()) throw new StorageUnavailableException();
-
-            var res = await Context.Products
-                .Include(p => p.Versions)
-                .Include(p => p.Pricelist)
-                .ToListAsync();
-
-            Console.Write($"DEBUG: Repository {res.Count},[0] {res.ElementAt(0).Versions.Count}");
-
-            return res;
-        }
-
         public async Task<bool> UpdateAsync(Product entity)
         {
             if (!CanConnect()) throw new StorageUnavailableException();
@@ -52,11 +38,31 @@ namespace pricelist_manager.Server.Repositories
             return await Context.Products.AnyAsync(pi => pi.Id == productId);
         }
 
-        public async Task<ICollection<Product>> GetAllAsync(Guid pricelistId)
+        public async Task<ICollection<Product>> GetAllAsync()
         {
             if (!CanConnect()) throw new StorageUnavailableException();
 
-            var products = await Context.Products.Where(p => p.PricelistId == pricelistId).Include(p => p.Versions.OrderByDescending(v => v.Version)).ToListAsync();
+            var products = await Context.Products
+                .Include(p => p.Versions.OrderByDescending(v => v.Version))
+                .Include(p => p.Pricelist)
+                .Include(p => p.Company)
+                .ToListAsync();
+
+            TrimProductsVersion(products);
+
+            return products;
+        }
+
+        public async Task<ICollection<Product>> GetByPricelistAsync(Guid pricelistId)
+        {
+            if (!CanConnect()) throw new StorageUnavailableException();
+
+            var products = await Context.Products
+                .Where(p => p.PricelistId == pricelistId)
+                .Include(p => p.Versions.OrderByDescending(v => v.Version))
+                .Include(p => p.Pricelist)
+                .Include(p => p.Company)
+                .ToListAsync();
 
             TrimProductsVersion(products);
 
@@ -69,7 +75,9 @@ namespace pricelist_manager.Server.Repositories
 
             var product = await Context.Products
                                     .Where(p => p.Id == productId)
-                                    .Include(p => p.Versions)
+                                    .Include(p => p.Versions.OrderByDescending(v => v.Version))
+                                    .Include(p => p.Pricelist)
+                                    .Include(p => p.Company)
                                     .FirstOrDefaultAsync();
 
             if (product == null) throw new NotFoundException<Product>(productId);
@@ -85,7 +93,9 @@ namespace pricelist_manager.Server.Repositories
 
             var product = await Context.Products
                                     .Where(p => p.Versions.Last().Name.Contains(name))
-                                    .Include(p => p.Versions)
+                                    .Include(p => p.Versions.OrderByDescending(v => v.Version))
+                                    .Include(p => p.Pricelist)
+                                    .Include(p => p.Company)
                                     .ToListAsync();
 
             TrimProductsVersion(product);
@@ -101,7 +111,9 @@ namespace pricelist_manager.Server.Repositories
 
             var product = await Context.Products
                                     .Where(p => p.ProductCode == code)
-                                    .Include(p => p.Versions)
+                                    .Include(p => p.Versions.OrderByDescending(v => v.Version))
+                                    .Include(p => p.Pricelist)
+                                    .Include(p => p.Company)
                                     .ToListAsync();
 
             TrimProductsVersion(product);
@@ -117,7 +129,9 @@ namespace pricelist_manager.Server.Repositories
 
             var product = await Context.Products
                                     .Where(p => p.CompanyId == companyId)
-                                    .Include(p => p.Versions)
+                                    .Include(p => p.Versions.OrderByDescending(v => v.Version))
+                                    .Include(p => p.Pricelist)
+                                    .Include(p => p.Company)
                                     .ToListAsync();
 
             TrimProductsVersion(product);
@@ -155,23 +169,23 @@ namespace pricelist_manager.Server.Repositories
 
         private void TrimProductsVersion(List<Product> products)
         {
-            foreach (var product in products)
-                TrimProductVersion(product);
+            //foreach (var product in products)
+            //    TrimProductVersion(product);
         }
 
         private void TrimProductsVersion(List<IGrouping<Guid, Product>> products)
         {
-            foreach (var pricelist in products)
-                foreach (var product in pricelist)
-                    TrimProductVersion(product);
+            //foreach (var pricelist in products)
+            //    foreach (var product in pricelist)
+            //        TrimProductVersion(product);
         }
 
         private void TrimProductVersion(Product product)
         {
-            foreach (var version in product.Versions)
-            {
-                version.Product = null!;
-            }
+            //foreach (var version in product.Versions)
+            //{
+            //    version.Product = null!;
+            //}
         }
 
         public async Task<ProductStatistics> GetStatistics()

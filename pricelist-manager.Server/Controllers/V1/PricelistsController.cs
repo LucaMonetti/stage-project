@@ -70,7 +70,7 @@ namespace pricelist_manager.Server.Controllers.V1
 
             try
             {
-                var res = await ProductRepository.GetAllAsync(pricelistId);
+                var res = await ProductRepository.GetByPricelistAsync(pricelistId);
 
                 return Ok(ProductMapping.MapToDTOs(res));
             }
