@@ -1,5 +1,5 @@
 ﻿using pricelist_manager.Server.Models;
-namespace pricelist_manager.Server.DTOs
+namespace pricelist_manager.Server.DTOs.V1
 {
     public class ProductInstanceDTO
     {
@@ -7,11 +7,11 @@ namespace pricelist_manager.Server.DTOs
         public int Version { get; set; } = 0;
         public string Name { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
-        public decimal Price { get; set; } = Decimal.Zero;
-        public Decimal Cost { get; set; } = Decimal.Zero;
-        public string AccountingControl { get; set; } = String.Empty;
-        public string CDA { get; set; } = String.Empty;
-        public string SalesItem { get; set; } = String.Empty;
+        public decimal Price { get; set; } = decimal.Zero;
+        public decimal Cost { get; set; } = decimal.Zero;
+        public string AccountingControl { get; set; } = string.Empty;
+        public string CDA { get; set; } = string.Empty;
+        public string SalesItem { get; set; } = string.Empty;
 
         public static ProductInstanceDTO FromProductInstance(ProductInstance? productInstance)
         {

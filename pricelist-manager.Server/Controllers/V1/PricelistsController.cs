@@ -1,18 +1,20 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using pricelist_manager.Server.Data;
-using pricelist_manager.Server.DTOs;
+using pricelist_manager.Server.DTOs.V1;
 using pricelist_manager.Server.Exceptions;
 using pricelist_manager.Server.Interfaces;
 using pricelist_manager.Server.Models;
 using pricelist_manager.Server.Repositories;
 using System.Globalization;
 
-namespace pricelist_manager.Server.Controllers
+namespace pricelist_manager.Server.Controllers.V1
 {
     [ApiController]
-    [Route("api/pricelists")]
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}/pricelists")]
     public class PricelistsController: ControllerBase
     {
         private readonly IPricelistRepository PricelistRepository;

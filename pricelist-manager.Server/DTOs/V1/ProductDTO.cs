@@ -1,8 +1,7 @@
-﻿
-using pricelist_manager.Server.Models;
+﻿using pricelist_manager.Server.Models;
 using System.ComponentModel.Design;
 
-namespace pricelist_manager.Server.DTOs
+namespace pricelist_manager.Server.DTOs.V1
 {
     public class ProductDTO
     {

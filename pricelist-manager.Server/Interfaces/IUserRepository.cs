@@ -1,4 +1,4 @@
-﻿using pricelist_manager.Server.DTOs.Statistics;
+﻿using pricelist_manager.Server.DTOs.V1.Statistics;
 using pricelist_manager.Server.Models;
 
 namespace pricelist_manager.Server.Interfaces

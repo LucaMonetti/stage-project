@@ -1,4 +1,4 @@
-﻿namespace pricelist_manager.Server.DTOs
+﻿namespace pricelist_manager.Server.DTOs.V1
 {
     public class LoginDTO
     {

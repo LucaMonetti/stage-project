@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace pricelist_manager.Server.DTOs
+namespace pricelist_manager.Server.DTOs.V1
 {
     public class UserDTO
     {

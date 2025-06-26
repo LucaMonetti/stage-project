@@ -1,6 +1,6 @@
 ﻿using pricelist_manager.Server.Helpers;
 
-namespace pricelist_manager.Server.DTOs
+namespace pricelist_manager.Server.DTOs.V1
 {
     public class RegisterDTO
     {

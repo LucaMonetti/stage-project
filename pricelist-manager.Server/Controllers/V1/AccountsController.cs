@@ -1,9 +1,10 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using pricelist_manager.Server.Data;
-using pricelist_manager.Server.DTOs;
+using pricelist_manager.Server.DTOs.V1;
 using pricelist_manager.Server.Helpers;
 using pricelist_manager.Server.Interfaces;
 using pricelist_manager.Server.Models;
@@ -12,10 +13,11 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace pricelist_manager.Server.Controllers
+namespace pricelist_manager.Server.Controllers.V1
 {
     [ApiController]
-    [Route("api/accounts")]
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}/accounts")]
     public class AccountsController : ControllerBase
     {
         private readonly UserManager<User> UserManager;

@@ -1,14 +1,16 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using pricelist_manager.Server.DTOs;
+﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Mvc;
+using pricelist_manager.Server.DTOs.V1;
 using pricelist_manager.Server.Exceptions;
 using pricelist_manager.Server.Interfaces;
 using pricelist_manager.Server.Models;
 using pricelist_manager.Server.Repositories;
 
-namespace pricelist_manager.Server.Controllers
+namespace pricelist_manager.Server.Controllers.V1
 {
     [ApiController]
-    [Route("api/products")]
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}/products")]
     public class ProductsController : ControllerBase
     {
         private readonly IProductRepository ProductRepository;

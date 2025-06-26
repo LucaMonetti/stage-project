@@ -1,7 +1,7 @@
 using pricelist_manager.Server.Models;
 using System.ComponentModel.DataAnnotations;
 
-namespace pricelist_manager.Server.DTOs
+namespace pricelist_manager.Server.DTOs.V1
 {
 
     public class PricelistDTO
@@ -9,10 +9,10 @@ namespace pricelist_manager.Server.DTOs
         public Guid Id { get; set; }
 
         [Length(5, 50)]
-        public string Name { get; set; } = String.Empty;
+        public string Name { get; set; } = string.Empty;
 
         [Length(0, 200)]
-        public string Description { get; set; } = String.Empty;
+        public string Description { get; set; } = string.Empty;
 
         public Company? Company { get; set; } = null!;
 

@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using pricelist_manager.Server.Data;
-using pricelist_manager.Server.DTOs.Statistics;
+using pricelist_manager.Server.DTOs.V1.Statistics;
 using pricelist_manager.Server.Exceptions;
 using pricelist_manager.Server.Helpers;
 using pricelist_manager.Server.Interfaces;

@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Mvc;
 using pricelist_manager.Server.Interfaces;
 
-namespace pricelist_manager.Server.Controllers
+namespace pricelist_manager.Server.Controllers.V1
 {
     [ApiController]
-    [Route("api/statistics")]
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}/statistics")]
     public class StatisticsController : ControllerBase
     {
         private readonly IProductRepository ProductsRepository;

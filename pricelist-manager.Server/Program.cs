@@ -1,4 +1,6 @@
 
+using Asp.Versioning.ApiExplorer;
+using Asp.Versioning.Conventions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -71,6 +73,23 @@ namespace pricelist_manager.Server
                 options.AddPolicy("UserPolicy", policy => policy.RequireRole("User"));
             });
 
+            // API Versioning
+            builder.Services.AddApiVersioning(options =>
+            {
+                options.AssumeDefaultVersionWhenUnspecified = true;
+                options.DefaultApiVersion = new Asp.Versioning.ApiVersion(1, 0);
+                options.ReportApiVersions = true;
+            }).AddMvc(options =>
+            {
+                options.Conventions.Add(new VersionByNamespaceConvention());
+            }).AddApiExplorer(options =>
+            {
+                options.GroupNameFormat = "'v'V";
+                options.SubstituteApiVersionInUrl = true;
+            });
+
+            builder.Services.ConfigureOptions<ConfigureSwaggerOptions>();
+
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(options =>
@@ -101,7 +120,15 @@ namespace pricelist_manager.Server
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
-                app.UseSwaggerUI();
+                app.UseSwaggerUI(options =>
+                {
+                    var providers = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
+
+                    foreach (var description in providers.ApiVersionDescriptions)
+                    {
+                        options.SwaggerEndpoint($"/swagger/{description.GroupName}/swagger.json", description.GroupName.ToUpperInvariant());
+                    }
+                });
             }
 
             //Middlewares
