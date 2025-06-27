@@ -6,6 +6,7 @@ export const CreateProductSchema = z.object({
   productCode: z
     .string()
     .min(1, "Necessario inserire il codice dell'Articolo!"),
+  companyId: z.string().min(1, "Necessario inserire il Codice dell'Azienda!"),
   name: z.string().min(1, "Necessario inserire il nome dell'Articolo!"),
   description: z.string(),
   price: z

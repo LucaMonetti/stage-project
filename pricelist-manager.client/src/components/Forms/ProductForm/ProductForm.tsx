@@ -18,6 +18,7 @@ type Props = {
 export type ProductFormData = {
   pricelistId: string;
   productCode: string;
+  companyId: string;
   name: string;
   description: string;
   price: number;
@@ -42,7 +43,7 @@ const ProductForm = ({ className, id, values }: Props) => {
   const errorDiv = useRef<HTMLDivElement>(null);
 
   const onSubmit: SubmitHandler<ProductFormData> = async (data) => {
-    let endpoint = `/api/pricelists/products`;
+    let endpoint = `/api/v1/products`;
     let options = {
       method: "POST",
       headers: {
@@ -51,8 +52,10 @@ const ProductForm = ({ className, id, values }: Props) => {
       body: JSON.stringify(data),
     };
 
+    console.log(data);
+
     if (values) {
-      endpoint = `/api/pricelists/${values.pricelistId}/products/${values.productCode}`;
+      endpoint = `/api/v1/products/${values.companyId}-${values.productCode}`;
       options.method = "PUT";
 
       if (isEqual(values, data)) {
@@ -141,6 +144,17 @@ const ProductForm = ({ className, id, values }: Props) => {
           }}
           value={values ? values.productCode : undefined}
         />
+        <Input
+          type="text"
+          id="companyId"
+          label="Codice Azienda"
+          register={register}
+          error={errors["productCode"]?.message}
+          registerOptions={{
+            required: "Necessario inserire il codice dell'azienda!",
+          }}
+          value={values ? values.companyId : undefined}
+        />
       </Fieldset>
       <Fieldset name="Informazioni Articolo">
         <Input
@@ -189,7 +203,7 @@ const ProductForm = ({ className, id, values }: Props) => {
       <Fieldset name="Informazioni Contabili">
         <Input
           type="text"
-          id="name"
+          id="accountingControl"
           label="Mastrino"
           register={register}
           error={errors["accountingControl"]?.message}
@@ -197,7 +211,7 @@ const ProductForm = ({ className, id, values }: Props) => {
         />
         <Input
           type="text"
-          id="name"
+          id="cda"
           label="CDA"
           register={register}
           error={errors["cda"]?.message}
@@ -205,7 +219,7 @@ const ProductForm = ({ className, id, values }: Props) => {
         />
         <Input
           type="text"
-          id="name"
+          id="salesItem"
           label="Voce vendita"
           register={register}
           error={errors["salesItem"]?.message}
