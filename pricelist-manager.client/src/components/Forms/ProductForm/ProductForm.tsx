@@ -58,6 +58,11 @@ const ProductForm = ({ className, id, values }: Props) => {
       endpoint = `/api/v1/products/${values.companyId}-${values.productCode}`;
       options.method = "PUT";
 
+      options.body = JSON.stringify({
+        ...data,
+        productId: `${values.companyId}-${values.productCode}`,
+      });
+
       if (isEqual(values, data)) {
         console.log("Equals");
         return;
@@ -215,7 +220,7 @@ const ProductForm = ({ className, id, values }: Props) => {
           label="CDA"
           register={register}
           error={errors["cda"]?.message}
-          value={values ? values.name : undefined}
+          value={values ? values.cda : undefined}
         />
         <Input
           type="text"

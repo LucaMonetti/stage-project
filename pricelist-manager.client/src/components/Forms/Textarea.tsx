@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import type {
   FieldValues,
   Path,
@@ -28,6 +29,12 @@ function Textarea<T extends FieldValues>({
   error,
   value,
 }: Props<T>) {
+  const [data, setData] = useState("");
+
+  useEffect(() => {
+    if (value) setData(String(value));
+  }, [value]);
+
   return (
     <>
       <label htmlFor={id}>{label}</label>
@@ -37,7 +44,8 @@ function Textarea<T extends FieldValues>({
           !isResizable ? "resize-none" : ""
         }`}
         {...register(id, registerOptions)}
-        value={value || undefined}
+        value={data}
+        onChange={(e) => setData(e.target.value)}
       >
         {placeholder?.trim()}
       </textarea>

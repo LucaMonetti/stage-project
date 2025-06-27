@@ -28,7 +28,9 @@ const ListItem = ({ item }: { item: TableRow }) => {
   return (
     <>
       <dt>{item.title}:</dt>
-      <dd className="pl-0 sm:pl-4">{item.value}</dd>
+      <dd className="pl-0 sm:pl-4">
+        {item.value == "" ? <p className="text-gray-500">-</p> : item.value}
+      </dd>
     </>
   );
 };

@@ -32,7 +32,6 @@ function Input<T extends FieldValues>({
   const [data, setData] = useState("");
 
   useEffect(() => {
-    console.log(value);
     if (value) setData(String(value));
   }, [value]);
 

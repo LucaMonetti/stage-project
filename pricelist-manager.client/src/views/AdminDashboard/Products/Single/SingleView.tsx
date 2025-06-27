@@ -35,13 +35,13 @@ const SingleProductView = () => {
           {
             color: "purple",
             Icon: FaPencil,
-            route: `edit/products/${productId}`,
+            route: `/admin-dashboard/edit/products/${productId}`,
             text: "Modifica",
           },
           {
             color: "blue",
             Icon: FaDownload,
-            route: `download/products/${productId}`,
+            route: `/admin-dashboard/download/products/${productId}`,
             text: "Scarica",
           },
         ]}
@@ -71,6 +71,24 @@ const SingleProductView = () => {
           {
             title: "Azienda",
             value: product.data?.company.id,
+          },
+        ]}
+      />
+
+      <DefinitionListWidget
+        title="Informazioni aggiuntive"
+        values={[
+          {
+            title: "Mastrino",
+            value: product.data?.currentInstance.accountingControl,
+          },
+          {
+            title: "CDA",
+            value: product.data?.currentInstance.cda,
+          },
+          {
+            title: "Voce Vendita",
+            value: product.data?.currentInstance.salesItem,
           },
         ]}
       />
