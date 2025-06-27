@@ -16,6 +16,8 @@ const ItemListGroup = () => {
         fetch={companies}
         getline={(item) => item.name}
         getCallout={(item) => item.id}
+        getUniqueId={(item) => item.id}
+        getRoute={(item) => `/admin-dashboard/products/${item.id}`}
       />
       <ItemList
         title="Listini"
@@ -24,12 +26,16 @@ const ItemListGroup = () => {
         getCallout={(item) =>
           item.products ? item.products.length.toString() : "0"
         }
+        getUniqueId={(item) => item.id}
+        getRoute={(item) => `/admin-dashboard/products/${item.id}`}
       />
       <ItemList
         title="Prodotti"
         fetch={products}
         getline={(item) => item.currentInstance.name}
         getCallout={(item) => item.productCode}
+        getUniqueId={(item) => item.id}
+        getRoute={(item) => `/admin-dashboard/products/${item.id}`}
       />
     </div>
   );

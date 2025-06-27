@@ -1,4 +1,4 @@
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { useFetch } from "../../../../hooks/useFetch";
 import { ProductSchema } from "../../../../models/Product";
 import BasicLoader from "../../../../components/Loader/BasicLoader";
@@ -9,6 +9,7 @@ import DefinitionListWidget from "../../../../components/SinglePage/Widgets/Defi
 import VersionWidget from "../../../../components/SinglePage/Widgets/VersionWidget";
 
 const SingleProductView = () => {
+  const navigate = useNavigate();
   const { productId } = useParams();
   const product = useFetch(`products/${productId}`, ProductSchema);
 
@@ -18,6 +19,10 @@ const SingleProductView = () => {
         <BasicLoader />
       </div>
     );
+  }
+
+  if (product.errorMsg) {
+    navigate("/error/404");
   }
 
   return (

@@ -7,23 +7,29 @@ const ProductsListView = () => {
 
   const columns = [
     {
-      key: "productCode" as keyof Product,
-      header: "Product Code",
-      mobileLabel: "Code",
-    },
-    {
-      key: "currentInstance.name" as keyof Product,
-      header: "Name",
+      key: "companyId" as keyof Product,
+      header: "Azienda",
+      mobileLabel: "Azienda",
+      className: "text-gray-500",
     },
     {
       key: "pricelist.name" as keyof Product,
-      header: "Pricelist",
+      header: "Listino",
       mobileLabel: "Pricelist",
       className: "text-gray-500",
     },
     {
+      key: "id" as keyof Product,
+      header: "Codice Prodotto",
+      mobileLabel: "Code",
+    },
+    {
+      key: "currentInstance.name" as keyof Product,
+      header: "Nome",
+    },
+    {
       key: "currentInstance.description" as keyof Product,
-      header: "Description",
+      header: "Descrizione",
       className: "max-w-xs truncate",
       render: (value: string) => (
         <span className="block truncate" title={value}>
@@ -33,15 +39,15 @@ const ProductsListView = () => {
     },
     {
       key: "currentInstance.price" as keyof Product,
-      header: "Price",
+      header: "Prezzo",
       className: "font-medium text-green-600",
       render: (value: number) => `${value.toFixed(2)} €`,
     },
     {
-      key: "companyId" as keyof Product,
-      header: "Company ID",
-      mobileLabel: "Company",
-      className: "text-gray-500",
+      key: "currentInstance.cost" as keyof Product,
+      header: "Costo",
+      className: "font-medium text-red-600",
+      render: (value: number) => `${value.toFixed(2)} €`,
     },
   ];
 
@@ -51,9 +57,9 @@ const ProductsListView = () => {
         data={products}
         columns={columns}
         config={{
-          baseUrl: "/admin-dashboard/pricelists/:pid/products/:pcode",
+          baseUrl: "/admin-dashboard/products/:pid",
           enableLink: true,
-          columnId: { ":pid": "pricelistId", ":pcode": "productCode" },
+          columnId: { ":pid": "id" },
         }}
         keyField="productCode"
       />

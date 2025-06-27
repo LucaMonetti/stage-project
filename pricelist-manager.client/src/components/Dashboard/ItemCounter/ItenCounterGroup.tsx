@@ -39,7 +39,7 @@ function ItenCounterGroup() {
         color="blue"
         description={"Prodotti unici disponibili"}
         getBodyText={(item) => item?.uniqueCount.toString()}
-        createLink="create-product"
+        createLink="create/products"
       />
     </div>
   );

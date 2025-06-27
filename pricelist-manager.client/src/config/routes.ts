@@ -26,8 +26,13 @@ const router = createBrowserRouter([
             Component: AdminDashboardView,
           },
           {
-            path: "create-product",
-            Component: CreateProductForm,
+            path: "create",
+            children: [
+              {
+                path: "products",
+                Component: CreateProductForm,
+              },
+            ],
           },
           {
             path: "products",
@@ -36,6 +41,10 @@ const router = createBrowserRouter([
                 index: true,
                 Component: ProductsListView,
               },
+              {
+                path: ":productId",
+                Component: SingleProductView,
+              },
             ],
           },
           {
@@ -43,12 +52,7 @@ const router = createBrowserRouter([
             children: [
               {
                 path: ":pricelistId",
-                children: [
-                  {
-                    path: "products/:productCode",
-                    Component: SingleProductView,
-                  },
-                ],
+                children: [],
               },
             ],
           },
@@ -56,13 +60,8 @@ const router = createBrowserRouter([
             path: "edit",
             children: [
               {
-                path: "pricelists/:pricelistId",
-                children: [
-                  {
-                    path: "products/:productCode",
-                    Component: EditProductForm,
-                  },
-                ],
+                path: "products/:productId",
+                Component: EditProductForm,
               },
             ],
           },
