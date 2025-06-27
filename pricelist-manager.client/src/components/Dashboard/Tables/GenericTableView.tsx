@@ -73,76 +73,71 @@ function GenericTableView<T extends Record<string, any>>({
 
   return (
     <div className={`w-full overflow-x-auto ${className}`}>
-      <div className="min-w-full shadow-lg rounded-lg w-full overflow-x-hidden">
-        {/* Desktop Table */}
-        <div className="hidden md:block">
-          <table className="min-w-full divide-y divide-gray-700 overflow-x-scroll">
-            <thead className="bg-gray-800">
-              <tr>
+      <table className="min-w-full divide-y divide-gray-700">
+        <thead className="bg-gray-800">
+          <tr className="rounded">
+            {columns.map((column) => (
+              <th
+                key={String(column.key)}
+                className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider whitespace-nowrap ${
+                  column.headerClassName || ""
+                }`}
+              >
+                {column.header}
+              </th>
+            ))}
+          </tr>
+        </thead>
+
+        {data.isLoading ? (
+          <tbody>
+            <tr>
+              <td colSpan={columns.length} className="px-6 py-4">
+                <BasicLoader />
+              </td>
+            </tr>
+          </tbody>
+        ) : data.data && data.data.length > 0 ? (
+          <tbody className="bg-gray-900 divide-y divide-gray-700">
+            {data.data.map((row, index) => (
+              <tr
+                onClick={
+                  config.enableLink
+                    ? (
+                        e: React.MouseEvent<HTMLTableRowElement, MouseEvent>
+                      ) => {
+                        handleClickRow(e, row);
+                      }
+                    : undefined
+                }
+                key={String(row[keyField])}
+                className={`${
+                  index % 2 === 0 ? "bg-gray-900" : "bg-gray-800"
+                } hover:bg-blue-950`}
+              >
                 {columns.map((column) => (
-                  <th
+                  <td
                     key={String(column.key)}
-                    className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
-                      column.headerClassName || ""
+                    className={`px-6 py-4 text-sm whitespace-nowrap ${
+                      column.className || "text-white"
                     }`}
                   >
-                    {column.header}
-                  </th>
+                    {renderCellValue(column, row)}
+                  </td>
                 ))}
               </tr>
-            </thead>
-
-            {data.isLoading ? (
-              <tbody>
-                <tr>
-                  <td colSpan={columns.length} className="px-6 py-4">
-                    <BasicLoader />
-                  </td>
-                </tr>
-              </tbody>
-            ) : data.data && data.data.length > 0 ? (
-              <tbody className="bg-gray-900 divide-y divide-gray-700">
-                {data.data.map((row, index) => (
-                  <tr
-                    onClick={
-                      config.enableLink
-                        ? (
-                            e: React.MouseEvent<HTMLTableRowElement, MouseEvent>
-                          ) => {
-                            handleClickRow(e, row);
-                          }
-                        : undefined
-                    }
-                    key={String(row[keyField])}
-                    className={`${
-                      index % 2 === 0 ? "bg-gray-900" : "bg-gray-800"
-                    } hover:bg-blue-950`}
-                  >
-                    {columns.map((column) => (
-                      <td
-                        key={String(column.key)}
-                        className={`px-6 py-4 text-sm ${
-                          column.className || "text-white"
-                        }`}
-                      >
-                        {renderCellValue(column, row)}
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            ) : (
-              <tbody>
-                <tr>
-                  <td colSpan={6} className="px-6 py-4 text-sm text-gray-500">
-                    Non sono stati registrati prodotti all'interno del database!
-                  </td>
-                </tr>
-              </tbody>
-            )}
-          </table>
-        </div>
-      </div>
+            ))}
+          </tbody>
+        ) : (
+          <tbody>
+            <tr>
+              <td colSpan={6} className="px-6 py-4 text-sm text-gray-500">
+                Non sono stati registrati prodotti all'interno del database!
+              </td>
+            </tr>
+          </tbody>
+        )}
+      </table>
     </div>
   );
 }
