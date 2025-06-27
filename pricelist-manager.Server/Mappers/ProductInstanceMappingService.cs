@@ -17,7 +17,11 @@ namespace pricelist_manager.Server.Mappers
                 Name = dto.Name,
                 Description = dto.Description,
                 Price = dto.Price,
-                Version = 0
+                Cost = dto.Cost,
+                Version = 0,
+                AccountingControl = dto.AccountingControl,
+                CDA = dto.CDA,
+                SalesItem = dto.SalesItem,
             };
         }
 

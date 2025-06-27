@@ -63,6 +63,7 @@ namespace pricelist_manager.Server.Mappers
 
             return new Product
             {
+                Id = $"{dto.CompanyId}-{dto.ProductCode}",
                 PricelistId = dto.PricelistId,
                 ProductCode = dto.ProductCode,
                 CompanyId = dto.CompanyId,

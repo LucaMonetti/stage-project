@@ -145,7 +145,7 @@ namespace pricelist_manager.Server.Repositories
         {
             if (!CanConnect()) throw new StorageUnavailableException();
 
-            if (await existsIdAsync(entity.Id)) throw new AlreadyExistException<Product>(entity.ProductCode);
+            if (await existsIdAsync(entity.Id)) throw new AlreadyExistException<Product>(entity.Id);
 
             await Context.Products.AddAsync(entity);
             var res = await Context.SaveChangesAsync();
