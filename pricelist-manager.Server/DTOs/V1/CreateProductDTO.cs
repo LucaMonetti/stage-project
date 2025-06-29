@@ -8,7 +8,6 @@ namespace pricelist_manager.Server.DTOs.V1
     public class CreateProductDTO
     {
         public required string ProductCode { get; set; }
-        public required string CompanyId { get; set; }
 
         public required Guid PricelistId { get; set; }
 

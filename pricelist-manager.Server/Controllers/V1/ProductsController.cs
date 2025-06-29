@@ -15,13 +15,15 @@ namespace pricelist_manager.Server.Controllers.V1
     public class ProductsController : ControllerBase
     {
         private readonly IProductRepository ProductRepository;
+        private readonly IPricelistRepository PricelistRepository;
         private readonly IProductInstanceRepository ProductInstanceRepository;
         private readonly IProductMappingService ProductMapping;
         private readonly IProductInstanceMappingService ProductInstanceMapping;
 
-        public ProductsController(IProductRepository productRepository, IProductInstanceRepository productInstanceRepository, IProductMappingService productMapping, IProductInstanceMappingService productInstanceMapping)
+        public ProductsController(IProductRepository productRepository, IPricelistRepository pricelistRepository, IProductInstanceRepository productInstanceRepository, IProductMappingService productMapping, IProductInstanceMappingService productInstanceMapping)
         {
             ProductRepository = productRepository;
+            PricelistRepository = pricelistRepository;
             ProductInstanceRepository = productInstanceRepository;
             ProductMapping = productMapping;
             ProductInstanceMapping = productInstanceMapping;
@@ -64,16 +66,22 @@ namespace pricelist_manager.Server.Controllers.V1
                 return BadRequest(ModelState);
             }
 
-            Product data = ProductMapping.MapToProduct(dto);
 
             try
             {
+                Pricelist pricelist = await PricelistRepository.GetByIdAsync(dto.PricelistId);
+                Product data = ProductMapping.MapToProduct(dto, pricelist.CompanyId);
+                
                 var res = await ProductRepository.CreateAsync(data);
                 return Ok(res);
             }
             catch (AlreadyExistException<Product> e)
             {
                 return Conflict(new { message = e.Message });
+            }
+            catch (NotFoundException<Pricelist> e)
+            {
+                return NotFound(new { message = e.Message });
             }
         }
 

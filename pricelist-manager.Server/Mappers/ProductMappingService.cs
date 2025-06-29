@@ -22,7 +22,7 @@ namespace pricelist_manager.Server.Mappers
         {
             ArgumentNullException.ThrowIfNull(product);
 
-            if (product.Versions?.Any() != true)
+            if (product.Versions.Count == 0)
                 throw new InvalidOperationException("Product must have at least one version");
 
             var currentInstance = GetCurrentInstance(product);
@@ -57,18 +57,18 @@ namespace pricelist_manager.Server.Mappers
                 .FirstOrDefault() ?? product.Versions.OrderByDescending(v => v.Version).First();
         }
 
-        public Product MapToProduct(CreateProductDTO dto)
+        public Product MapToProduct(CreateProductDTO dto, string companyId)
         {
             ArgumentNullException.ThrowIfNull(dto);
 
             return new Product
             {
-                Id = $"{dto.CompanyId}-{dto.ProductCode}",
+                Id = $"{companyId}-{dto.ProductCode}",
                 PricelistId = dto.PricelistId,
                 ProductCode = dto.ProductCode,
-                CompanyId = dto.CompanyId,
+                CompanyId = companyId,
                 LatestVersion = 0,
-                Versions = [ProductInstanceMapping.MapToProductInstance(dto)]
+                Versions = [ProductInstanceMapping.MapToProductInstance(dto, companyId)]
             };
         }
     }

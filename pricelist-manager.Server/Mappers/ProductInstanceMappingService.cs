@@ -7,13 +7,13 @@ namespace pricelist_manager.Server.Mappers
 {
     public class ProductInstanceMappingService : IProductInstanceMappingService
     {
-        public ProductInstance MapToProductInstance(CreateProductDTO dto)
+        public ProductInstance MapToProductInstance(CreateProductDTO dto, string companyId)
         {
             ArgumentNullException.ThrowIfNull(dto);
 
             return new ProductInstance
             {
-                ProductId = $"{dto.CompanyId}-{dto.ProductCode}",
+                ProductId = $"{companyId}-{dto.ProductCode}",
                 Name = dto.Name,
                 Description = dto.Description,
                 Price = dto.Price,
