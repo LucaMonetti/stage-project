@@ -62,7 +62,7 @@ type Props<T extends FieldValues> = {
   control: Control<T, any, T>;
   registerOptions?: RegisterOptions<T, Path<T>>;
   error?: string;
-  prevValue?: string;
+  value?: string;
 };
 
 type Option = {
@@ -75,7 +75,7 @@ function SearchableSelect<T extends FieldValues>({
   control,
   error,
   registerOptions,
-  prevValue,
+  value: prevValue,
 }: Props<T>) {
   const pricelists = useFetch("pricelists", PricelistArraySchema);
   const options =
@@ -123,7 +123,7 @@ function SearchableSelect<T extends FieldValues>({
           />
         )}
       />
-      {error && (
+      {error !== undefined && (
         <div>
           <p className="text-red-600">{error}</p>
         </div>

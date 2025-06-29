@@ -1,7 +1,105 @@
 import FormButton from "../../../components/Buttons/FormButton";
-import ProductForm from "../../../components/Forms/ProductForm/ProductForm";
+import GenericForm, {
+  type Config,
+} from "../../../components/Forms/GenericForm";
 
 import { FaPlus } from "react-icons/fa6";
+import {
+  CreateProductSchema,
+  type CreateProduct,
+} from "../../../models/FormProduct";
+
+const config = {
+  fieldset: [
+    {
+      title: "Informazioni Generali",
+      inputs: [
+        {
+          id: "pricelistId",
+          label: "Listino",
+          type: "searchable",
+          placeholder: "Seleziona il listino prezzi",
+          registerOptions: {
+            required: "Necessario selezionare un listino!",
+          },
+        },
+        {
+          id: "productCode",
+          label: "Codice Prodotto",
+          type: "text",
+          placeholder: "Inserire il codice del prodotto",
+          registerOptions: {
+            required: "Necessario inserire un codice Prodotto!",
+          },
+        },
+      ],
+    },
+    {
+      title: "Informazioni Articolo",
+      inputs: [
+        {
+          id: "name",
+          label: "Nome",
+          type: "text",
+          placeholder: "Inserisci il nome dell'Articolo",
+          registerOptions: {
+            required: "Necessario inserire il nome dell'Articolo.",
+          },
+        },
+        {
+          id: "price",
+          label: "Prezzo Articolo",
+          type: "number",
+          placeholder: "Inserire il prezzo dell'Articolo",
+          registerOptions: {
+            valueAsNumber: true,
+            required: "Necessario inserire un prezzo Prodotto.",
+          },
+        },
+        {
+          id: "cost",
+          label: "Costo Articolo",
+          type: "number",
+          placeholder: "Inserire il costo dell'Articolo",
+          registerOptions: {
+            valueAsNumber: true,
+            required: "Necessario inserire il costo dell'Articolo.",
+          },
+        },
+        {
+          id: "description",
+          label: "Descrizione Articolo",
+          type: "textarea",
+          placeholder: "Inserire la descrizione dell'Articolo.",
+        },
+      ],
+    },
+    {
+      title: "Informazioni Contabili",
+      inputs: [
+        {
+          id: "accountingControl",
+          label: "Mastrino",
+          type: "text",
+          placeholder: "Inserisci il codice del mastrino.",
+        },
+        {
+          id: "cda",
+          label: "CDA",
+          type: "text",
+          placeholder: "Inserisci il codice CDA.",
+        },
+        {
+          id: "salesItem",
+          label: "Voce di vendita",
+          type: "text",
+          placeholder: "Inserisci il codice della voce di vendita.",
+        },
+      ],
+    },
+  ],
+  endpoint: "products"
+} satisfies Config<CreateProduct>;
 
 const CreateProductForm = () => {
   return (
@@ -17,7 +115,13 @@ const CreateProductForm = () => {
         <FormButton formId="create-product-form" color="purple" Icon={FaPlus} />
       </header>
 
-      <ProductForm className="mt-4" id="create-product-form" />
+      <GenericForm
+        schema={CreateProductSchema}
+        className="mt-4"
+        config={config}
+        id="create-product-form"
+        method={"POST"}
+      />
     </div>
   );
 };

@@ -1,27 +1,128 @@
 import { useParams } from "react-router";
 import FormButton from "../../../components/Buttons/FormButton";
-import ProductForm, {
-  type ProductFormData,
-} from "../../../components/Forms/ProductForm/ProductForm";
 
 import { FaPlus } from "react-icons/fa6";
-import { useFetch } from "../../../hooks/useFetch";
+import { useFetch, useGet } from "../../../hooks/useGenericFetch";
 import { ProductSchema } from "../../../models/Product";
+import type { Config } from "../../../components/Forms/GenericForm";
+import { CreateProductSchema, EditProductSchema, type CreateProduct, type EditProduct } from "../../../models/FormProduct";
+import GenericForm from "../../../components/Forms/GenericForm";
+
+const config = {
+  fieldset: [
+    {
+      title: "Informazioni Generali",
+      inputs: [
+        {
+          id: "pricelistId",
+          label: "Listino",
+          type: "searchable",
+          placeholder: "Seleziona il listino prezzi",
+          registerOptions: {
+            required: "Necessario selezionare un listino!",
+          },
+        },
+        {
+          id: "productCode",
+          label: "Codice Prodotto",
+          type: "text",
+          placeholder: "Inserire il codice del prodotto",
+          registerOptions: {
+            required: "Necessario inserire un codice Prodotto!",
+          },
+        },
+      ],
+    },
+    {
+      title: "Informazioni Articolo",
+      inputs: [
+        {
+          id: "name",
+          label: "Nome",
+          type: "text",
+          placeholder: "Inserisci il nome dell'Articolo",
+          registerOptions: {
+            required: "Necessario inserire il nome dell'Articolo.",
+          },
+        },
+        {
+          id: "price",
+          label: "Prezzo Articolo",
+          type: "number",
+          placeholder: "Inserire il prezzo dell'Articolo",
+          registerOptions: {
+            valueAsNumber: true,
+            required: "Necessario inserire un prezzo Prodotto.",
+          },
+        },
+        {
+          id: "cost",
+          label: "Costo Articolo",
+          type: "number",
+          placeholder: "Inserire il costo dell'Articolo",
+          registerOptions: {
+            valueAsNumber: true,
+            required: "Necessario inserire il costo dell'Articolo.",
+          },
+        },
+        {
+          id: "description",
+          label: "Descrizione Articolo",
+          type: "textarea",
+          placeholder: "Inserire la descrizione dell'Articolo.",
+        },
+      ],
+    },
+    {
+      title: "Informazioni Contabili",
+      inputs: [
+        {
+          id: "accountingControl",
+          label: "Mastrino",
+          type: "text",
+          placeholder: "Inserisci il codice del mastrino.",
+        },
+        {
+          id: "cda",
+          label: "CDA",
+          type: "text",
+          placeholder: "Inserisci il codice CDA.",
+        },
+        {
+          id: "salesItem",
+          label: "Voce di vendita",
+          type: "text",
+          placeholder: "Inserisci il codice della voce di vendita.",
+        },
+      ],
+    },
+  ],
+  endpoint: "products"
+} satisfies Config<EditProduct>;
 
 const EditProductForm = () => {
-  const { productId } = useParams();
-  const product = useFetch(`products/${productId}`, ProductSchema);
+  let data: EditProduct | undefined = undefined;
 
-  let edit;
+  const { productId } = useParams();
+  const product = useGet({
+    endpoint: `products/${productId}`,
+    method: "GET",
+    schema: ProductSchema
+  });
 
   if (product.data) {
-    edit = {
-      name: product.data.currentInstance.name,
-      description: product.data.currentInstance.description,
-      price: product.data.currentInstance.price,
+    data = {
       pricelistId: product.data.pricelistId,
       productCode: product.data.productCode,
-    } satisfies ProductFormData;
+      name: product.data.currentInstance.name,
+      price: product.data.currentInstance.price,
+      cost: product.data.currentInstance.cost,
+      description: product.data.currentInstance.description,
+      accountingControl: product.data.currentInstance.accountingControl ?? "",
+      cda: product.data.currentInstance.cda ?? "",
+      salesItem: product.data.currentInstance.salesItem ?? "",
+      productId: productId ?? "",
+    }
   }
 
   return (
@@ -30,12 +131,12 @@ const EditProductForm = () => {
         <div>
           <h1 className="text-3xl text-medium">Modifica il prodotto</h1>
           <p className="text-gray-400">
-            Inserisci i dettagli del nuovo prodotto
+            Inserisci i dettagli del che vuoi modificare prodotto
           </p>
         </div>
 
         <FormButton
-          formId="create-product-form"
+          formId="edit-product-form"
           color="purple"
           text="Aggiorna"
           Icon={FaPlus}
@@ -43,7 +144,14 @@ const EditProductForm = () => {
         />
       </header>
 
-      <ProductForm className="mt-4" id="create-product-form" values={edit} />
+      
+      <GenericForm<CreateProduct>
+        id="edit-product-form"
+        config={{...config, endpoint: `products/${productId}`}}
+        schema={EditProductSchema}
+        values={data}
+        method="PUT"
+        />
     </div>
   );
 };

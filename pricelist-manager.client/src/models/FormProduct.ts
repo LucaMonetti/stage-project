@@ -6,7 +6,6 @@ export const CreateProductSchema = z.object({
   productCode: z
     .string()
     .min(1, "Necessario inserire il codice dell'Articolo!"),
-  companyId: z.string().min(1, "Necessario inserire il Codice dell'Azienda!"),
   name: z.string().min(1, "Necessario inserire il nome dell'Articolo!"),
   description: z.string(),
   price: z
@@ -23,3 +22,12 @@ export const CreateProductSchema = z.object({
 export const CreateProductArraySchema = z.array(CreateProductSchema);
 
 export type CreateProduct = z.infer<typeof CreateProductSchema>;
+
+// Edit Product
+export const EditProductSchema = CreateProductSchema.extend({
+  productId: z.string(),
+});
+
+export const EditProductArraySchema = z.array(EditProductSchema);
+
+export type EditProduct = z.infer<typeof EditProductSchema>;

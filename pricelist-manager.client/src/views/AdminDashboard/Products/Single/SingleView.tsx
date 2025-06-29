@@ -1,5 +1,4 @@
 import { useNavigate, useParams } from "react-router";
-import { useFetch } from "../../../../hooks/useFetch";
 import { ProductSchema } from "../../../../models/Product";
 import BasicLoader from "../../../../components/Loader/BasicLoader";
 import { FaPencil, FaDownload } from "react-icons/fa6";
@@ -7,11 +6,16 @@ import InfoWidget from "../../../../components/SinglePage/Widgets/InfoWidget";
 import MoneyWidget from "../../../../components/SinglePage/Widgets/MoneyWidget";
 import DefinitionListWidget from "../../../../components/SinglePage/Widgets/DefinitionListWidget";
 import VersionWidget from "../../../../components/SinglePage/Widgets/VersionWidget";
+import { useFetch } from "../../../../hooks/useGenericFetch";
 
 const SingleProductView = () => {
   const navigate = useNavigate();
   const { productId } = useParams();
-  const product = useFetch(`products/${productId}`, ProductSchema);
+  const product = useFetch({
+    method: "GET",
+    endpoint: `products/${productId}`,
+    schema: ProductSchema,
+  });
 
   if (product.isLoading) {
     return (

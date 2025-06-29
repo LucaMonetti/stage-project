@@ -13,7 +13,7 @@ type Props<T extends FieldValues> = {
   placeholder?: string;
   className?: string;
   register: UseFormRegister<T>;
-  registerOptions?: RegisterOptions<T, Path<T>>;
+  registerOptions?: Partial<RegisterOptions<T>>;
   error?: string;
   value?: string | number;
 };
@@ -46,7 +46,7 @@ function Input<T extends FieldValues>({
         value={data}
         onChange={(e) => setData(e.target.value)}
       />
-      {error && (
+      {error !== undefined && (
         <div>
           <p className="text-red-600">{error}</p>
         </div>

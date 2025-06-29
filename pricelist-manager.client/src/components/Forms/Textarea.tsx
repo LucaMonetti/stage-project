@@ -49,7 +49,7 @@ function Textarea<T extends FieldValues>({
       >
         {placeholder?.trim()}
       </textarea>
-      {error && (
+      {error !== undefined && (
         <div>
           <p className="text-red-600">{error}</p>
         </div>
