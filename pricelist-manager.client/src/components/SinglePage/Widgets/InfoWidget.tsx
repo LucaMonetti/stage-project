@@ -6,7 +6,7 @@ import { FaTag } from "react-icons/fa6";
 type Props = {
   title?: React.ReactNode;
   subtitle?: React.ReactNode;
-  callout: React.ReactNode;
+  callout?: React.ReactNode;
   CalloutIcon?: React.ComponentType<{ className?: string }>;
   actions: {
     Icon: IconType;

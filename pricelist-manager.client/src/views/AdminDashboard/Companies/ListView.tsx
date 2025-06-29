@@ -1,0 +1,63 @@
+import GenericTableView from "../../../components/Dashboard/Tables/GenericTableView";
+import { useFetch } from "../../../hooks/useFetch";
+import { useGet } from "../../../hooks/useGenericFetch";
+import { CompanyArraySchema, type Company } from "../../../models/Company";
+
+const CompanyListView = () => {
+  const companies = useGet({
+    method: "GET",
+    endpoint: "companies",
+    schema: CompanyArraySchema,
+  });
+
+  const columns = [
+    {
+      key: "id" as keyof Company,
+      header: "Codice Azienda",
+      className: "text-gray-500",
+    },
+    {
+      key: "name" as keyof Company,
+      header: "Ragione Sociale",
+    },
+    {
+      key: "phone" as keyof Company,
+      header: "Descrizione",
+    },
+    {
+      key: "pricelists" as keyof Company,
+      header: "Totale Listini",
+      render: (value: any[]) => (
+        <span className="uppercase">
+          {value.length ?? 0} {value.length === 1 ? "listino" : "listini"}
+        </span>
+      ),
+    },
+    {
+      key: "products" as keyof Company,
+      header: "Totale Prodotti",
+      render: (value: any[]) => (
+        <span className="uppercase">
+          {value.length ?? 0} {value.length === 1 ? "prodotto" : "prodotti"}
+        </span>
+      ),
+    },
+  ];
+
+  return (
+    <div className="px-8 py-4">
+      <GenericTableView
+        data={companies}
+        columns={columns}
+        config={{
+          baseUrl: "/admin-dashboard/companies/:pid",
+          enableLink: true,
+          columnId: { ":pid": "id" },
+        }}
+        keyField="id"
+      />
+    </div>
+  );
+};
+
+export default CompanyListView;

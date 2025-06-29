@@ -9,6 +9,8 @@ import SingleProductView from "../views/AdminDashboard/Products/Single/SingleVie
 import EditProductForm from "../views/AdminDashboard/Edit/EditProduct";
 import PricelistListView from "../views/AdminDashboard/Pricelists/ListView";
 import SinglePricelistView from "../views/AdminDashboard/Pricelists/Single/SingleView";
+import CompanyListView from "../views/AdminDashboard/Companies/ListView";
+import SingleCompanyView from "../views/AdminDashboard/Companies/Single/SingleView";
 
 const router = createBrowserRouter([
   {
@@ -68,6 +70,19 @@ const router = createBrowserRouter([
               {
                 path: ":pricelistId",
                 Component: SinglePricelistView,
+              },
+            ],
+          },
+          {
+            path: "companies",
+            children: [
+              {
+                index: true,
+                Component: CompanyListView,
+              },
+              {
+                path: ":companyId",
+                Component: SingleCompanyView,
               },
             ],
           },

@@ -10,6 +10,7 @@ type Props<T> = {
   columns: Column<T>[];
   config?: TableConfig<T>;
   keyField: keyof T;
+  title: string;
 };
 
 function TableWidget<T extends Record<string, any>>({
@@ -17,14 +18,17 @@ function TableWidget<T extends Record<string, any>>({
   columns,
   config,
   keyField,
+  title,
 }: Props<T>) {
   return (
     <WidgetBase>
+      <h2 className="uppercase font-bold text-gray-500">{title}</h2>
       <GenericTableView
         data={data}
         columns={columns}
         config={config}
         keyField={keyField}
+        className="mt-4"
       />
     </WidgetBase>
   );

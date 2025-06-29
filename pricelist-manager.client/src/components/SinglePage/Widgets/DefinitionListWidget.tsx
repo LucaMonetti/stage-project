@@ -1,8 +1,9 @@
+import type React from "react";
 import WidgetBase, { type QueryDimensions } from "./WidgetBase";
 
 type TableRow = {
   title: string;
-  value?: string;
+  value?: React.ReactNode | string;
 };
 
 type Props = {
