@@ -36,7 +36,7 @@ const InfoWidget = ({
         {callout && (
           <div className="inline-block px-2 py-1 bg-blue-600 rounded text-sm font-mono">
             <CalloutIcon className="inline" />
-            <p className="inline">{callout}</p>
+            <p className="inline ml-2">{callout}</p>
           </div>
         )}
       </div>

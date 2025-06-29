@@ -6,12 +6,12 @@ import InfoWidget from "../../../../components/SinglePage/Widgets/InfoWidget";
 import MoneyWidget from "../../../../components/SinglePage/Widgets/MoneyWidget";
 import DefinitionListWidget from "../../../../components/SinglePage/Widgets/DefinitionListWidget";
 import VersionWidget from "../../../../components/SinglePage/Widgets/VersionWidget";
-import { useFetch } from "../../../../hooks/useGenericFetch";
+import { useFetch, useGet } from "../../../../hooks/useGenericFetch";
 
 const SingleProductView = () => {
   const navigate = useNavigate();
   const { productId } = useParams();
-  const product = useFetch({
+  const product = useGet({
     method: "GET",
     endpoint: `products/${productId}`,
     schema: ProductSchema,
