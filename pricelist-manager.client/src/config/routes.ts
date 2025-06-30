@@ -3,7 +3,7 @@ import BaseLayout from "../views/BaseLayout";
 import HomeView from "../views/Index";
 import AdminDashboardLayout from "../views/AdminDashboard/BaseLayout";
 import AdminDashboardView from "../views/AdminDashboard/AdminDashboardView";
-import CreateProductForm from "../views/AdminDashboard/CreateProduct/CreateProduct";
+import CreateProductForm from "../views/AdminDashboard/Create/CreateProduct";
 import ProductsListView from "../views/AdminDashboard/Products/ProductsListView";
 import SingleProductView from "../views/AdminDashboard/Products/Single/SingleView";
 import EditProductForm from "../views/AdminDashboard/Edit/EditProduct";
@@ -11,6 +11,8 @@ import PricelistListView from "../views/AdminDashboard/Pricelists/ListView";
 import SinglePricelistView from "../views/AdminDashboard/Pricelists/Single/SingleView";
 import CompanyListView from "../views/AdminDashboard/Companies/ListView";
 import SingleCompanyView from "../views/AdminDashboard/Companies/Single/SingleView";
+import CreatePricelistForm from "../views/AdminDashboard/Create/CreatePricelist";
+import EditPricelistForm from "../views/AdminDashboard/Edit/EditPricelist";
 
 const router = createBrowserRouter([
   {
@@ -36,6 +38,10 @@ const router = createBrowserRouter([
                 path: "products",
                 Component: CreateProductForm,
               },
+              {
+                path: "pricelists",
+                Component: CreatePricelistForm,
+              },
             ],
           },
           {
@@ -44,6 +50,10 @@ const router = createBrowserRouter([
               {
                 path: "products/:productId",
                 Component: EditProductForm,
+              },
+              {
+                path: "pricelists/:pricelistId",
+                Component: EditPricelistForm,
               },
             ],
           },
