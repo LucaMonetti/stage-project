@@ -2,8 +2,9 @@ import { useFetch } from "../../../hooks/useFetch";
 import { CompanyStatisticsSchema } from "../../../models/CompanyStatistics";
 import { PricelistStatisticsSchema } from "../../../models/PricelistStatistics";
 import { ProductStatisticsSchema } from "../../../models/ProductStatistics";
+import { UserStatisticsSchema } from "../../../models/User";
 import ItemCounter from "./ItemCounter";
-import { FaBuilding, FaListUl } from "react-icons/fa6";
+import { FaBuilding, FaListUl, FaUser } from "react-icons/fa6";
 
 function ItenCounterGroup() {
   const products = useFetch("statistics/products", ProductStatisticsSchema);
@@ -12,6 +13,7 @@ function ItenCounterGroup() {
     "statistics/pricelists",
     PricelistStatisticsSchema
   );
+  const users = useFetch("statistics/accounts", UserStatisticsSchema);
 
   return (
     <div className="flex flex-wrap gap-8 mt-8">
@@ -40,6 +42,15 @@ function ItenCounterGroup() {
         description={"Prodotti unici disponibili"}
         getBodyText={(item) => item?.uniqueCount.toString()}
         createLink="create/products"
+      />
+      <ItemCounter
+        fetch={users}
+        title={"Utenti"}
+        Icon={FaUser}
+        color="yellow"
+        description={`Utenti registrati`}
+        getBodyText={(item) => `${item?.totalRegistered}`}
+        createLink="create/users"
       />
     </div>
   );

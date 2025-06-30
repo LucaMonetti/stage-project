@@ -40,6 +40,7 @@ function Input<T extends FieldValues>({
       <label htmlFor={id}>{label}</label>
       <input
         type={type}
+        id={id}
         placeholder={placeholder}
         className={`border-2 border-gray-700 rounded px-4 py-2 bg-gray-900 ${className}`}
         {...register(id, registerOptions)}

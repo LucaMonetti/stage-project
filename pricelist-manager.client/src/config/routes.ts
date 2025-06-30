@@ -15,6 +15,10 @@ import CreatePricelistForm from "../views/AdminDashboard/Create/CreatePricelist"
 import EditPricelistForm from "../views/AdminDashboard/Edit/EditPricelist";
 import CreateCompanyForm from "../views/AdminDashboard/Create/CreateCompany";
 import EditCompanyForm from "../views/AdminDashboard/Edit/EditCompany";
+import CreateUserForm from "../views/AdminDashboard/Create/CreateUser";
+import UsersListView from "../views/AdminDashboard/Users/ListView";
+import SingleUserView from "../views/AdminDashboard/Users/Single/SingleView";
+import EditUserForm from "../views/AdminDashboard/Edit/EditUser";
 
 const router = createBrowserRouter([
   {
@@ -48,6 +52,10 @@ const router = createBrowserRouter([
                 path: "companies",
                 Component: CreateCompanyForm,
               },
+              {
+                path: "users",
+                Component: CreateUserForm,
+              },
             ],
           },
           {
@@ -64,6 +72,10 @@ const router = createBrowserRouter([
               {
                 path: "companies/:companyId",
                 Component: EditCompanyForm,
+              },
+              {
+                path: "users/:userId",
+                Component: EditUserForm,
               },
             ],
           },
@@ -103,6 +115,19 @@ const router = createBrowserRouter([
               {
                 path: ":companyId",
                 Component: SingleCompanyView,
+              },
+            ],
+          },
+          {
+            path: "users",
+            children: [
+              {
+                index: true,
+                Component: UsersListView,
+              },
+              {
+                path: ":userId",
+                Component: SingleUserView,
               },
             ],
           },

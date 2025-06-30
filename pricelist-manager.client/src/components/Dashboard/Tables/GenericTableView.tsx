@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router";
 import type { FetchData } from "../../../types";
 import BasicLoader from "../../Loader/BasicLoader";
 import type { MouseEventHandler } from "react";
+import type { Path } from "react-hook-form";
 
 type Prods<T> = {
   data: FetchData<T[]>;
@@ -12,13 +13,14 @@ type Prods<T> = {
 };
 
 export interface Column<T> {
-  key: keyof T;
+  key: Path<T>;
   header: string;
   render?: (value: any, row: T) => React.ReactNode;
   headerClassName?: string;
   className?: string;
   mobileLabel?: string;
   hideOnMobile?: boolean;
+  linkUrl?: (item: T) => string;
 }
 
 export interface TableConfig<T> {
@@ -71,6 +73,21 @@ function GenericTableView<T extends Record<string, any>>({
     navigate(endpoint);
   };
 
+  const handleCellClick = (e: React.MouseEvent, column: Column<T>, row: T) => {
+    if (!column.linkUrl) return;
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    const url = column.linkUrl(row);
+
+    if (url.startsWith("mailto:") || url.startsWith("tel:")) {
+      window.location.href = url;
+    } else {
+      navigate(url);
+    }
+  };
+
   return (
     <div className={`w-full overflow-x-auto ${className}`}>
       <table className="min-w-full divide-y divide-gray-700">
@@ -117,6 +134,10 @@ function GenericTableView<T extends Record<string, any>>({
               >
                 {columns.map((column) => (
                   <td
+                    {...(column.linkUrl && {
+                      onClick: (e) => handleCellClick(e, column, row),
+                      style: { cursor: "pointer" }, // Optional: visual feedback
+                    })}
                     key={String(column.key)}
                     className={`px-6 py-4 text-sm whitespace-nowrap ${
                       column.className || "text-white"
