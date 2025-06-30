@@ -36,5 +36,31 @@ namespace pricelist_manager.Server.Mappers
 
             return [.. pricelists.Select(p => MapToDTO(p))];
         }
+
+        public Pricelist MapToPricelist(CreatePricelistDTO pricelist)
+        {
+            ArgumentNullException.ThrowIfNull(pricelist);
+
+            return new Pricelist
+            {
+                Id = pricelist.Id,
+                Name = pricelist.Name,
+                Description = pricelist.Description,
+                CompanyId = pricelist.CompanyId
+            };
+        }
+
+        public Pricelist MapToPricelist(UpdatePricelistDTO pricelist)
+        {
+            ArgumentNullException.ThrowIfNull(pricelist);
+
+            return new Pricelist
+            {
+                Id = pricelist.Id,
+                Name = pricelist.Name,
+                Description = pricelist.Description,
+                CompanyId = pricelist.CompanyId
+            };
+        }
     }
 }

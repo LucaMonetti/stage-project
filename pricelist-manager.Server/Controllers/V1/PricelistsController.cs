@@ -81,14 +81,14 @@ namespace pricelist_manager.Server.Controllers.V1
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] Pricelist dto)
+        public async Task<IActionResult> Create([FromBody] CreatePricelistDTO dto)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var data = dto;
+            var data = PricelistMapping.MapToPricelist(dto);
 
             try
             {
@@ -102,7 +102,7 @@ namespace pricelist_manager.Server.Controllers.V1
         }
 
         [HttpPut("{id:guid}")]
-        public async Task<IActionResult> UpdateProduct(Guid id, [FromBody] Pricelist dto)
+        public async Task<IActionResult> UpdateProduct(Guid id, [FromBody] UpdatePricelistDTO dto)
         {
             if (id != dto.Id)
             {
@@ -117,7 +117,7 @@ namespace pricelist_manager.Server.Controllers.V1
 
             try
             {
-                var res = await PricelistRepository.UpdateAsync(dto);
+                var res = await PricelistRepository.UpdateAsync(PricelistMapping.MapToPricelist(dto));
                 return Ok(res);
             }
             catch (NotFoundException<Pricelist> e)

@@ -1,6 +1,7 @@
 ﻿using pricelist_manager.Server.DTOs.V1;
 using pricelist_manager.Server.Interfaces;
 using pricelist_manager.Server.Models;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace pricelist_manager.Server.Mappers
 {
@@ -31,6 +32,23 @@ namespace pricelist_manager.Server.Mappers
                 Province = company.Province,
                 Pricelists = PricelistMapping.MapToLiteDTOs(company.Pricelists),
                 Products = ProductMapping.MapToLiteDTOs(company.Products)
+            };
+        }
+
+        public Company MapToCompany(CreateCompanyDTO dto)
+        {
+            ArgumentNullException.ThrowIfNull(dto);
+
+            return new Company
+            {
+                Id = dto.Id,
+                Name = dto.Name,
+                Address = dto.Address,
+                InterfaceColor = dto.InterfaceColor,
+                LogoUri = dto.LogoUri,
+                Phone = dto.Phone,
+                PostalCode = dto.PostalCode,
+                Province = dto.Province
             };
         }
 

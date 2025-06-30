@@ -6,6 +6,9 @@ namespace pricelist_manager.Server.Interfaces
     public interface IPricelistMappingService
     {
         PricelistDTO MapToDTO(Pricelist pricelist);
+        Pricelist MapToPricelist(CreatePricelistDTO pricelist);
+        Pricelist MapToPricelist(UpdatePricelistDTO pricelist);
+
 
         ICollection<PricelistDTO> MapToDTOs(ICollection<Pricelist> pricelists);
     }

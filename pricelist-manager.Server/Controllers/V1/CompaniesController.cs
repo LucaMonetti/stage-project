@@ -105,14 +105,14 @@ namespace pricelist_manager.Server.Controllers.V1
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] Company dto)
+        public async Task<IActionResult> Create([FromBody] CreateCompanyDTO dto)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var data = dto;
+            var data = CompanyMapping.MapToCompany(dto);
 
             try
             {

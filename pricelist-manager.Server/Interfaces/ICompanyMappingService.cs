@@ -6,6 +6,8 @@ namespace pricelist_manager.Server.Interfaces
     public interface ICompanyMappingService
     {
         CompanyDTO MapToDTO(Company company);
+        Company MapToCompany(CreateCompanyDTO dto);
+
         ICollection<CompanyDTO> MapToDTOs(ICollection<Company> companies);
     }
 }
