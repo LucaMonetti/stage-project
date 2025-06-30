@@ -23,8 +23,9 @@ namespace pricelist_manager.Server.Controllers.V1
         private readonly ICompanyMappingService CompanyMapping;
         private readonly IProductMappingService ProductMapping;
         private readonly IPricelistMappingService PricelistMapping;
+        private readonly IUserMappingService UserMapping;
 
-        public CompaniesController(ICompanyRepository companyRepository, IUserRepository userRepository, IProductRepository productRepository, IPricelistRepository pricelistRepository, ICompanyMappingService companyMapping, IProductMappingService productMapping, IPricelistMappingService pricelistMapping)
+        public CompaniesController(ICompanyRepository companyRepository, IUserRepository userRepository, IProductRepository productRepository, IPricelistRepository pricelistRepository, ICompanyMappingService companyMapping, IProductMappingService productMapping, IPricelistMappingService pricelistMapping, IUserMappingService userMapping)
         {
             CompanyRepository = companyRepository;
             UserRepository = userRepository;
@@ -33,6 +34,7 @@ namespace pricelist_manager.Server.Controllers.V1
             CompanyMapping = companyMapping;
             ProductMapping = productMapping;
             PricelistMapping = pricelistMapping;
+            UserMapping = userMapping;
         }
 
         [HttpGet]
@@ -75,7 +77,7 @@ namespace pricelist_manager.Server.Controllers.V1
 
             var res = await UserRepository.GetByCompany(id);
 
-            return Ok(UserDTO.FromUsers(res));
+            return Ok(UserMapping.MapToDTOs(res));
         }
 
         [HttpGet("{id}/products")]

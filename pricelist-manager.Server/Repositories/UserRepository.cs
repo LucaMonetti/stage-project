@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using pricelist_manager.Server.Data;
+using pricelist_manager.Server.DTOs.V1;
 using pricelist_manager.Server.DTOs.V1.Statistics;
 using pricelist_manager.Server.Exceptions;
 using pricelist_manager.Server.Helpers;
@@ -18,23 +19,52 @@ namespace pricelist_manager.Server.Repositories
             UserManager = userManage;
         }
 
-        public async Task<ICollection<User>> GetAll()
+        public async Task<ICollection<(User user, ICollection<string> roles)>> GetAll()
         {
             if (!CanConnect()) throw new StorageUnavailableException();
 
             var data = await Context.Users.Include(u => u.Company).ToListAsync();
 
-            return data;
+            var res = new List<(User user, ICollection<string> roles)>();
 
+            foreach (var user in data)
+            {
+                var userRoles = await UserManager.GetRolesAsync(user);
+                res.Add((user, userRoles));
+            }
+
+            return res;
         }
 
-        public async Task<ICollection<User>> GetByCompany(string companyId)
+        public async Task<ICollection<(User user, ICollection<string> roles)>> GetByCompany(string companyId)
         {
             if (!CanConnect()) throw new StorageUnavailableException();
 
             var data = await Context.Users.Where(u => u.CompanyId == companyId).Include(u => u.Company).ToListAsync();
 
-            return data;
+            var res = new List<(User user, ICollection<string> roles)>();
+
+            foreach (var user in data)
+            {
+                var userRoles = await UserManager.GetRolesAsync(user);
+                res.Add((user, userRoles));
+            }
+
+            return res;
+        }
+
+        public async Task<(User user, ICollection<string> roles)> GetById(string userId)
+        {
+            if (!CanConnect()) throw new StorageUnavailableException();
+
+            var data = await Context.Users.Include(u => u.Company).FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (data == null) 
+                throw new NotFoundException<User>(userId);
+
+            var userRoles = await UserManager.GetRolesAsync(data);
+
+            return (data, userRoles);
         }
 
         public async Task<UserStatistics> GetStatistics()

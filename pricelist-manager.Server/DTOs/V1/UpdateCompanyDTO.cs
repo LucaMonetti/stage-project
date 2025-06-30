@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace pricelist_manager.Server.DTOs.V1
 {
-    public class CreateCompanyDTO
+    public class UpdateCompanyDTO
     {
         [Length(1, 10)]
         public required string Id { get; set; }

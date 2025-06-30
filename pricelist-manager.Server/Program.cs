@@ -122,6 +122,9 @@ namespace pricelist_manager.Server
             builder.Services.AddScoped<IPricelistMappingService, PricelistMappingService>();
             builder.Services.AddScoped<IPricelistLiteMappingService, PricelistLiteMappingService>();
 
+            builder.Services.AddScoped<IUserMappingService, UserMappingService>();
+            builder.Services.AddScoped<IUserLiteMappingService, UserLiteMappingService>();
+
 
 
             var app = builder.Build();
