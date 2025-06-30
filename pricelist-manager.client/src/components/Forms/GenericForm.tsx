@@ -43,7 +43,7 @@ interface NumberInput<T extends FieldValues> extends BaseInput<T> {
 }
 
 interface SimpleInput<T extends FieldValues> extends BaseInput<T> {
-  type: "text" | "email" | "password";
+  type: "text" | "email" | "password" | "url" | "color";
   maxLength?: number;
 }
 
@@ -94,9 +94,14 @@ function RenderInputField<T extends FieldValues>(
     case "text":
     case "email":
     case "password":
+    case "url":
       return <Input {...commonProps} type={input.type} />;
     case "number":
       return <Input {...commonProps} type={input.type} />;
+    case "color":
+      return (
+        <Input {...commonProps} type={input.type} className="min-h-12 w-full" />
+      );
     case "searchable":
       return <SearchableSelect<T> {...commonProps} control={control} />;
     case "textarea":
@@ -110,7 +115,7 @@ function GenericForm<T extends FieldValues>({
   config,
   values,
   method = "POST",
-  id
+  id,
 }: Props<T>) {
   const {
     register,
@@ -137,9 +142,9 @@ function GenericForm<T extends FieldValues>({
       schema: schema,
       fieldErrors: errors,
       setError: setError,
-      setIsLoading: setIsLoading
+      setIsLoading: setIsLoading,
     });
-  }
+  };
 
   useEffect(() => {
     if (values) {

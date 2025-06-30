@@ -13,6 +13,8 @@ import CompanyListView from "../views/AdminDashboard/Companies/ListView";
 import SingleCompanyView from "../views/AdminDashboard/Companies/Single/SingleView";
 import CreatePricelistForm from "../views/AdminDashboard/Create/CreatePricelist";
 import EditPricelistForm from "../views/AdminDashboard/Edit/EditPricelist";
+import CreateCompanyForm from "../views/AdminDashboard/Create/CreateCompany";
+import EditCompanyForm from "../views/AdminDashboard/Edit/EditCompany";
 
 const router = createBrowserRouter([
   {
@@ -42,6 +44,10 @@ const router = createBrowserRouter([
                 path: "pricelists",
                 Component: CreatePricelistForm,
               },
+              {
+                path: "companies",
+                Component: CreateCompanyForm,
+              },
             ],
           },
           {
@@ -54,6 +60,10 @@ const router = createBrowserRouter([
               {
                 path: "pricelists/:pricelistId",
                 Component: EditPricelistForm,
+              },
+              {
+                path: "companies/:companyId",
+                Component: EditCompanyForm,
               },
             ],
           },

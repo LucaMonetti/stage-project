@@ -1,11 +1,12 @@
 import { z } from "zod/v4";
 
-// Edit Copany
-export const EditCopanySchema = z.object({
+// Edit Company
+export const EditCompanySchema = z.object({
+  id: z.string().min(1, "Necessario inserire il codice dell'Azienda!"),
   name: z
     .string()
     .min(1, "Necessario inserire la Ragione Sociale dell'Azienda!"),
-  postlCode: z
+  postalCode: z
     .string()
     .min(5, "Il Codice Postale deve avere 5 caratteri!")
     .max(5, "Il Codice Postale deve avere 5 caratteri!"),
@@ -26,15 +27,13 @@ export const EditCopanySchema = z.object({
     ),
 });
 
-export const EditCopanyArraySchema = z.array(EditCopanySchema);
+export const EditCompanyArraySchema = z.array(EditCompanySchema);
 
-export type EditCopany = z.infer<typeof EditCopanySchema>;
+export type EditCompany = z.infer<typeof EditCompanySchema>;
 
-// Create Copany
-export const CreateCopanySchema = EditCopanySchema.extend({
-  id: z.string().min(1, "Necessario inserire il codice dell'Azienda!"),
-});
+// Create Company
+export const CreateCompanySchema = EditCompanySchema;
 
-export const CreateCopanyArraySchema = z.array(CreateCopanySchema);
+export const CreateCompanyArraySchema = z.array(CreateCompanySchema);
 
-export type CreateCopany = z.infer<typeof CreateCopanySchema>;
+export type CreateCompany = z.infer<typeof CreateCompanySchema>;

@@ -17,7 +17,7 @@ const ItemListGroup = () => {
         getline={(item) => item.name}
         getCallout={(item) => item.id}
         getUniqueId={(item) => item.id}
-        getRoute={(item) => `/admin-dashboard/products/${item.id}`}
+        getRoute={(item) => `/admin-dashboard/companies/${item.id}`}
       />
       <ItemList
         title="Listini"
@@ -27,7 +27,7 @@ const ItemListGroup = () => {
           item.products ? item.products.length.toString() : "0"
         }
         getUniqueId={(item) => item.id}
-        getRoute={(item) => `/admin-dashboard/products/${item.id}`}
+        getRoute={(item) => `/admin-dashboard/pricelists/${item.id}`}
       />
       <ItemList
         title="Prodotti"
