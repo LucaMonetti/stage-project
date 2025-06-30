@@ -2,10 +2,14 @@ import { useParams } from "react-router";
 import FormButton from "../../../components/Buttons/FormButton";
 
 import { FaPlus } from "react-icons/fa6";
-import { useFetch, useGet } from "../../../hooks/useGenericFetch";
+import { useGet } from "../../../hooks/useGenericFetch";
 import { ProductSchema } from "../../../models/Product";
 import type { Config } from "../../../components/Forms/GenericForm";
-import { CreateProductSchema, EditProductSchema, type CreateProduct, type EditProduct } from "../../../models/FormProduct";
+import {
+  EditProductSchema,
+  type CreateProduct,
+  type EditProduct,
+} from "../../../models/FormProduct";
 import GenericForm from "../../../components/Forms/GenericForm";
 
 const config = {
@@ -17,6 +21,7 @@ const config = {
           id: "pricelistId",
           label: "Listino",
           type: "searchable",
+          isDisabled: true,
           placeholder: "Seleziona il listino prezzi",
           registerOptions: {
             required: "Necessario selezionare un listino!",
@@ -26,6 +31,7 @@ const config = {
           id: "productCode",
           label: "Codice Prodotto",
           type: "text",
+          isDisabled: true,
           placeholder: "Inserire il codice del prodotto",
           registerOptions: {
             required: "Necessario inserire un codice Prodotto!",
@@ -97,7 +103,7 @@ const config = {
       ],
     },
   ],
-  endpoint: "products"
+  endpoint: "products",
 } satisfies Config<EditProduct>;
 
 const EditProductForm = () => {
@@ -107,7 +113,7 @@ const EditProductForm = () => {
   const product = useGet({
     endpoint: `products/${productId}`,
     method: "GET",
-    schema: ProductSchema
+    schema: ProductSchema,
   });
 
   if (product.data) {
@@ -122,7 +128,7 @@ const EditProductForm = () => {
       cda: product.data.currentInstance.cda ?? "",
       salesItem: product.data.currentInstance.salesItem ?? "",
       productId: productId ?? "",
-    }
+    };
   }
 
   return (
@@ -144,14 +150,13 @@ const EditProductForm = () => {
         />
       </header>
 
-      
       <GenericForm<CreateProduct>
         id="edit-product-form"
-        config={{...config, endpoint: `products/${productId}`}}
+        config={{ ...config, endpoint: `products/${productId}` }}
         schema={EditProductSchema}
         values={data}
         method="PUT"
-        />
+      />
     </div>
   );
 };

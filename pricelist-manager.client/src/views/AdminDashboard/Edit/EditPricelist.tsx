@@ -5,12 +5,9 @@ import GenericForm, {
 
 import { FaPlus } from "react-icons/fa6";
 import {
-  CreatePricelistSchema,
   EditPricelistSchema,
-  type CreatePricelist,
   type EditPricelist,
 } from "../../../models/FormPricelist";
-import type { EditProduct } from "../../../models/FormProduct";
 import { useParams } from "react-router";
 import { useGet } from "../../../hooks/useGenericFetch";
 import { PricelistSchema } from "../../../models/Pricelist";
@@ -24,6 +21,7 @@ const config = {
           id: "id",
           label: "ID",
           type: "text",
+          isDisabled: true,
         },
         {
           id: "name",
