@@ -1,10 +1,10 @@
 import { Link, useNavigate, useParams } from "react-router";
-import BasicLoader from "../../../../components/Loader/BasicLoader";
+import BasicLoader from "../../../components/Loader/BasicLoader";
 import { FaPencil, FaDownload, FaUser } from "react-icons/fa6";
-import InfoWidget from "../../../../components/SinglePage/Widgets/InfoWidget";
-import DefinitionListWidget from "../../../../components/SinglePage/Widgets/DefinitionListWidget";
-import { useGet } from "../../../../hooks/useGenericFetch";
-import { UserSchema } from "../../../../models/User";
+import InfoWidget from "../../../components/SinglePage/Widgets/InfoWidget";
+import DefinitionListWidget from "../../../components/SinglePage/Widgets/DefinitionListWidget";
+import { useGet } from "../../../hooks/useGenericFetch";
+import { UserSchema } from "../../../models/User";
 
 const SingleUserView = () => {
   const navigate = useNavigate();

@@ -5,19 +5,19 @@ import AdminDashboardLayout from "../views/AdminDashboard/BaseLayout";
 import AdminDashboardView from "../views/AdminDashboard/AdminDashboardView";
 import CreateProductForm from "../views/AdminDashboard/Create/CreateProduct";
 import ProductsListView from "../views/AdminDashboard/Products/ListView";
-import SingleProductView from "../views/AdminDashboard/Products/Single/SingleView";
+import SingleProductView from "../views/AdminDashboard/Products/SingleView";
 import EditProductForm from "../views/AdminDashboard/Edit/EditProduct";
 import PricelistListView from "../views/AdminDashboard/Pricelists/ListView";
-import SinglePricelistView from "../views/AdminDashboard/Pricelists/Single/SingleView";
+import SinglePricelistView from "../views/AdminDashboard/Pricelists/SingleView";
 import CompanyListView from "../views/AdminDashboard/Companies/ListView";
-import SingleCompanyView from "../views/AdminDashboard/Companies/Single/SingleView";
+import SingleCompanyView from "../views/AdminDashboard/Companies/SingleView";
 import CreatePricelistForm from "../views/AdminDashboard/Create/CreatePricelist";
 import EditPricelistForm from "../views/AdminDashboard/Edit/EditPricelist";
 import CreateCompanyForm from "../views/AdminDashboard/Create/CreateCompany";
 import EditCompanyForm from "../views/AdminDashboard/Edit/EditCompany";
 import CreateUserForm from "../views/AdminDashboard/Create/CreateUser";
 import UsersListView from "../views/AdminDashboard/Users/ListView";
-import SingleUserView from "../views/AdminDashboard/Users/Single/SingleView";
+import SingleUserView from "../views/AdminDashboard/Users/SingleView";
 import EditUserForm from "../views/AdminDashboard/Edit/EditUser";
 
 const router = createBrowserRouter([

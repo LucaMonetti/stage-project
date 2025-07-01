@@ -1,12 +1,12 @@
-import { useNavigate, useParams } from "react-router";
-import { ProductSchema } from "../../../../models/Product";
-import BasicLoader from "../../../../components/Loader/BasicLoader";
 import { FaPencil, FaDownload } from "react-icons/fa6";
-import InfoWidget from "../../../../components/SinglePage/Widgets/InfoWidget";
-import MoneyWidget from "../../../../components/SinglePage/Widgets/MoneyWidget";
-import DefinitionListWidget from "../../../../components/SinglePage/Widgets/DefinitionListWidget";
-import VersionWidget from "../../../../components/SinglePage/Widgets/VersionWidget";
-import { useFetch, useGet } from "../../../../hooks/useGenericFetch";
+import { useNavigate, useParams } from "react-router-dom";
+import BasicLoader from "../../../components/Loader/BasicLoader";
+import DefinitionListWidget from "../../../components/SinglePage/Widgets/DefinitionListWidget";
+import InfoWidget from "../../../components/SinglePage/Widgets/InfoWidget";
+import MoneyWidget from "../../../components/SinglePage/Widgets/MoneyWidget";
+import VersionWidget from "../../../components/SinglePage/Widgets/VersionWidget";
+import { useGet } from "../../../hooks/useGenericFetch";
+import { ProductSchema } from "../../../models/Product";
 
 const SingleProductView = () => {
   const navigate = useNavigate();

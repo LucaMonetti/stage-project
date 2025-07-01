@@ -1,17 +1,17 @@
 import { Link, useNavigate, useParams } from "react-router";
-import { ProductArraySchema, type Product } from "../../../../models/Product";
-import BasicLoader from "../../../../components/Loader/BasicLoader";
+import { ProductArraySchema, type Product } from "../../../models/Product";
+import BasicLoader from "../../../components/Loader/BasicLoader";
 import { FaPencil, FaDownload, FaPlus } from "react-icons/fa6";
-import InfoWidget from "../../../../components/SinglePage/Widgets/InfoWidget";
-import { useGet } from "../../../../hooks/useGenericFetch";
+import InfoWidget from "../../../components/SinglePage/Widgets/InfoWidget";
+import { useGet } from "../../../hooks/useGenericFetch";
 import {
   PricelistArraySchema,
   type Pricelist,
-} from "../../../../models/Pricelist";
-import TableWidget from "../../../../components/SinglePage/Widgets/TableWidget";
-import { CompanySchema } from "../../../../models/Company";
-import DefinitionListWidget from "../../../../components/SinglePage/Widgets/DefinitionListWidget";
-import type { Column } from "../../../../components/Dashboard/Tables/GenericTableView";
+} from "../../../models/Pricelist";
+import TableWidget from "../../../components/SinglePage/Widgets/TableWidget";
+import { CompanySchema } from "../../../models/Company";
+import DefinitionListWidget from "../../../components/SinglePage/Widgets/DefinitionListWidget";
+import type { Column } from "../../../components/Dashboard/Tables/GenericTableView";
 
 const SingleCompanyView = () => {
   const navigate = useNavigate();

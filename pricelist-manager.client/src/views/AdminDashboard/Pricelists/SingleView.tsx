@@ -1,12 +1,12 @@
 import { useNavigate, useParams } from "react-router";
-import { ProductArraySchema, type Product } from "../../../../models/Product";
-import BasicLoader from "../../../../components/Loader/BasicLoader";
+import { ProductArraySchema, type Product } from "../../../models/Product";
+import BasicLoader from "../../../components/Loader/BasicLoader";
 import { FaPencil, FaDownload, FaPlus } from "react-icons/fa6";
-import InfoWidget from "../../../../components/SinglePage/Widgets/InfoWidget";
-import { useGet } from "../../../../hooks/useGenericFetch";
-import { PricelistSchema } from "../../../../models/Pricelist";
-import TableWidget from "../../../../components/SinglePage/Widgets/TableWidget";
-import type { Column } from "../../../../components/Dashboard/Tables/GenericTableView";
+import InfoWidget from "../../../components/SinglePage/Widgets/InfoWidget";
+import { useGet } from "../../../hooks/useGenericFetch";
+import { PricelistSchema } from "../../../models/Pricelist";
+import TableWidget from "../../../components/SinglePage/Widgets/TableWidget";
+import type { Column } from "../../../components/Dashboard/Tables/GenericTableView";
 
 const SinglePricelistView = () => {
   const navigate = useNavigate();
