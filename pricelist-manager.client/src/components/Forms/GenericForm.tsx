@@ -1,8 +1,6 @@
-import { keyof, z } from "zod/v4";
 import { useEffect, useRef, useState } from "react";
 import Fieldset from "./Fieldset";
 import Input from "./Input";
-import SearchableSelect from "./SearchableSelect";
 import Textarea from "./Textarea";
 import {
   useForm,
@@ -15,7 +13,11 @@ import {
   type UseFormRegister,
 } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useFetch, usePost } from "../../hooks/useGenericFetch";
+import { useGet, usePost } from "../../hooks/useGenericFetch";
+import { FaExclamation } from "react-icons/fa6";
+import SearchSelect from "./SearchSelect";
+import { PricelistArraySchema, type Pricelist } from "../../models/Pricelist";
+import type { z, ZodType } from "zod/v4";
 
 type InferredZodSchema<T extends FieldValues> = z.ZodType<T, any, any>;
 
@@ -56,6 +58,7 @@ interface TextAreaInput<T extends FieldValues> extends BaseInput<T> {
 interface SearchableInput<T extends FieldValues> extends BaseInput<T> {
   type: "searchable";
   maxLength?: number;
+  schema: ZodType;
 }
 
 type InputConfig<T extends FieldValues> =
@@ -126,12 +129,22 @@ function RenderInputField<T extends FieldValues>(
       );
     case "searchable":
       return (
-        <SearchableSelect<T>
-          key={key}
-          isDisabled={input.isDisabled}
-          {...commonProps}
-          control={control}
-        />
+        <>
+          <SearchSelect<T, Pricelist>
+            key={key}
+            isDisabled={input.isDisabled}
+            {...commonProps}
+            control={control}
+            fetchData={useGet({
+              endpoint: "pricelists",
+              method: "GET",
+              schema: PricelistArraySchema,
+            })}
+            getLabel={(p) => `${p.company.id} - ${p.name}`}
+            getValue={(p) => p.id}
+            groupBy={(p) => ({ id: p.company.id, name: p.company.name })}
+          />
+        </>
       );
     case "textarea":
       return (
@@ -191,11 +204,11 @@ function GenericForm<T extends FieldValues>({
       id={id}
     >
       {errors.root && (
-        <div
-          className="border-2 border-red-700 rounded p-8 bg-red-950"
-          ref={errorDiv}
-        >
-          <p className="text-red-50">{errors.root.message}</p>
+        <div className="bg-opacity-10 border border-l-8 border-red-400 p-3 rounded-r-md">
+          <div className="flex items-center gap-2">
+            <FaExclamation className="text-red-400" />
+            <span className="text-red-400">{errors.root.message}</span>
+          </div>
         </div>
       )}
 

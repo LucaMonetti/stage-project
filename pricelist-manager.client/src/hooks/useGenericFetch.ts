@@ -1,7 +1,12 @@
 import { useEffect, useState } from "react";
 import { ZodType, z } from "zod/v4";
 import type { FetchData } from "../types";
-import type { FieldErrors, FieldValues, FormState, UseFormSetError } from "react-hook-form";
+import type {
+  FieldErrors,
+  FieldValues,
+  FormState,
+  UseFormSetError,
+} from "react-hook-form";
 
 const DEFAULT_API_VERSION = "v1";
 
