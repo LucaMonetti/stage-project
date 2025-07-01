@@ -12,5 +12,7 @@ namespace pricelist_manager.Server.DTOs.V1
         public string AccountingControl { get; set; } = string.Empty;
         public string CDA { get; set; } = string.Empty;
         public string SalesItem { get; set; } = string.Empty;
+
+        public DateTime UpdatedAt {  get; set; } = DateTime.Now;
     }
 }

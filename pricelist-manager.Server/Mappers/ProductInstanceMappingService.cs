@@ -57,7 +57,8 @@ namespace pricelist_manager.Server.Mappers
                 AccountingControl = dto.AccountingControl,
                 CDA = dto.CDA,
                 SalesItem = dto.SalesItem,
-                Cost = dto.Cost
+                Cost = dto.Cost,
+                UpdatedAt = dto.UpdatedAt
             };
         }
 
@@ -75,7 +76,8 @@ namespace pricelist_manager.Server.Mappers
                 Cost = product.Cost,
                 AccountingControl = product.AccountingControl,
                 CDA = product.CDA,
-                SalesItem = product.SalesItem
+                SalesItem = product.SalesItem,
+                UpdatedAt = product.UpdatedAt,
             };
         }
 

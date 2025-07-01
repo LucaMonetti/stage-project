@@ -29,6 +29,8 @@ namespace pricelist_manager.Server.Models
 
         public string SalesItem { get; set; } = String.Empty;
 
+        public DateTime UpdatedAt { get; set; } = DateTime.Now;
+
         public Product? Product { get; set; } = null!;
     }
 }
