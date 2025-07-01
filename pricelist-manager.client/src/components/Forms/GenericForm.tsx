@@ -18,6 +18,9 @@ import { FaExclamation } from "react-icons/fa6";
 import SearchSelect from "./SearchSelect";
 import { PricelistArraySchema, type Pricelist } from "../../models/Pricelist";
 import type { z, ZodType } from "zod/v4";
+import type { FetchData } from "../../types";
+import type { Company } from "../../models/Company";
+import type { Product } from "../../models/Product";
 
 type InferredZodSchema<T extends FieldValues> = z.ZodType<T, any, any>;
 
@@ -58,7 +61,8 @@ interface TextAreaInput<T extends FieldValues> extends BaseInput<T> {
 interface SearchableInput<T extends FieldValues> extends BaseInput<T> {
   type: "searchable";
   maxLength?: number;
-  schema: ZodType;
+  schema: "pricelist" | "product" | "company";
+  fetchData: FetchData<Pricelist[] | Product[] | Company[]>;
 }
 
 type InputConfig<T extends FieldValues> =
@@ -128,24 +132,34 @@ function RenderInputField<T extends FieldValues>(
         />
       );
     case "searchable":
-      return (
-        <>
-          <SearchSelect<T, Pricelist>
-            key={key}
-            isDisabled={input.isDisabled}
-            {...commonProps}
-            control={control}
-            fetchData={useGet({
-              endpoint: "pricelists",
-              method: "GET",
-              schema: PricelistArraySchema,
-            })}
-            getLabel={(p) => `${p.company.id} - ${p.name}`}
-            getValue={(p) => p.id}
-            groupBy={(p) => ({ id: p.company.id, name: p.company.name })}
-          />
-        </>
-      );
+      switch (input.schema) {
+        case "pricelist":
+          return (
+            <SearchSelect<T, Pricelist>
+              key={key}
+              isDisabled={input.isDisabled}
+              {...commonProps}
+              control={control}
+              fetchData={input.fetchData as FetchData<Pricelist[]>}
+              getLabel={(p) => `${p.company.id} - ${p.name}`}
+              getValue={(p) => p.id}
+              groupBy={(p) => ({ id: p.company.id, name: p.company.name })}
+            />
+          );
+        case "company":
+          return (
+            <SearchSelect<T, Company>
+              key={key}
+              isDisabled={input.isDisabled}
+              {...commonProps}
+              control={control}
+              fetchData={input.fetchData as FetchData<Company[]>}
+              getLabel={(p) => `${p.name} (${p.id})`}
+              getValue={(p) => p.id}
+            />
+          );
+      }
+      break;
     case "textarea":
       return (
         <Textarea key={key} isDisabled={input.isDisabled} {...commonProps} />

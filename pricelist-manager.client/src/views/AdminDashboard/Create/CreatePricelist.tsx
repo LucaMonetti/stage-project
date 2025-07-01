@@ -8,43 +8,51 @@ import {
   CreatePricelistSchema,
   type CreatePricelist,
 } from "../../../models/FormPricelist";
-
-const config = {
-  fieldset: [
-    {
-      title: "Informazioni Articolo",
-      inputs: [
-        {
-          id: "name",
-          label: "Nome",
-          type: "text",
-          placeholder: "Inserisci il nome del listino",
-          registerOptions: {
-            required: "Necessario inserire il nome del Listino.",
-          },
-        },
-        {
-          id: "companyId",
-          label: "Codice Azienda",
-          type: "text",
-          placeholder: "Inserire il codice dell'azienda",
-          registerOptions: {
-            required: "Necessario inserire il codice dell'Azienda.",
-          },
-        },
-        {
-          id: "description",
-          label: "Descrizione Listino",
-          type: "textarea",
-          placeholder: "Inserire la descrizione dell'Listino.",
-        },
-      ],
-    },
-  ],
-  endpoint: "pricelists",
-} satisfies Config<CreatePricelist>;
+import { useGet } from "../../../hooks/useGenericFetch";
+import { CompanyArraySchema } from "../../../models/Company";
 
 const CreatePricelistForm = () => {
+  const config = {
+    fieldset: [
+      {
+        title: "Informazioni Articolo",
+        inputs: [
+          {
+            id: "name",
+            label: "Nome",
+            type: "text",
+            placeholder: "Inserisci il nome del listino",
+            registerOptions: {
+              required: "Necessario inserire il nome del Listino.",
+            },
+          },
+          {
+            id: "companyId",
+            label: "Codice Azienda",
+            type: "searchable",
+            fetchData: useGet({
+              endpoint: "companies",
+              method: "GET",
+              schema: CompanyArraySchema,
+            }),
+            schema: "company",
+            placeholder: "Inserire il codice dell'azienda",
+            registerOptions: {
+              required: "Necessario inserire il codice dell'Azienda.",
+            },
+          },
+          {
+            id: "description",
+            label: "Descrizione Listino",
+            type: "textarea",
+            placeholder: "Inserire la descrizione dell'Listino.",
+          },
+        ],
+      },
+    ],
+    endpoint: "pricelists",
+  } satisfies Config<CreatePricelist>;
+
   return (
     <div className="pb-4 px-8">
       <header className="flex justify-between items-center sticky top-[65.6px] bg-gray-900 z-50 py-4 border-gray-800 border-b-2">

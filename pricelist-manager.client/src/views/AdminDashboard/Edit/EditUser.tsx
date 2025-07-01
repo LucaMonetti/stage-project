@@ -13,97 +13,104 @@ import {
 import { useParams } from "react-router";
 import { useGet } from "../../../hooks/useGenericFetch";
 import { UserSchema } from "../../../models/User";
-
-const config = {
-  fieldset: [
-    {
-      title: "Informazioni Generali",
-      inputs: [
-        {
-          id: "companyId",
-          label: "Codice Azienda",
-          type: "text",
-          isDisabled: true,
-          placeholder: "Inserire il dell'Azienda per cui lavora l'utente.",
-          registerOptions: {
-            required: "Necessario inserire il codice dell'Azienda",
-          },
-        },
-        {
-          id: "firstName",
-          label: "Nome",
-          type: "text",
-          placeholder: "Inserire il nome dell'Utente.",
-          registerOptions: {
-            required: "Necessario inserire il nome dell'Utente.",
-          },
-        },
-        {
-          id: "lastName",
-          label: "Cognome",
-          type: "text",
-          placeholder: "Inserire il cognome dell'Utente.",
-          registerOptions: {
-            required: "Necessario inserire il cognome dell'Utente.",
-          },
-        },
-        {
-          id: "phone",
-          label: "Numero telefonico",
-          type: "text",
-          placeholder: "Inserire il numero telefonico dell'Utente.",
-          registerOptions: {
-            required: "Necessario inserire il numero telefonico dell'Utente.",
-          },
-        },
-      ],
-    },
-    {
-      title: "Informazioni di Accesso",
-      inputs: [
-        {
-          id: "username",
-          label: "Username",
-          type: "text",
-          placeholder: "Inserire uno username per l'Utente.",
-          registerOptions: {
-            required: "Necessario inserire uno username per l'Utente.",
-          },
-        },
-        {
-          id: "email",
-          label: "Email",
-          type: "email",
-          placeholder: "Inserire l'email dell'Utente.",
-          registerOptions: {
-            required: "Necessario inserire l'email dell'Utente.",
-          },
-        },
-        {
-          id: "password",
-          label: "Password",
-          type: "password",
-          placeholder: "Inserire una password per l'Utente.",
-          registerOptions: {
-            required: "Necessario inserire una password.",
-          },
-        },
-        {
-          id: "role",
-          label: "Ruolo",
-          type: "text",
-          placeholder: "Inserire un ruolo per l'Utente.",
-          registerOptions: {
-            required: "Necessario selezionare un ruolo.",
-          },
-        },
-      ],
-    },
-  ],
-  endpoint: "accounts",
-} satisfies Config<EditUser>;
+import { CompanyArraySchema } from "../../../models/Company";
 
 const EditUserForm = () => {
+  const config = {
+    fieldset: [
+      {
+        title: "Informazioni Generali",
+        inputs: [
+          {
+            id: "companyId",
+            label: "Codice Azienda",
+            type: "searchable",
+            isDisabled: true,
+            schema: "company",
+            fetchData: useGet({
+              endpoint: `companies`,
+              method: "GET",
+              schema: CompanyArraySchema,
+            }),
+            placeholder: "Inserire il dell'Azienda per cui lavora l'utente.",
+            registerOptions: {
+              required: "Necessario inserire il codice dell'Azienda",
+            },
+          },
+          {
+            id: "firstName",
+            label: "Nome",
+            type: "text",
+            placeholder: "Inserire il nome dell'Utente.",
+            registerOptions: {
+              required: "Necessario inserire il nome dell'Utente.",
+            },
+          },
+          {
+            id: "lastName",
+            label: "Cognome",
+            type: "text",
+            placeholder: "Inserire il cognome dell'Utente.",
+            registerOptions: {
+              required: "Necessario inserire il cognome dell'Utente.",
+            },
+          },
+          {
+            id: "phone",
+            label: "Numero telefonico",
+            type: "text",
+            placeholder: "Inserire il numero telefonico dell'Utente.",
+            registerOptions: {
+              required: "Necessario inserire il numero telefonico dell'Utente.",
+            },
+          },
+        ],
+      },
+      {
+        title: "Informazioni di Accesso",
+        inputs: [
+          {
+            id: "username",
+            label: "Username",
+            type: "text",
+            placeholder: "Inserire uno username per l'Utente.",
+            registerOptions: {
+              required: "Necessario inserire uno username per l'Utente.",
+            },
+          },
+          {
+            id: "email",
+            label: "Email",
+            type: "email",
+            placeholder: "Inserire l'email dell'Utente.",
+            registerOptions: {
+              required: "Necessario inserire l'email dell'Utente.",
+            },
+          },
+          {
+            id: "password",
+            label: "Password",
+            type: "password",
+            placeholder: "Inserire una password per l'Utente.",
+            registerOptions: {
+              required: "Necessario inserire una password.",
+            },
+          },
+          {
+            id: "role",
+            label: "Ruolo",
+            type: "text",
+            placeholder: "Inserire un ruolo per l'Utente.",
+            registerOptions: {
+              required: "Necessario selezionare un ruolo.",
+            },
+          },
+        ],
+      },
+    ],
+    endpoint: "accounts",
+  } satisfies Config<EditUser>;
+
   let data: EditUser | undefined = undefined;
 
   const { userId } = useParams();

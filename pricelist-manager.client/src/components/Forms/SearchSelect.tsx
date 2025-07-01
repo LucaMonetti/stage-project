@@ -80,6 +80,7 @@ type Props<T extends FieldValues, OptionItem> = {
   error?: string;
   value?: string;
   isDisabled?: boolean;
+  label: string;
   placeholder?: string;
   fetchData: FetchData<OptionItem[]>;
   getLabel: (item: OptionItem) => string;
@@ -94,6 +95,7 @@ function SearchSelect<T extends FieldValues, OptionItem>({
   getLabel,
   getValue,
   groupBy,
+  label,
   error,
   registerOptions,
   placeholder,
@@ -142,55 +144,59 @@ function SearchSelect<T extends FieldValues, OptionItem>({
   }, [fetchData.data]);
 
   return (
-    <div className="flex flex-col gap-2">
-      <Controller
-        control={control}
-        name={id}
-        rules={registerOptions}
-        render={({
-          field: { onChange, onBlur, value = prevValue, name, ref },
-        }) => {
-          const allOptions = groupedOptions.flatMap((g) => g.options);
-          const selectedOption =
-            allOptions.find((opt) => opt.value === value) ?? null;
+    <>
+      <div className="flex flex-col">
+        <label htmlFor={id}>{label}</label>
+        <Controller
+          control={control}
+          name={id}
+          rules={registerOptions}
+          render={({
+            field: { onChange, onBlur, value = prevValue, name, ref },
+          }) => {
+            const allOptions = groupedOptions.flatMap((g) => g.options);
+            const selectedOption =
+              allOptions.find((opt) => opt.value === value) ?? null;
 
-          return (
-            <AsyncSelect<Option, false>
-              cacheOptions
-              value={selectedOption}
-              loadOptions={(input) => {
-                const filtered = groupedOptions
-                  .map((group) => ({
-                    ...group,
-                    options: group.options.filter((opt) =>
-                      opt.label.toLowerCase().includes(input.toLowerCase())
-                    ),
-                  }))
-                  .filter((group) => group.options.length > 0);
+            return (
+              <AsyncSelect<Option, false>
+                cacheOptions
+                value={selectedOption}
+                loadOptions={(input) => {
+                  const filtered = groupedOptions
+                    .map((group) => ({
+                      ...group,
+                      options: group.options.filter((opt) =>
+                        opt.label.toLowerCase().includes(input.toLowerCase())
+                      ),
+                    }))
+                    .filter((group) => group.options.length > 0);
 
-                return Promise.resolve(filtered);
-              }}
-              onChange={(selected) => {
-                onChange(selected?.value ?? "");
-              }}
-              onBlur={onBlur}
-              name={name}
-              ref={ref}
-              classNames={{
-                option: () => "custom-select-option",
-              }}
-              defaultOptions={groupedOptions}
-              placeholder={
-                fetchData.isLoading
-                  ? "Ricerca in corso.."
-                  : placeholder ?? "Seleziona un'opzione"
-              }
-              styles={customStyles(!!error)}
-              isOptionDisabled={(opt) => isDisabled && opt.value != value}
-            />
-          );
-        }}
-      />
+                  return Promise.resolve(filtered);
+                }}
+                onChange={(selected) => {
+                  onChange(selected?.value ?? "");
+                }}
+                onBlur={onBlur}
+                name={name}
+                ref={ref}
+                classNames={{
+                  option: () => "custom-select-option",
+                }}
+                defaultOptions={groupedOptions}
+                placeholder={
+                  fetchData.isLoading
+                    ? "Ricerca in corso.."
+                    : placeholder ?? "Seleziona un'opzione"
+                }
+                styles={customStyles(!!error)}
+                isOptionDisabled={(opt) => isDisabled && opt.value != value}
+              />
+            );
+          }}
+        />
+      </div>
+
       {error !== undefined && (
         <div className="bg-opacity-10 border border-l-8 border-red-400 p-3 rounded-r-md">
           <div className="flex items-center gap-2">
@@ -199,7 +205,7 @@ function SearchSelect<T extends FieldValues, OptionItem>({
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }
 

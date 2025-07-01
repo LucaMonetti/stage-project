@@ -40,23 +40,25 @@ function Textarea<T extends FieldValues>({
 
   return (
     <>
-      <label htmlFor={id}>{label}</label>
-      <textarea
-        id={id}
-        {...(isDisabled && { disabled: true })}
-        className={`border-2 ${
-          error !== undefined
-            ? "border-red-400 hover:border-red-500 focus:border-red-500 focus-within:border-red-500"
-            : "border-gray-700 hover:border-blue-500 focus:border-blue-500 focus-within:border-blue-500"
-        } transition-colors outline-0 rounded px-4 py-2 bg-gray-900 ${className} ${
-          !isResizable ? "resize-none" : ""
-        }`}
-        {...register(id, registerOptions)}
-        value={data}
-        onChange={(e) => setData(e.target.value)}
-      >
-        {placeholder?.trim()}
-      </textarea>
+      <div className="flex flex-col">
+        <label htmlFor={id}>{label}</label>
+        <textarea
+          id={id}
+          {...(isDisabled && { disabled: true })}
+          className={`border-2 ${
+            error !== undefined
+              ? "border-red-400 hover:border-red-500 focus:border-red-500 focus-within:border-red-500"
+              : "border-gray-700 hover:border-blue-500 focus:border-blue-500 focus-within:border-blue-500"
+          } transition-colors outline-0 rounded px-4 py-2 bg-gray-900 ${className} ${
+            !isResizable ? "resize-none" : ""
+          }`}
+          {...register(id, registerOptions)}
+          value={data}
+          onChange={(e) => setData(e.target.value)}
+        >
+          {placeholder?.trim()}
+        </textarea>
+      </div>
       {error !== undefined && (
         <div className="bg-opacity-10 border border-l-8 border-red-400 p-3 rounded-r-md">
           <div className="flex items-center gap-2">

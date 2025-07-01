@@ -11,50 +11,57 @@ import {
 import { useParams } from "react-router";
 import { useGet } from "../../../hooks/useGenericFetch";
 import { PricelistSchema } from "../../../models/Pricelist";
-
-const config = {
-  fieldset: [
-    {
-      title: "Informazioni Articolo",
-      inputs: [
-        {
-          id: "id",
-          label: "ID",
-          type: "text",
-          isDisabled: true,
-        },
-        {
-          id: "companyId",
-          label: "Codice Azienda",
-          type: "text",
-          isDisabled: true,
-          placeholder: "Inserire il codice dell'azienda",
-          registerOptions: {
-            required: "Necessario inserire il codice dell'Azienda.",
-          },
-        },
-        {
-          id: "name",
-          label: "Nome",
-          type: "text",
-          placeholder: "Inserisci il nome del listino",
-          registerOptions: {
-            required: "Necessario inserire il nome del Listino.",
-          },
-        },
-        {
-          id: "description",
-          label: "Descrizione Listino",
-          type: "textarea",
-          placeholder: "Inserire la descrizione dell'Listino.",
-        },
-      ],
-    },
-  ],
-  endpoint: "pricelists",
-} satisfies Config<EditPricelist>;
+import { CompanyArraySchema } from "../../../models/Company";
 
 const EditPricelistForm = () => {
+  const config = {
+    fieldset: [
+      {
+        title: "Informazioni Articolo",
+        inputs: [
+          {
+            id: "id",
+            label: "ID",
+            type: "text",
+            isDisabled: true,
+          },
+          {
+            id: "companyId",
+            label: "Codice Azienda",
+            type: "searchable",
+            isDisabled: true,
+            schema: "company",
+            fetchData: useGet({
+              endpoint: `companies`,
+              method: "GET",
+              schema: CompanyArraySchema,
+            }),
+            placeholder: "Inserire il codice dell'azienda",
+            registerOptions: {
+              required: "Necessario inserire il codice dell'Azienda.",
+            },
+          },
+          {
+            id: "name",
+            label: "Nome",
+            type: "text",
+            placeholder: "Inserisci il nome del listino",
+            registerOptions: {
+              required: "Necessario inserire il nome del Listino.",
+            },
+          },
+          {
+            id: "description",
+            label: "Descrizione Listino",
+            type: "textarea",
+            placeholder: "Inserire la descrizione dell'Listino.",
+          },
+        ],
+      },
+    ],
+    endpoint: "pricelists",
+  } satisfies Config<EditPricelist>;
+
   let data: EditPricelist | undefined = undefined;
 
   const { pricelistId } = useParams();
