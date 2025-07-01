@@ -7,6 +7,7 @@ import MoneyWidget from "../../../components/SinglePage/Widgets/MoneyWidget";
 import VersionWidget from "../../../components/SinglePage/Widgets/VersionWidget";
 import { useGet } from "../../../hooks/useGenericFetch";
 import { ProductSchema } from "../../../models/Product";
+import GraphWidget from "../../../components/SinglePage/Widgets/GraphWidget";
 
 const SingleProductView = () => {
   const navigate = useNavigate();
@@ -96,6 +97,8 @@ const SingleProductView = () => {
           },
         ]}
       />
+
+      <GraphWidget />
 
       <VersionWidget
         versions={product.data?.versions}
