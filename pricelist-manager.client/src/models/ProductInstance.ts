@@ -10,6 +10,10 @@ export const ProductInstanceSchema = z.object({
   accountingControl: z.string().optional(),
   cda: z.string().optional(),
   salesItem: z.string().optional(),
+  updatedAt: z.preprocess(
+    (arg) => (typeof arg === "string" ? new Date(arg) : arg),
+    z.date()
+  ),
 });
 
 export const ProductInstanceArraySchema = z.array(ProductInstanceSchema);
