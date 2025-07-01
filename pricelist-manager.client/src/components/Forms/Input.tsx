@@ -16,6 +16,7 @@ type Props<T extends FieldValues> = {
   registerOptions?: Partial<RegisterOptions<T>>;
   error?: string;
   value?: string | number;
+  isDisabled?: boolean;
 };
 
 function Input<T extends FieldValues>({
@@ -28,6 +29,7 @@ function Input<T extends FieldValues>({
   registerOptions,
   error,
   value,
+  isDisabled = false,
 }: Props<T>) {
   const [data, setData] = useState("");
 
@@ -40,6 +42,7 @@ function Input<T extends FieldValues>({
       <label htmlFor={id}>{label}</label>
       <input
         type={type}
+        {...(isDisabled && { disabled: true })}
         id={id}
         placeholder={placeholder}
         className={`border-2 border-gray-700 rounded px-4 py-2 bg-gray-900 ${className}`}

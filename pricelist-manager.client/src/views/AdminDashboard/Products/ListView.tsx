@@ -1,3 +1,5 @@
+import { FaPlus } from "react-icons/fa6";
+import ActionRenderer from "../../../components/Buttons/ActionRenderer";
 import GenericTableView from "../../../components/Dashboard/Tables/GenericTableView";
 import { useFetch } from "../../../hooks/useFetch";
 import { ProductArraySchema, type Product } from "../../../models/Product";
@@ -53,6 +55,25 @@ const ProductsListView = () => {
 
   return (
     <div className="px-8 py-4">
+      <div className="flex justify-between items-center mb-8">
+        <div>
+          <h1 className="text-3xl text-medium">Prodotti</h1>
+          <p className="text-gray-400">
+            Visualizza tutti i prodotti registrati all'interno della
+            piattaforma.
+          </p>
+        </div>
+        <ActionRenderer
+          actions={[
+            {
+              color: "blue",
+              Icon: FaPlus,
+              route: `/admin-dashboard/create/products`,
+            },
+          ]}
+        />
+      </div>
+
       <GenericTableView
         data={products}
         columns={columns}

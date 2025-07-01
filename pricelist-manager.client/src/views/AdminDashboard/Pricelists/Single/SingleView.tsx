@@ -1,18 +1,12 @@
 import { useNavigate, useParams } from "react-router";
-import {
-  ProductArraySchema,
-  ProductSchema,
-  type Product,
-} from "../../../../models/Product";
+import { ProductArraySchema, type Product } from "../../../../models/Product";
 import BasicLoader from "../../../../components/Loader/BasicLoader";
-import { FaPencil, FaDownload } from "react-icons/fa6";
+import { FaPencil, FaDownload, FaPlus } from "react-icons/fa6";
 import InfoWidget from "../../../../components/SinglePage/Widgets/InfoWidget";
-import MoneyWidget from "../../../../components/SinglePage/Widgets/MoneyWidget";
-import DefinitionListWidget from "../../../../components/SinglePage/Widgets/DefinitionListWidget";
-import VersionWidget from "../../../../components/SinglePage/Widgets/VersionWidget";
-import { useFetch, useGet } from "../../../../hooks/useGenericFetch";
+import { useGet } from "../../../../hooks/useGenericFetch";
 import { PricelistSchema } from "../../../../models/Pricelist";
 import TableWidget from "../../../../components/SinglePage/Widgets/TableWidget";
+import type { Column } from "../../../../components/Dashboard/Tables/GenericTableView";
 
 const SinglePricelistView = () => {
   const navigate = useNavigate();
@@ -64,33 +58,43 @@ const SinglePricelistView = () => {
       />
 
       <TableWidget
-        data={productsData}
-        columns={[
+        title="Prodotti Registrati"
+        actions={[
           {
-            key: "id" as keyof Product,
-            header: "Codice Prodotto",
-            className: "text-white",
-            headerClassName: "text-white",
-          },
-          {
-            key: "currentInstance.name" as keyof Product,
-            header: "Nome Prodotto",
-            className: "text-white",
-            headerClassName: "text-white",
-          },
-          {
-            key: "currentInstance.price" as keyof Product,
-            header: "Prezzo",
-            className: "font-medium text-green-600",
-            render: (value: number) => `${value.toFixed(2)} €`,
-          },
-          {
-            key: "currentInstance.cost" as keyof Product,
-            header: "Costo",
-            className: "font-medium text-red-600",
-            render: (value: number) => `${value.toFixed(2)} €`,
+            color: "blue",
+            Icon: FaPlus,
+            route: `/admin-dashboard/create/products?pricelistId=${pricelistId}`,
           },
         ]}
+        data={productsData}
+        columns={
+          [
+            {
+              key: "id",
+              header: "Codice Prodotto",
+              className: "text-white",
+              headerClassName: "text-white",
+            },
+            {
+              key: "currentInstance.name",
+              header: "Nome Prodotto",
+              className: "text-white",
+              headerClassName: "text-white",
+            },
+            {
+              key: "currentInstance.price",
+              header: "Prezzo",
+              className: "font-medium text-green-600",
+              render: (value: number) => `${value.toFixed(2)} €`,
+            },
+            {
+              key: "currentInstance.cost",
+              header: "Costo",
+              className: "font-medium text-red-600",
+              render: (value: number) => `${value.toFixed(2)} €`,
+            },
+          ] satisfies Column<Product>[]
+        }
         config={{
           baseUrl: "/admin-dashboard/products/:pid",
           enableLink: true,

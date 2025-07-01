@@ -1,3 +1,5 @@
+import { FaPlus } from "react-icons/fa6";
+import ActionRenderer from "../../../components/Buttons/ActionRenderer";
 import GenericTableView, {
   type Column,
 } from "../../../components/Dashboard/Tables/GenericTableView";
@@ -36,6 +38,25 @@ const UsersListView = () => {
 
   return (
     <div className="px-8 py-4">
+      <div className="flex justify-between items-center mb-8">
+        <div>
+          <h1 className="text-3xl text-medium">Utenti</h1>
+          <p className="text-gray-400">
+            Visualizza tutti gli Account registrati all'interno della
+            piattaforma.
+          </p>
+        </div>
+        <ActionRenderer
+          actions={[
+            {
+              color: "blue",
+              Icon: FaPlus,
+              route: `/admin-dashboard/create/users`,
+            },
+          ]}
+        />
+      </div>
+
       <GenericTableView
         data={Users}
         columns={columns}

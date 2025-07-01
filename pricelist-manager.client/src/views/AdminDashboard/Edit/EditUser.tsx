@@ -20,6 +20,16 @@ const config = {
       title: "Informazioni Generali",
       inputs: [
         {
+          id: "companyId",
+          label: "Codice Azienda",
+          type: "text",
+          isDisabled: true,
+          placeholder: "Inserire il dell'Azienda per cui lavora l'utente.",
+          registerOptions: {
+            required: "Necessario inserire il codice dell'Azienda",
+          },
+        },
+        {
           id: "firstName",
           label: "Nome",
           type: "text",
@@ -35,15 +45,6 @@ const config = {
           placeholder: "Inserire il cognome dell'Utente.",
           registerOptions: {
             required: "Necessario inserire il cognome dell'Utente.",
-          },
-        },
-        {
-          id: "companyId",
-          label: "Codice Azienda",
-          type: "text",
-          placeholder: "Inserire il dell'Azienda per cui lavora l'utente.",
-          registerOptions: {
-            required: "Necessario inserire il codice dell'Azienda",
           },
         },
         {
@@ -99,7 +100,7 @@ const config = {
       ],
     },
   ],
-  endpoint: "accounts/register",
+  endpoint: "accounts",
 } satisfies Config<EditUser>;
 
 const EditUserForm = () => {

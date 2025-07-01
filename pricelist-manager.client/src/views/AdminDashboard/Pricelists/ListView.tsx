@@ -1,6 +1,11 @@
+import { FaPlus } from "react-icons/fa6";
+import ActionRenderer from "../../../components/Buttons/ActionRenderer";
 import GenericTableView from "../../../components/Dashboard/Tables/GenericTableView";
 import { useFetch } from "../../../hooks/useFetch";
-import { PricelistArraySchema, type Pricelist } from "../../../models/Pricelist";
+import {
+  PricelistArraySchema,
+  type Pricelist,
+} from "../../../models/Pricelist";
 
 const PricelistListView = () => {
   const pricelists = useFetch("pricelists", PricelistArraySchema);
@@ -46,6 +51,24 @@ const PricelistListView = () => {
 
   return (
     <div className="px-8 py-4">
+      <div className="flex justify-between items-center mb-8">
+        <div>
+          <h1 className="text-3xl text-medium">Listini</h1>
+          <p className="text-gray-400">
+            Visualizza tutti i listini registrati all'interno della piattaforma.
+          </p>
+        </div>
+        <ActionRenderer
+          actions={[
+            {
+              color: "blue",
+              Icon: FaPlus,
+              route: `/admin-dashboard/create/pricelists`,
+            },
+          ]}
+        />
+      </div>
+
       <GenericTableView
         data={pricelists}
         columns={columns}

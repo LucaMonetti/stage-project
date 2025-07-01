@@ -1,4 +1,4 @@
-import { z } from "zod/v4";
+import { keyof, z } from "zod/v4";
 import { useEffect, useRef, useState } from "react";
 import Fieldset from "./Fieldset";
 import Input from "./Input";
@@ -33,6 +33,7 @@ interface BaseInput<T extends FieldValues> {
   label: string;
   registerOptions?: Partial<RegisterOptions<T>>;
   placeholder?: string;
+  isDisabled?: boolean;
 }
 
 interface NumberInput<T extends FieldValues> extends BaseInput<T> {
@@ -78,7 +79,8 @@ function RenderInputField<T extends FieldValues>(
   register: UseFormRegister<T>,
   control: Control<T, any, T>,
   errors: FieldErrors<T>,
-  values: T | undefined
+  values: T | undefined,
+  key: string
 ) {
   const commonProps = {
     id: input.id,
@@ -95,17 +97,46 @@ function RenderInputField<T extends FieldValues>(
     case "email":
     case "password":
     case "url":
-      return <Input {...commonProps} type={input.type} />;
+      return (
+        <Input
+          key={key}
+          isDisabled={input.isDisabled}
+          {...commonProps}
+          type={input.type}
+        />
+      );
     case "number":
-      return <Input {...commonProps} type={input.type} />;
+      return (
+        <Input
+          key={key}
+          isDisabled={input.isDisabled}
+          {...commonProps}
+          type={input.type}
+        />
+      );
     case "color":
       return (
-        <Input {...commonProps} type={input.type} className="min-h-12 w-full" />
+        <Input
+          key={key}
+          isDisabled={input.isDisabled}
+          {...commonProps}
+          type={input.type}
+          className="min-h-12 w-full"
+        />
       );
     case "searchable":
-      return <SearchableSelect<T> {...commonProps} control={control} />;
+      return (
+        <SearchableSelect<T>
+          key={key}
+          isDisabled={input.isDisabled}
+          {...commonProps}
+          control={control}
+        />
+      );
     case "textarea":
-      return <Textarea {...commonProps} />;
+      return (
+        <Textarea key={key} isDisabled={input.isDisabled} {...commonProps} />
+      );
   }
 }
 
@@ -170,13 +201,14 @@ function GenericForm<T extends FieldValues>({
 
       {config.fieldset.map((fieldset, index) => (
         <Fieldset key={index} name={fieldset.title}>
-          {fieldset.inputs.map((input) => {
+          {fieldset.inputs.map((input, inputIndex) => {
             return RenderInputField<T>(
               input,
               register,
               control,
               errors,
-              values
+              values,
+              `${index}-${inputIndex}`
             );
           })}
         </Fieldset>

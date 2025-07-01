@@ -2,18 +2,15 @@ import type { IconType } from "react-icons/lib";
 import WidgetBase, { type QueryDimensions } from "./WidgetBase";
 import SimpleIconButton from "../../Buttons/SimpleButton";
 import { FaTag } from "react-icons/fa6";
+import type { Action } from "../../Buttons/ActionRenderer";
+import ActionRenderer from "../../Buttons/ActionRenderer";
 
 type Props = {
   title?: React.ReactNode;
   subtitle?: React.ReactNode;
   callout?: React.ReactNode;
   CalloutIcon?: React.ComponentType<{ className?: string }>;
-  actions: {
-    Icon: IconType;
-    color: "blue" | "yellow" | "purple";
-    route: string;
-    text: string;
-  }[];
+  actions: Action[];
   dimensions?: QueryDimensions;
 };
 
@@ -41,15 +38,7 @@ const InfoWidget = ({
         )}
       </div>
       <div className="flex gap-4 flex-wrap items-start">
-        {actions.map((btn, index) => (
-          <SimpleIconButton
-            key={index}
-            Icon={btn.Icon}
-            text={btn.text}
-            color={btn.color}
-            route={btn.route}
-          />
-        ))}
+        <ActionRenderer actions={actions} />
       </div>
     </WidgetBase>
   );

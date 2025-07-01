@@ -1,3 +1,5 @@
+import { FaPlus } from "react-icons/fa6";
+import ActionRenderer from "../../../components/Buttons/ActionRenderer";
 import GenericTableView from "../../../components/Dashboard/Tables/GenericTableView";
 import { useFetch } from "../../../hooks/useFetch";
 import { useGet } from "../../../hooks/useGenericFetch";
@@ -46,6 +48,24 @@ const CompanyListView = () => {
 
   return (
     <div className="px-8 py-4">
+      <div className="flex justify-between items-center mb-8">
+        <div>
+          <h1 className="text-3xl text-medium">Aziende</h1>
+          <p className="text-gray-400">
+            Visualizza tutte le aziende registrate all'interno della
+            piattaforma.
+          </p>
+        </div>
+        <ActionRenderer
+          actions={[
+            {
+              color: "blue",
+              Icon: FaPlus,
+              route: `/admin-dashboard/create/companies`,
+            },
+          ]}
+        />
+      </div>
       <GenericTableView
         data={companies}
         columns={columns}

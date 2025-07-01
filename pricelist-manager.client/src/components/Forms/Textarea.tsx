@@ -12,6 +12,7 @@ type Props<T extends FieldValues> = {
   placeholder?: string;
   className?: string;
   isResizable?: boolean;
+  isDisabled?: boolean;
   register: UseFormRegister<T>;
   registerOptions?: RegisterOptions<T, Path<T>>;
   error?: string;
@@ -27,6 +28,7 @@ function Textarea<T extends FieldValues>({
   register,
   registerOptions,
   error,
+  isDisabled = false,
   value,
 }: Props<T>) {
   const [data, setData] = useState("");
@@ -40,6 +42,7 @@ function Textarea<T extends FieldValues>({
       <label htmlFor={id}>{label}</label>
       <textarea
         id={id}
+        {...(isDisabled && { disabled: true })}
         className={`border-2 border-gray-700 rounded px-4 py-2 bg-gray-900 ${className} ${
           !isResizable ? "resize-none" : ""
         }`}

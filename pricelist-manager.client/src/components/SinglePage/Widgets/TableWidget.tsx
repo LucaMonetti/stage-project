@@ -1,4 +1,6 @@
 import type { FetchData } from "../../../types";
+import type { Action } from "../../Buttons/ActionRenderer";
+import ActionRenderer from "../../Buttons/ActionRenderer";
 import GenericTableView, {
   type Column,
   type TableConfig,
@@ -11,6 +13,7 @@ type Props<T> = {
   config?: TableConfig<T>;
   keyField: keyof T;
   title: string;
+  actions?: Action[];
 };
 
 function TableWidget<T extends Record<string, any>>({
@@ -19,10 +22,18 @@ function TableWidget<T extends Record<string, any>>({
   config,
   keyField,
   title,
+  actions,
 }: Props<T>) {
   return (
     <WidgetBase>
-      <h2 className="uppercase font-bold text-gray-500">{title}</h2>
+      <div className="flex justify-between items-center">
+        <h2 className="uppercase font-bold text-gray-500">{title}</h2>
+        {actions && (
+          <div className="flex gap-4">
+            <ActionRenderer actions={actions} />
+          </div>
+        )}
+      </div>
       <GenericTableView
         data={data}
         columns={columns}

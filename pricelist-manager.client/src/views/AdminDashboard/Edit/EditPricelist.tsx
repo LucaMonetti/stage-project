@@ -24,21 +24,22 @@ const config = {
           isDisabled: true,
         },
         {
+          id: "companyId",
+          label: "Codice Azienda",
+          type: "text",
+          isDisabled: true,
+          placeholder: "Inserire il codice dell'azienda",
+          registerOptions: {
+            required: "Necessario inserire il codice dell'Azienda.",
+          },
+        },
+        {
           id: "name",
           label: "Nome",
           type: "text",
           placeholder: "Inserisci il nome del listino",
           registerOptions: {
             required: "Necessario inserire il nome del Listino.",
-          },
-        },
-        {
-          id: "companyId",
-          label: "Codice Azienda",
-          type: "text",
-          placeholder: "Inserire il codice dell'azienda",
-          registerOptions: {
-            required: "Necessario inserire il codice dell'Azienda.",
           },
         },
         {

@@ -63,6 +63,7 @@ type Props<T extends FieldValues> = {
   registerOptions?: RegisterOptions<T, Path<T>>;
   error?: string;
   value?: string;
+  isDisabled?: boolean;
 };
 
 type Option = {
@@ -76,6 +77,7 @@ function SearchableSelect<T extends FieldValues>({
   error,
   registerOptions,
   value: prevValue,
+  isDisabled = false,
 }: Props<T>) {
   const pricelists = useFetch("pricelists", PricelistArraySchema);
   const options =
@@ -120,6 +122,7 @@ function SearchableSelect<T extends FieldValues>({
             defaultOptions
             placeholder="Ricerca in corso"
             styles={customStyles}
+            isOptionDisabled={(opt) => isDisabled && opt.value != value}
           />
         )}
       />

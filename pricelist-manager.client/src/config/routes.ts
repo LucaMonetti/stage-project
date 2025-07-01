@@ -4,7 +4,7 @@ import HomeView from "../views/Index";
 import AdminDashboardLayout from "../views/AdminDashboard/BaseLayout";
 import AdminDashboardView from "../views/AdminDashboard/AdminDashboardView";
 import CreateProductForm from "../views/AdminDashboard/Create/CreateProduct";
-import ProductsListView from "../views/AdminDashboard/Products/ProductsListView";
+import ProductsListView from "../views/AdminDashboard/Products/ListView";
 import SingleProductView from "../views/AdminDashboard/Products/Single/SingleView";
 import EditProductForm from "../views/AdminDashboard/Edit/EditProduct";
 import PricelistListView from "../views/AdminDashboard/Pricelists/ListView";

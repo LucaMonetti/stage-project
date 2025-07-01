@@ -22,6 +22,7 @@ const config = {
           id: "id",
           label: "Codice Azienda",
           type: "text",
+          isDisabled: true,
           placeholder: "Inserire il Codice dell'Azienda",
           registerOptions: {
             required: "Necessario inserire il codice dell'Azienda!",
