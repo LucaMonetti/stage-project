@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ChangeEventHandler } from "react";
 import Fieldset from "./Fieldset";
 import Input from "./Input";
 import Textarea from "./Textarea";
@@ -31,6 +31,7 @@ interface Props<T extends FieldValues> {
   values?: T;
   method?: "POST" | "PUT" | "DELETE";
   id: string;
+  isRow?: boolean;
 }
 
 interface BaseInput<T extends FieldValues> {
@@ -39,6 +40,8 @@ interface BaseInput<T extends FieldValues> {
   registerOptions?: Partial<RegisterOptions<T>>;
   placeholder?: string;
   isDisabled?: boolean;
+  autocomplete?: boolean;
+  outerClass?: string;
 }
 
 interface NumberInput<T extends FieldValues> extends BaseInput<T> {
@@ -51,6 +54,9 @@ interface NumberInput<T extends FieldValues> extends BaseInput<T> {
 interface SimpleInput<T extends FieldValues> extends BaseInput<T> {
   type: "text" | "email" | "password" | "url" | "color";
   maxLength?: number;
+  onChange?: ChangeEventHandler<
+    HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+  >;
 }
 
 interface TextAreaInput<T extends FieldValues> extends BaseInput<T> {
@@ -63,6 +69,7 @@ interface SearchableInput<T extends FieldValues> extends BaseInput<T> {
   maxLength?: number;
   schema: "pricelist" | "product" | "company";
   fetchData: FetchData<Pricelist[] | Product[] | Company[]>;
+  onChange?: (value: string) => void;
 }
 
 type InputConfig<T extends FieldValues> =
@@ -97,6 +104,7 @@ function RenderInputField<T extends FieldValues>(
     label: input.label,
     error: errors[input.id]?.message?.toString() ?? undefined,
     value: values ? values[input.id] : undefined,
+    outerClass: input.outerClass ?? "",
   };
 
   switch (input.type) {
@@ -109,6 +117,8 @@ function RenderInputField<T extends FieldValues>(
           key={key}
           isDisabled={input.isDisabled}
           {...commonProps}
+          autocomplete={input.autocomplete ?? false}
+          onChange={input.onChange ?? undefined}
           type={input.type}
         />
       );
@@ -118,6 +128,7 @@ function RenderInputField<T extends FieldValues>(
           key={key}
           isDisabled={input.isDisabled}
           {...commonProps}
+          autocomplete={input.autocomplete ?? false}
           type={input.type}
         />
       );
@@ -126,6 +137,7 @@ function RenderInputField<T extends FieldValues>(
         <Input
           key={key}
           isDisabled={input.isDisabled}
+          autocomplete={input.autocomplete ?? false}
           {...commonProps}
           type={input.type}
           className="min-h-12 w-full"
@@ -141,6 +153,7 @@ function RenderInputField<T extends FieldValues>(
               {...commonProps}
               control={control}
               fetchData={input.fetchData as FetchData<Pricelist[]>}
+              onChange={input.onChange ?? undefined}
               getLabel={(p) => `${p.company.id} - ${p.name}`}
               getValue={(p) => p.id}
               groupBy={(p) => ({ id: p.company.id, name: p.company.name })}
@@ -154,6 +167,7 @@ function RenderInputField<T extends FieldValues>(
               {...commonProps}
               control={control}
               fetchData={input.fetchData as FetchData<Company[]>}
+              onChange={input.onChange ?? undefined}
               getLabel={(p) => `${p.name} (${p.id})`}
               getValue={(p) => p.id}
             />
@@ -174,6 +188,7 @@ function GenericForm<T extends FieldValues>({
   values,
   method = "POST",
   id,
+  isRow = false,
 }: Props<T>) {
   const {
     register,
@@ -227,7 +242,11 @@ function GenericForm<T extends FieldValues>({
       )}
 
       {config.fieldset.map((fieldset, index) => (
-        <Fieldset key={index} name={fieldset.title}>
+        <Fieldset
+          key={index}
+          name={fieldset.title}
+          className={`${isRow ? "flex-row " : "flex-col"}`}
+        >
           {fieldset.inputs.map((input, inputIndex) => {
             return RenderInputField<T>(
               input,

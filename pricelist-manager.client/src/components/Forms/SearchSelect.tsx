@@ -8,7 +8,12 @@ import {
   type Path,
   type RegisterOptions,
 } from "react-hook-form";
-import { useCallback, useEffect, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useState,
+  type ChangeEventHandler,
+} from "react";
 
 const customStyles = (hasError: boolean) => ({
   control: (base: any) => ({
@@ -85,7 +90,8 @@ type Props<T extends FieldValues, OptionItem> = {
   fetchData: FetchData<OptionItem[]>;
   getLabel: (item: OptionItem) => string;
   getValue: (item: OptionItem) => string;
-  groupBy?: (item: OptionItem) => { id: string; name: string }; // Optional grouping logic
+  groupBy?: (item: OptionItem) => { id: string; name: string };
+  onChange?: (value: string) => void;
 };
 
 function SearchSelect<T extends FieldValues, OptionItem>({
@@ -101,6 +107,7 @@ function SearchSelect<T extends FieldValues, OptionItem>({
   placeholder,
   value: prevValue,
   isDisabled = false,
+  onChange: customOnChange,
 }: Props<T, OptionItem>) {
   const [groupedOptions, setGroupedOptions] = useState<GroupedOptions[]>([]);
 
@@ -176,6 +183,11 @@ function SearchSelect<T extends FieldValues, OptionItem>({
                 }}
                 onChange={(selected) => {
                   onChange(selected?.value ?? "");
+                  console.log("I'm fired!", customOnChange);
+
+                  if (customOnChange) {
+                    customOnChange(selected?.value ?? "");
+                  }
                 }}
                 onBlur={onBlur}
                 name={name}

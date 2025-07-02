@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ChangeEventHandler } from "react";
 import type {
   FieldValues,
   Path,
@@ -18,6 +18,7 @@ type Props<T extends FieldValues> = {
   registerOptions?: RegisterOptions<T, Path<T>>;
   error?: string;
   value?: string;
+  onChange?: ChangeEventHandler;
 };
 
 function Textarea<T extends FieldValues>({
@@ -31,6 +32,7 @@ function Textarea<T extends FieldValues>({
   error,
   isDisabled = false,
   value,
+  onChange,
 }: Props<T>) {
   const [data, setData] = useState("");
 
@@ -54,7 +56,13 @@ function Textarea<T extends FieldValues>({
           }`}
           {...register(id, registerOptions)}
           value={data}
-          onChange={(e) => setData(e.target.value)}
+          onChange={(e) => {
+            setData(e.target.value);
+
+            if (onChange) {
+              onChange(e);
+            }
+          }}
         >
           {placeholder?.trim()}
         </textarea>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ChangeEventHandler } from "react";
 import type {
   FieldValues,
   Path,
@@ -18,6 +18,9 @@ type Props<T extends FieldValues> = {
   error?: string;
   value?: string | number;
   isDisabled?: boolean;
+  onChange?: ChangeEventHandler;
+  autocomplete?: boolean;
+  outerClass?: string;
 };
 
 function Input<T extends FieldValues>({
@@ -31,6 +34,9 @@ function Input<T extends FieldValues>({
   error,
   value,
   isDisabled = false,
+  onChange,
+  autocomplete,
+  outerClass,
 }: Props<T>) {
   const [data, setData] = useState("");
 
@@ -39,7 +45,7 @@ function Input<T extends FieldValues>({
   }, [value]);
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className={`flex flex-col gap-4 ${outerClass}`}>
       <div className="flex flex-col">
         <label htmlFor={id}>{label}</label>
         <input
@@ -54,7 +60,14 @@ function Input<T extends FieldValues>({
           } transition-colors outline-0 rounded px-4 py-2 bg-gray-900 ${className}`}
           {...register(id, registerOptions)}
           value={data}
-          onChange={(e) => setData(e.target.value)}
+          onChange={(e) => {
+            setData(e.target.value);
+
+            if (onChange) {
+              onChange(e);
+            }
+          }}
+          autoComplete={autocomplete == true ? "on" : "off"}
         />
       </div>
       {error !== undefined && (

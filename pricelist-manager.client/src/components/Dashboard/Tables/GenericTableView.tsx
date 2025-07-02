@@ -1,14 +1,18 @@
 import { Link, useNavigate } from "react-router";
 import type { FetchData } from "../../../types";
 import BasicLoader from "../../Loader/BasicLoader";
-import type { MouseEventHandler } from "react";
+import { useState, type MouseEventHandler } from "react";
 import type { Path } from "react-hook-form";
 import {
   flexRender,
   getCoreRowModel,
+  getFilteredRowModel,
   useReactTable,
   type ColumnDef,
+  type ColumnFilter,
 } from "@tanstack/react-table";
+import Input from "../../Forms/Input";
+import FilterRenderer from "./FilterRenderer";
 
 export type CustomColumnDef<T> = ColumnDef<T> & {
   linkUrl?: (item: T) => string;
@@ -51,10 +55,18 @@ function GenericTableView<T extends Record<string, any>>({
   },
 }: Prods<T>) {
   const navigate = useNavigate();
+
+  const [columnFilters, setColumnFilters] = useState<ColumnFilter[]>([]);
+
   const table = useReactTable({
     data: data.data ?? [],
     columns,
     getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    state: {
+      columnFilters,
+    },
+    onColumnFiltersChange: setColumnFilters,
   });
 
   const getValue = (key: keyof T, row: T) => {
@@ -105,95 +117,104 @@ function GenericTableView<T extends Record<string, any>>({
   };
 
   return (
-    <div className="overflow-x-auto">
-      <table className="min-w-full border-collapse">
-        <thead>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <tr key={headerGroup.id} className="bg-gray-800">
-              {headerGroup.headers.map((header) => (
-                <th
-                  key={header.id}
-                  className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider whitespace-nowrap"
-                >
-                  {flexRender(
-                    header.column.columnDef.header,
-                    header.getContext()
-                  )}
-                </th>
-              ))}
-            </tr>
-          ))}
-        </thead>
-        {data.isLoading ? (
-          <tbody>
-            <tr>
-              <td colSpan={columns.length} className="px-6 py-4">
-                <BasicLoader />
-              </td>
-            </tr>
-          </tbody>
-        ) : data.data && data.data.length > 0 ? (
-          <tbody className="bg-gray-900 divide-y divide-gray-700">
-            {table.getRowModel().rows.map((row, rowIndex) => (
-              <tr
-                onClick={
-                  config.enableLink
-                    ? (
-                        e: React.MouseEvent<HTMLTableRowElement, MouseEvent>
-                      ) => {
-                        handleClickRow(
-                          e,
-                          data.data ? data.data[rowIndex] : undefined
-                        );
-                      }
-                    : undefined
-                }
-                key={row.id}
-                className="hover:bg-gray-700"
-              >
-                {row.getVisibleCells().map((cell, colIndex) => (
-                  <td
-                    onClick={
-                      columns[colIndex].linkUrl
-                        ? (
-                            e: React.MouseEvent<
-                              HTMLTableCellElement,
-                              MouseEvent
-                            >
-                          ) => {
-                            console.log(rowIndex);
-                            handleCellClick(
-                              e,
-                              columns[colIndex],
-                              data.data ? data.data[rowIndex] : undefined
-                            );
-                          }
-                        : undefined
-                    }
-                    key={cell.id}
-                    className={`px-6 py-4 ${
-                      cell.column.columnDef.meta
-                        ? (cell.column.columnDef.meta as { className?: string })
-                            .className ?? ""
-                        : ""
-                    } ${columns[colIndex].linkUrl ? "cursor-pointer" : ""}`}
+    <div>
+      <FilterRenderer table={table} />
+      <div className="overflow-x-auto">
+        <table className="min-w-full border-collapse">
+          <thead>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <tr key={headerGroup.id} className="bg-gray-800">
+                {headerGroup.headers.map((header) => (
+                  <th
+                    key={header.id}
+                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider whitespace-nowrap"
                   >
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </td>
+                    {flexRender(
+                      header.column.columnDef.header,
+                      header.getContext()
+                    )}
+                  </th>
                 ))}
               </tr>
             ))}
-          </tbody>
-        ) : (
-          <tbody>
-            <tr>
-              <td colSpan={6} className="px-6 py-4 text-sm text-gray-500">
-                Non sono stati registrati prodotti all'interno del database!
-              </td>
-            </tr>
-          </tbody>
-        )}
-      </table>
+          </thead>
+          {data.isLoading ? (
+            <tbody>
+              <tr>
+                <td colSpan={columns.length} className="px-6 py-4">
+                  <BasicLoader />
+                </td>
+              </tr>
+            </tbody>
+          ) : data.data && data.data.length > 0 ? (
+            <tbody className="bg-gray-900 divide-y divide-gray-700">
+              {table.getRowModel().rows.map((row, rowIndex) => (
+                <tr
+                  onClick={
+                    config.enableLink
+                      ? (
+                          e: React.MouseEvent<HTMLTableRowElement, MouseEvent>
+                        ) => {
+                          handleClickRow(
+                            e,
+                            data.data ? data.data[rowIndex] : undefined
+                          );
+                        }
+                      : undefined
+                  }
+                  key={row.id}
+                  className="hover:bg-gray-700"
+                >
+                  {row.getVisibleCells().map((cell, colIndex) => (
+                    <td
+                      onClick={
+                        columns[colIndex].linkUrl
+                          ? (
+                              e: React.MouseEvent<
+                                HTMLTableCellElement,
+                                MouseEvent
+                              >
+                            ) => {
+                              console.log(rowIndex);
+                              handleCellClick(
+                                e,
+                                columns[colIndex],
+                                data.data ? data.data[rowIndex] : undefined
+                              );
+                            }
+                          : undefined
+                      }
+                      key={cell.id}
+                      className={`px-6 py-4 ${
+                        cell.column.columnDef.meta
+                          ? (
+                              cell.column.columnDef.meta as {
+                                className?: string;
+                              }
+                            ).className ?? ""
+                          : ""
+                      } ${columns[colIndex].linkUrl ? "cursor-pointer" : ""}`}
+                    >
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          ) : (
+            <tbody>
+              <tr>
+                <td colSpan={6} className="px-6 py-4 text-sm text-gray-500">
+                  Non sono stati registrati prodotti all'interno del database!
+                </td>
+              </tr>
+            </tbody>
+          )}
+        </table>
+      </div>
     </div>
   );
 }
