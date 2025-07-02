@@ -12,4 +12,4 @@ export const UserLiteSchema = z.object({
 
 export type UserLite = z.infer<typeof UserLiteSchema>;
 
-export const UserLiteArrraySchema = z.array(UserLiteSchema);
+export const UserLiteArraySchema = z.array(UserLiteSchema);

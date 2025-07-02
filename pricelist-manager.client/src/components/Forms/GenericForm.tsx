@@ -157,6 +157,7 @@ function RenderInputField<T extends FieldValues>(
               getLabel={(p) => `${p.company.id} - ${p.name}`}
               getValue={(p) => p.id}
               groupBy={(p) => ({ id: p.company.id, name: p.company.name })}
+              isClearable={!input.isDisabled}
             />
           );
         case "company":
@@ -170,6 +171,7 @@ function RenderInputField<T extends FieldValues>(
               onChange={input.onChange ?? undefined}
               getLabel={(p) => `${p.name} (${p.id})`}
               getValue={(p) => p.id}
+              isClearable={!input.isDisabled}
             />
           );
       }
