@@ -1,55 +1,73 @@
 import { FaPlus } from "react-icons/fa6";
 import ActionRenderer from "../../../components/Buttons/ActionRenderer";
-import GenericTableView from "../../../components/Dashboard/Tables/GenericTableView";
+import GenericTableView, {
+  type CustomColumnDef,
+} from "../../../components/Dashboard/Tables/GenericTableView";
 import { useFetch } from "../../../hooks/useFetch";
 import { ProductArraySchema, type Product } from "../../../models/Product";
+import { type ColumnDef } from "@tanstack/react-table";
 
 const ProductsListView = () => {
   const products = useFetch("products", ProductArraySchema);
 
-  const columns = [
+  const columns: CustomColumnDef<Product>[] = [
     {
-      key: "companyId" as keyof Product,
+      accessorKey: "companyId",
       header: "Azienda",
-      mobileLabel: "Azienda",
-      className: "text-gray-500",
+      meta: {
+        mobileLabel: "Azienda",
+        className: "text-gray-500",
+      },
     },
     {
-      key: "pricelist.name" as keyof Product,
+      accessorKey: "pricelist.name",
       header: "Listino",
-      mobileLabel: "Pricelist",
-      className: "text-gray-500",
+      meta: {
+        mobileLabel: "Pricelist",
+        className: "text-gray-500",
+      },
     },
     {
-      key: "id" as keyof Product,
+      accessorKey: "productCode",
       header: "Codice Prodotto",
-      mobileLabel: "Code",
+      meta: {
+        mobileLabel: "Code",
+      },
     },
     {
-      key: "currentInstance.name" as keyof Product,
+      accessorKey: "currentInstance.name",
       header: "Nome",
     },
     {
-      key: "currentInstance.description" as keyof Product,
+      accessorKey: "currentInstance.description",
       header: "Descrizione",
-      className: "max-w-xs truncate",
-      render: (value: string) => (
-        <span className="block truncate" title={value}>
-          {value}
-        </span>
-      ),
+      meta: {
+        className: "max-w-xs truncate",
+      },
+      cell: ({ getValue }) => {
+        const value = getValue() as string;
+        return (
+          <span className="block truncate" title={value}>
+            {value}
+          </span>
+        );
+      },
     },
     {
-      key: "currentInstance.price" as keyof Product,
+      accessorKey: "currentInstance.price",
       header: "Prezzo",
-      className: "font-medium text-green-600",
-      render: (value: number) => `${value.toFixed(2)} €`,
+      meta: {
+        className: "font-medium text-green-600 whitespace-nowrap",
+      },
+      accessorFn: (row: Product) => `${row.currentInstance.price.toFixed(2)} €`,
     },
     {
-      key: "currentInstance.cost" as keyof Product,
+      accessorKey: "currentInstance.cost",
       header: "Costo",
-      className: "font-medium text-red-600",
-      render: (value: number) => `${value.toFixed(2)} €`,
+      meta: {
+        className: "font-medium text-red-600 whitespace-nowrap",
+      },
+      accessorFn: (row: Product) => `${row.currentInstance.cost.toFixed(2)} €`,
     },
   ];
 
