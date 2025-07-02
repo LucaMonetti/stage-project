@@ -17,7 +17,7 @@ const MoneyWidget = ({
 }: Props) => {
   return (
     <WidgetBase dimensions={dimensions} className="">
-      <h2 className="uppercase font-bold text-gray-500">{title}</h2>
+      {title && <h2 className="uppercase font-bold text-gray-500">{title}</h2>}
       <p
         className={`text-3xl ${
           color == "green" ? "text-green-500" : "text-red-500"

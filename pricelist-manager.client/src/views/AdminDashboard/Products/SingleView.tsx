@@ -7,6 +7,7 @@ import MoneyWidget from "../../../components/SinglePage/Widgets/MoneyWidget";
 import VersionWidget from "../../../components/SinglePage/Widgets/VersionWidget";
 import { useGet } from "../../../hooks/useGenericFetch";
 import { ProductSchema } from "../../../models/Product";
+import GraphWidget from "../../../components/SinglePage/Widgets/GraphWidget";
 
 const SingleProductView = () => {
   const navigate = useNavigate();
@@ -93,6 +94,30 @@ const SingleProductView = () => {
           {
             title: "Voce Vendita",
             value: product.data?.currentInstance.salesItem,
+          },
+        ]}
+      />
+
+      <GraphWidget
+        title="Andamento Prezzi / Costi"
+        dataset={product.data?.versions ?? []}
+        getData={(item) => ({
+          y: item.updatedAt,
+          x: {
+            price: item.price,
+            cost: item.cost,
+          },
+        })}
+        lineCols={[
+          {
+            dataKey: "x.price",
+            stroke: "green",
+            name: "Prezzo",
+          },
+          {
+            dataKey: "x.cost",
+            stroke: "red",
+            name: "Costo",
           },
         ]}
       />
