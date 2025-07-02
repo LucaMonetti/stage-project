@@ -11,3 +11,11 @@ export const PricelistSchema = PricelistLiteSchema.extend({
 export type Pricelist = z.infer<typeof PricelistSchema>;
 
 export const PricelistArraySchema = z.array(PricelistSchema);
+
+// Pricelist Filter
+export const PricelistFilterSchema = z.object({
+  name: z.string(),
+  company_id: z.string(),
+});
+
+export type PricelistFilter = z.infer<typeof PricelistFilterSchema>;

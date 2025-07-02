@@ -30,7 +30,7 @@ type Prods<T extends Record<string, any>, TFilter extends FieldValues> = {
   keyField: keyof T;
   className?: string;
   config?: TableConfig<T>;
-  filterConfig: Config<TFilter>;
+  filterConfig?: Config<TFilter>;
   onTableReady?: (item: Table<T>) => void;
 };
 
@@ -137,7 +137,7 @@ function GenericTableView<
 
   return (
     <div>
-      <FilterRenderer config={filterConfig} />
+      {filterConfig && <FilterRenderer config={filterConfig} />}
       <div className="overflow-x-auto">
         <table className="min-w-full border-collapse">
           <thead>

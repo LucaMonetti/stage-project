@@ -12,3 +12,11 @@ export const CompanySchema = CompanyLiteSchema.extend({
 export const CompanyArraySchema = z.array(CompanySchema);
 
 export type Company = z.infer<typeof CompanySchema>;
+
+// Company
+export const CompanyFilterSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+});
+
+export type CompanyFilter = z.infer<typeof CompanyFilterSchema>;

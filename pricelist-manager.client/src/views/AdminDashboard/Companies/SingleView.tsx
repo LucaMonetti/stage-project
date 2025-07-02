@@ -11,7 +11,10 @@ import {
 import TableWidget from "../../../components/SinglePage/Widgets/TableWidget";
 import { CompanySchema } from "../../../models/Company";
 import DefinitionListWidget from "../../../components/SinglePage/Widgets/DefinitionListWidget";
-import type { Column } from "../../../components/Dashboard/Tables/GenericTableView";
+import type {
+  Column,
+  CustomColumnDef,
+} from "../../../components/Dashboard/Tables/GenericTableView";
 
 const SingleCompanyView = () => {
   const navigate = useNavigate();
@@ -108,25 +111,32 @@ const SingleCompanyView = () => {
         data={pricelists}
         columns={[
           {
-            key: "id" as keyof Pricelist,
+            accessorKey: "id",
             header: "Codice",
-            className: "text-white",
-            headerClassName: "text-white",
+            meta: {
+              className: "text-white",
+              headerClassName: "text-white",
+            },
           },
           {
-            key: "name" as keyof Pricelist,
+            accessorKey: "name",
             header: "Nome Prodotto",
-            className: "text-white",
-            headerClassName: "text-white",
+            meta: {
+              className: "text-white",
+              headerClassName: "text-white",
+            },
           },
           {
-            key: "products" as keyof Pricelist,
+            accessorKey: "products",
             header: "Totale Prodotti",
-            render: (value: any[]) => (
-              <span>
-                {value.length} {value.length == 1 ? "prodotto" : "prodotti"}
-              </span>
-            ),
+            cell: ({ getValue }) => {
+              const value = getValue() as any[];
+              return (
+                <span>
+                  {value.length} {value.length === 1 ? "prodotto" : "prodotti"}
+                </span>
+              );
+            },
           },
         ]}
         config={{
@@ -147,34 +157,46 @@ const SingleCompanyView = () => {
           },
         ]}
         data={productsData}
-        columns={
-          [
-            {
-              key: "id",
-              header: "Codice Prodotto",
+        columns={[
+          {
+            accessorKey: "id",
+            header: "Codice Prodotto",
+            meta: {
               className: "text-white",
               headerClassName: "text-white",
             },
-            {
-              key: "currentInstance.name",
-              header: "Nome Prodotto",
+          },
+          {
+            accessorKey: "currentInstance.name",
+            header: "Nome Prodotto",
+            meta: {
               className: "text-white",
               headerClassName: "text-white",
             },
-            {
-              key: "currentInstance.price",
-              header: "Prezzo",
+          },
+          {
+            accessorKey: "currentInstance.price",
+            header: "Prezzo",
+            meta: {
               className: "font-medium text-green-600",
-              render: (value: number) => `${value.toFixed(2)} €`,
             },
-            {
-              key: "currentInstance.cost",
-              header: "Costo",
+            cell: ({ getValue }) => {
+              const value = getValue() as number;
+              return `${value.toFixed(2)} €`;
+            },
+          },
+          {
+            accessorKey: "currentInstance.cost",
+            header: "Costo",
+            meta: {
               className: "font-medium text-red-600",
-              render: (value: number) => `${value.toFixed(2)} €`,
             },
-          ] satisfies Column<Product>[]
-        }
+            cell: ({ getValue }) => {
+              const value = getValue() as number;
+              return `${value.toFixed(2)} €`;
+            },
+          },
+        ]}
         config={{
           baseUrl: "/admin-dashboard/products/:pid",
           enableLink: true,

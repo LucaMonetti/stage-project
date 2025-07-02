@@ -9,14 +9,18 @@ import {
   type Product,
   type ProductFilter,
 } from "../../../models/Product";
-import { type ColumnDef, type Table } from "@tanstack/react-table";
+import { type Table } from "@tanstack/react-table";
 import type { Config } from "../../../components/Forms/GenericForm";
 import { CompanyArraySchema } from "../../../models/Company";
 import { useGet } from "../../../hooks/useGenericFetch";
-import { useRef, useState } from "react";
+import { useState } from "react";
 
 const ProductsListView = () => {
-  const products = useFetch("products", ProductArraySchema);
+  const products = useGet({
+    method: "GET",
+    endpoint: "products",
+    schema: ProductArraySchema,
+  });
   const [table, setTable] = useState<Table<Product>>();
 
   const columns: CustomColumnDef<Product>[] = [
@@ -108,7 +112,6 @@ const ProductsListView = () => {
             }),
             schema: "company",
             onChange: (value) => {
-              console.log("I'm changing!");
               table?.getColumn("companyId")?.setFilterValue(value);
             },
           },
@@ -139,7 +142,7 @@ const ProductsListView = () => {
         />
       </div>
 
-      <GenericTableView<Product, ProductFilter>
+      <GenericTableView
         data={products}
         columns={columns}
         config={{

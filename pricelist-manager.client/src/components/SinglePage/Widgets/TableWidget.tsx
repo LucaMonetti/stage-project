@@ -3,13 +3,14 @@ import type { Action } from "../../Buttons/ActionRenderer";
 import ActionRenderer from "../../Buttons/ActionRenderer";
 import GenericTableView, {
   type Column,
+  type CustomColumnDef,
   type TableConfig,
 } from "../../Dashboard/Tables/GenericTableView";
 import WidgetBase from "./WidgetBase";
 
 type Props<T> = {
   data: FetchData<T[]>;
-  columns: Column<T>[];
+  columns: CustomColumnDef<T>[];
   config?: TableConfig<T>;
   keyField: keyof T;
   title: string;
@@ -26,7 +27,7 @@ function TableWidget<T extends Record<string, any>>({
 }: Props<T>) {
   return (
     <WidgetBase>
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center mb-4">
         <h2 className="uppercase font-bold text-gray-500">{title}</h2>
         {actions && (
           <div className="flex gap-4">

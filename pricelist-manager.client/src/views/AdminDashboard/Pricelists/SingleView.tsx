@@ -67,34 +67,46 @@ const SinglePricelistView = () => {
           },
         ]}
         data={productsData}
-        columns={
-          [
-            {
-              key: "id",
-              header: "Codice Prodotto",
+        columns={[
+          {
+            accessorKey: "id",
+            header: "Codice Prodotto",
+            meta: {
               className: "text-white",
               headerClassName: "text-white",
             },
-            {
-              key: "currentInstance.name",
-              header: "Nome Prodotto",
+          },
+          {
+            accessorKey: "currentInstance.name",
+            header: "Nome Prodotto",
+            meta: {
               className: "text-white",
               headerClassName: "text-white",
             },
-            {
-              key: "currentInstance.price",
-              header: "Prezzo",
+          },
+          {
+            accessorKey: "currentInstance.price",
+            header: "Prezzo",
+            meta: {
               className: "font-medium text-green-600",
-              render: (value: number) => `${value.toFixed(2)} €`,
             },
-            {
-              key: "currentInstance.cost",
-              header: "Costo",
+            cell: ({ getValue }) => {
+              const value = getValue() as number;
+              return `${value.toFixed(2)} €`;
+            },
+          },
+          {
+            accessorKey: "currentInstance.cost",
+            header: "Costo",
+            meta: {
               className: "font-medium text-red-600",
-              render: (value: number) => `${value.toFixed(2)} €`,
             },
-          ] satisfies Column<Product>[]
-        }
+            cell: ({ getValue }) => {
+              const value = getValue() as number;
+              return `${value.toFixed(2)} €`;
+            },
+          },
+        ]}
         config={{
           baseUrl: "/admin-dashboard/products/:pid",
           enableLink: true,

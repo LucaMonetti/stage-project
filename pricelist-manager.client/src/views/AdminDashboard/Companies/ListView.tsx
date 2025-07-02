@@ -1,9 +1,18 @@
 import { FaPlus } from "react-icons/fa6";
 import ActionRenderer from "../../../components/Buttons/ActionRenderer";
-import GenericTableView from "../../../components/Dashboard/Tables/GenericTableView";
+import GenericTableView, {
+  type CustomColumnDef,
+} from "../../../components/Dashboard/Tables/GenericTableView";
 import { useFetch } from "../../../hooks/useFetch";
 import { useGet } from "../../../hooks/useGenericFetch";
-import { CompanyArraySchema, type Company } from "../../../models/Company";
+import {
+  CompanyArraySchema,
+  type Company,
+  type CompanyFilter,
+} from "../../../models/Company";
+import { useState } from "react";
+import type { Table } from "@tanstack/react-table";
+import type { Config } from "../../../components/Forms/GenericForm";
 
 const CompanyListView = () => {
   const companies = useGet({
@@ -11,40 +20,72 @@ const CompanyListView = () => {
     endpoint: "companies",
     schema: CompanyArraySchema,
   });
+  const [table, setTable] = useState<Table<Company>>();
 
-  const columns = [
+  const columns: CustomColumnDef<Company>[] = [
     {
-      key: "id" as keyof Company,
+      accessorKey: "id",
       header: "Codice Azienda",
-      className: "text-gray-500",
+      meta: {
+        className: "text-gray-500",
+      },
     },
     {
-      key: "name" as keyof Company,
+      accessorKey: "name",
       header: "Ragione Sociale",
     },
     {
-      key: "phone" as keyof Company,
-      header: "Descrizione",
+      accessorKey: "phone",
+      header: "Contatto Telefonico",
+      linkUrl: (item) => `tel:${item.phone}`,
     },
     {
-      key: "pricelists" as keyof Company,
+      accessorKey: "pricelists",
       header: "Totale Listini",
-      render: (value: any[]) => (
-        <span className="uppercase">
-          {value.length ?? 0} {value.length === 1 ? "listino" : "listini"}
-        </span>
-      ),
+      cell: ({ getValue }) => {
+        const value = getValue() as any[];
+        return (
+          <span className="text-blue-500">
+            {value.length ?? 0} {value.length === 1 ? "listino" : "listini"}
+          </span>
+        );
+      },
     },
     {
-      key: "products" as keyof Company,
+      accessorKey: "products",
       header: "Totale Prodotti",
-      render: (value: any[]) => (
-        <span className="uppercase">
-          {value.length ?? 0} {value.length === 1 ? "prodotto" : "prodotti"}
-        </span>
-      ),
+      cell: ({ getValue }) => {
+        const value = getValue() as any[];
+        return (
+          <span className="text-blue-500">
+            {value.length ?? 0} {value.length === 1 ? "prodotto" : "prodotti"}
+          </span>
+        );
+      },
     },
   ];
+
+  const filterConfig = {
+    fieldset: [
+      {
+        title: "Filtri",
+        inputs: [
+          {
+            id: "name",
+            label: "Nome",
+            type: "text",
+            placeholder: "Inserire il nome",
+            autocomplete: false,
+            outerClass: "flex-1",
+            onChange: (e) => {
+              table?.getColumn("name")?.setFilterValue(e.target.value);
+            },
+          },
+        ],
+      },
+    ],
+    endpoint: "products",
+  } satisfies Config<CompanyFilter>;
 
   return (
     <div className="px-8 py-4">
@@ -69,6 +110,8 @@ const CompanyListView = () => {
       <GenericTableView
         data={companies}
         columns={columns}
+        onTableReady={setTable}
+        filterConfig={filterConfig}
         config={{
           baseUrl: "/admin-dashboard/companies/:pid",
           enableLink: true,
