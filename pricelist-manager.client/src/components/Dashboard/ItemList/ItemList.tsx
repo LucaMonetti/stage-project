@@ -53,7 +53,7 @@ function ItemList<T extends any[]>({
           ) : fetch.errorMsg != undefined ? (
             <p className="text-red-500">{fetch.errorMsg}</p>
           ) : fetch.data && fetch.data.length > 0 ? (
-            fetch.data.map((item: T[]) => (
+            fetch.data.map((item: T[number]) => (
               <li
                 key={getUniqueId(item)}
                 className="[&+li]:border-t-2 border-gray-700 py-2"
