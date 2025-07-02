@@ -1,8 +1,13 @@
 import { Link, useNavigate } from "react-router";
 import type { FetchData } from "../../../types";
 import BasicLoader from "../../Loader/BasicLoader";
-import { useState, type MouseEventHandler } from "react";
-import type { Path } from "react-hook-form";
+import {
+  useEffect,
+  useImperativeHandle,
+  useState,
+  type MouseEventHandler,
+} from "react";
+import type { FieldValues, Path } from "react-hook-form";
 import {
   flexRender,
   getCoreRowModel,
@@ -10,20 +15,23 @@ import {
   useReactTable,
   type ColumnDef,
   type ColumnFilter,
+  type Table,
 } from "@tanstack/react-table";
-import Input from "../../Forms/Input";
 import FilterRenderer from "./FilterRenderer";
+import type { Config } from "../../Forms/GenericForm";
 
 export type CustomColumnDef<T> = ColumnDef<T> & {
   linkUrl?: (item: T) => string;
 };
 
-type Prods<T> = {
+type Prods<T extends Record<string, any>, TFilter extends FieldValues> = {
   data: FetchData<T[]>;
   columns: CustomColumnDef<T>[];
   keyField: keyof T;
   className?: string;
   config?: TableConfig<T>;
+  filterConfig: Config<TFilter>;
+  onTableReady?: (item: Table<T>) => void;
 };
 
 export interface Column<T> {
@@ -43,7 +51,10 @@ export interface TableConfig<T> {
   columnId: Record<string, keyof T>;
 }
 
-function GenericTableView<T extends Record<string, any>>({
+function GenericTableView<
+  T extends Record<string, any>,
+  TFilter extends FieldValues
+>({
   data,
   columns,
   keyField,
@@ -53,7 +64,9 @@ function GenericTableView<T extends Record<string, any>>({
     baseUrl: "",
     columnId: {},
   },
-}: Prods<T>) {
+  filterConfig,
+  onTableReady,
+}: Prods<T, TFilter>) {
   const navigate = useNavigate();
 
   const [columnFilters, setColumnFilters] = useState<ColumnFilter[]>([]);
@@ -116,9 +129,15 @@ function GenericTableView<T extends Record<string, any>>({
     }
   };
 
+  useEffect(() => {
+    if (onTableReady) {
+      onTableReady(table);
+    }
+  }, [table, onTableReady]);
+
   return (
     <div>
-      <FilterRenderer table={table} />
+      <FilterRenderer config={filterConfig} />
       <div className="overflow-x-auto">
         <table className="min-w-full border-collapse">
           <thead>

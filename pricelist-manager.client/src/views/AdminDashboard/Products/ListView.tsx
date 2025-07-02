@@ -4,11 +4,20 @@ import GenericTableView, {
   type CustomColumnDef,
 } from "../../../components/Dashboard/Tables/GenericTableView";
 import { useFetch } from "../../../hooks/useFetch";
-import { ProductArraySchema, type Product } from "../../../models/Product";
-import { type ColumnDef } from "@tanstack/react-table";
+import {
+  ProductArraySchema,
+  type Product,
+  type ProductFilter,
+} from "../../../models/Product";
+import { type ColumnDef, type Table } from "@tanstack/react-table";
+import type { Config } from "../../../components/Forms/GenericForm";
+import { CompanyArraySchema } from "../../../models/Company";
+import { useGet } from "../../../hooks/useGenericFetch";
+import { useRef, useState } from "react";
 
 const ProductsListView = () => {
   const products = useFetch("products", ProductArraySchema);
+  const [table, setTable] = useState<Table<Product>>();
 
   const columns: CustomColumnDef<Product>[] = [
     {
@@ -71,6 +80,44 @@ const ProductsListView = () => {
     },
   ];
 
+  const filterConfig = {
+    fieldset: [
+      {
+        title: "Filtri",
+        inputs: [
+          {
+            id: "productCode",
+            label: "Codice Prodotto",
+            type: "text",
+            placeholder: "Inserire il codice del prodotto",
+            autocomplete: false,
+            outerClass: "flex-1",
+            onChange: (e) => {
+              table?.getColumn("productCode")?.setFilterValue(e.target.value);
+            },
+          },
+          {
+            id: "companyId",
+            label: "Codice Azienda",
+            type: "searchable",
+            placeholder: "Selezionare codice azienda...",
+            fetchData: useGet({
+              endpoint: "companies",
+              method: "GET",
+              schema: CompanyArraySchema,
+            }),
+            schema: "company",
+            onChange: (value) => {
+              console.log("I'm changing!");
+              table?.getColumn("companyId")?.setFilterValue(value);
+            },
+          },
+        ],
+      },
+    ],
+    endpoint: "products",
+  } satisfies Config<ProductFilter>;
+
   return (
     <div className="px-8 py-4">
       <div className="flex justify-between items-center mb-8">
@@ -92,7 +139,7 @@ const ProductsListView = () => {
         />
       </div>
 
-      <GenericTableView
+      <GenericTableView<Product, ProductFilter>
         data={products}
         columns={columns}
         config={{
@@ -100,6 +147,8 @@ const ProductsListView = () => {
           enableLink: true,
           columnId: { ":pid": "id" },
         }}
+        onTableReady={setTable}
+        filterConfig={filterConfig}
         keyField="productCode"
       />
     </div>
