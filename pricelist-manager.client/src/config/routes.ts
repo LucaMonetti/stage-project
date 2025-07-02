@@ -3,10 +3,22 @@ import BaseLayout from "../views/BaseLayout";
 import HomeView from "../views/Index";
 import AdminDashboardLayout from "../views/AdminDashboard/BaseLayout";
 import AdminDashboardView from "../views/AdminDashboard/AdminDashboardView";
-import CreateProductForm from "../views/AdminDashboard/CreateProduct/CreateProduct";
-import ProductsListView from "../views/AdminDashboard/Products/ProductsListView";
-import SingleProductView from "../views/AdminDashboard/Products/Single/SingleView";
+import CreateProductForm from "../views/AdminDashboard/Create/CreateProduct";
+import ProductsListView from "../views/AdminDashboard/Products/ListView";
+import SingleProductView from "../views/AdminDashboard/Products/SingleView";
 import EditProductForm from "../views/AdminDashboard/Edit/EditProduct";
+import PricelistListView from "../views/AdminDashboard/Pricelists/ListView";
+import SinglePricelistView from "../views/AdminDashboard/Pricelists/SingleView";
+import CompanyListView from "../views/AdminDashboard/Companies/ListView";
+import SingleCompanyView from "../views/AdminDashboard/Companies/SingleView";
+import CreatePricelistForm from "../views/AdminDashboard/Create/CreatePricelist";
+import EditPricelistForm from "../views/AdminDashboard/Edit/EditPricelist";
+import CreateCompanyForm from "../views/AdminDashboard/Create/CreateCompany";
+import EditCompanyForm from "../views/AdminDashboard/Edit/EditCompany";
+import CreateUserForm from "../views/AdminDashboard/Create/CreateUser";
+import UsersListView from "../views/AdminDashboard/Users/ListView";
+import SingleUserView from "../views/AdminDashboard/Users/SingleView";
+import EditUserForm from "../views/AdminDashboard/Edit/EditUser";
 
 const router = createBrowserRouter([
   {
@@ -26,8 +38,46 @@ const router = createBrowserRouter([
             Component: AdminDashboardView,
           },
           {
-            path: "create-product",
-            Component: CreateProductForm,
+            path: "create",
+            children: [
+              {
+                path: "products",
+                Component: CreateProductForm,
+              },
+              {
+                path: "pricelists",
+                Component: CreatePricelistForm,
+              },
+              {
+                path: "companies",
+                Component: CreateCompanyForm,
+              },
+              {
+                path: "users",
+                Component: CreateUserForm,
+              },
+            ],
+          },
+          {
+            path: "edit",
+            children: [
+              {
+                path: "products/:productId",
+                Component: EditProductForm,
+              },
+              {
+                path: "pricelists/:pricelistId",
+                Component: EditPricelistForm,
+              },
+              {
+                path: "companies/:companyId",
+                Component: EditCompanyForm,
+              },
+              {
+                path: "users/:userId",
+                Component: EditUserForm,
+              },
+            ],
           },
           {
             path: "products",
@@ -36,33 +86,48 @@ const router = createBrowserRouter([
                 index: true,
                 Component: ProductsListView,
               },
+              {
+                path: ":productId",
+                Component: SingleProductView,
+              },
             ],
           },
           {
             path: "pricelists",
             children: [
               {
+                index: true,
+                Component: PricelistListView,
+              },
+              {
                 path: ":pricelistId",
-                children: [
-                  {
-                    path: "products/:productCode",
-                    Component: SingleProductView,
-                  },
-                ],
+                Component: SinglePricelistView,
               },
             ],
           },
           {
-            path: "edit",
+            path: "companies",
             children: [
               {
-                path: "pricelists/:pricelistId",
-                children: [
-                  {
-                    path: "products/:productCode",
-                    Component: EditProductForm,
-                  },
-                ],
+                index: true,
+                Component: CompanyListView,
+              },
+              {
+                path: ":companyId",
+                Component: SingleCompanyView,
+              },
+            ],
+          },
+          {
+            path: "users",
+            children: [
+              {
+                index: true,
+                Component: UsersListView,
+              },
+              {
+                path: ":userId",
+                Component: SingleUserView,
               },
             ],
           },

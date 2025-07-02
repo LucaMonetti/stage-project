@@ -1,20 +1,19 @@
 import { useFetch } from "../../../hooks/useFetch";
-import { CompanyStatisticsSchema } from "../../../models/Company";
-import { PricelistStatisticsSchema } from "../../../models/Pricelist";
-import { ProductStatisticsSchema } from "../../../models/Product";
+import { CompanyStatisticsSchema } from "../../../models/CompanyStatistics";
+import { PricelistStatisticsSchema } from "../../../models/PricelistStatistics";
+import { ProductStatisticsSchema } from "../../../models/ProductStatistics";
+import { UserStatisticsSchema } from "../../../models/User";
 import ItemCounter from "./ItemCounter";
-import { FaBuilding, FaListUl } from "react-icons/fa6";
+import { FaBuilding, FaListUl, FaUser } from "react-icons/fa6";
 
 function ItenCounterGroup() {
-  const products = useFetch("api/statistics/products", ProductStatisticsSchema);
-  const companies = useFetch(
-    "api/statistics/companies",
-    CompanyStatisticsSchema
-  );
+  const products = useFetch("statistics/products", ProductStatisticsSchema);
+  const companies = useFetch("statistics/companies", CompanyStatisticsSchema);
   const pricelists = useFetch(
-    "api/statistics/pricelists",
+    "statistics/pricelists",
     PricelistStatisticsSchema
   );
+  const users = useFetch("statistics/accounts", UserStatisticsSchema);
 
   return (
     <div className="flex flex-wrap gap-8 mt-8">
@@ -25,7 +24,7 @@ function ItenCounterGroup() {
         description={"Aziende registrate nel sistema"}
         Icon={FaBuilding}
         getBodyText={(item) => item?.totalRegistered.toString()}
-        createLink="create-company"
+        createLink="create/companies"
       />
       <ItemCounter
         fetch={pricelists}
@@ -34,7 +33,7 @@ function ItenCounterGroup() {
         description={"Totale listini creati"}
         Icon={FaListUl}
         getBodyText={(item) => item?.totalRegistered.toString()}
-        createLink="create-pricelist"
+        createLink="create/pricelists"
       />
       <ItemCounter
         fetch={products}
@@ -42,7 +41,16 @@ function ItenCounterGroup() {
         color="blue"
         description={"Prodotti unici disponibili"}
         getBodyText={(item) => item?.uniqueCount.toString()}
-        createLink="create-product"
+        createLink="create/products"
+      />
+      <ItemCounter
+        fetch={users}
+        title={"Utenti"}
+        Icon={FaUser}
+        color="yellow"
+        description={`Utenti registrati`}
+        getBodyText={(item) => `${item?.totalRegistered}`}
+        createLink="create/users"
       />
     </div>
   );

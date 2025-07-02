@@ -10,24 +10,24 @@ namespace pricelist_manager.Server.Repositories
     {
         public ProductInstanceRepository(DataContext dataContext) : base(dataContext) { }
 
-        public async Task<ICollection<ProductInstance>> GetAllAsync(Guid pricelistId, string productCode)
+        public async Task<ICollection<ProductInstance>> GetAllAsync(string productId)
         {
             if (!CanConnect()) throw new StorageUnavailableException();
 
-            var productInstances = await Context.ProductInstances.Where(pi => pi.PricelistId == pricelistId && pi.ProductCode == productCode).ToListAsync();
+            var productInstances = await Context.ProductInstances.Where(pi => pi.ProductId == productId).ToListAsync();
 
-            if (!productInstances.Any()) throw new NotFoundException<Product>(productCode);
+            if (!productInstances.Any()) throw new NotFoundException<Product>(productId);
 
             return productInstances;
         }
 
-        public async Task<ProductInstance> GetByVersionAsync(Guid pricelistId, string productCode, int version)
+        public async Task<ProductInstance> GetByVersionAsync(string productId, int version)
         {
             if (!CanConnect()) throw new StorageUnavailableException();
 
-            var productInstance = await Context.ProductInstances.Where(pi => pi.PricelistId == pricelistId && pi.ProductCode == productCode).FirstOrDefaultAsync();
+            var productInstance = await Context.ProductInstances.Where(pi => pi.ProductId == productId && pi.Version == version).FirstOrDefaultAsync();
 
-            if (productInstance == null) throw new NotFoundException<ProductInstance>(version);
+            if (productInstance == null) throw new NotFoundException<ProductInstance>($"{productId} versione {version}");
 
             return productInstance;
         }

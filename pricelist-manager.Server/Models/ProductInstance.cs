@@ -4,13 +4,10 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace pricelist_manager.Server.Models
 {
-    [PrimaryKey(nameof(PricelistId), nameof(ProductCode), nameof(Version))]
+    [PrimaryKey(nameof(ProductId), nameof(Version))]
     public class ProductInstance
     {
-        [Required]
-        public Guid PricelistId { get; set; }
-
-        public string ProductCode { get; set; } = String.Empty;
+        public required string ProductId { get; set; }
 
         public int Version { get; set; } = 0;
 
@@ -22,6 +19,17 @@ namespace pricelist_manager.Server.Models
 
         [Precision(10, 2)]
         public Decimal Price { get; set; } = Decimal.Zero;
+        
+        [Precision(10, 2)]
+        public Decimal Cost { get; set; } = Decimal.Zero;
+
+        public string AccountingControl { get; set; } = String.Empty;
+
+        public string CDA {  get; set; } = String.Empty;
+
+        public string SalesItem { get; set; } = String.Empty;
+
+        public DateTime UpdatedAt { get; set; } = DateTime.Now;
 
         public Product? Product { get; set; } = null!;
     }

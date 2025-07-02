@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Client;
 using pricelist_manager.Server.Data;
-using pricelist_manager.Server.DTOs.Statistics;
+using pricelist_manager.Server.DTOs.V1.Statistics;
 using pricelist_manager.Server.Exceptions;
 using pricelist_manager.Server.Interfaces;
 using pricelist_manager.Server.Models;
@@ -14,24 +14,11 @@ namespace pricelist_manager.Server.Repositories
         public ProductRepository(DataContext dataContext) : base(dataContext)
         {}
 
-        public async Task<ICollection<ProductWithPricelist>> GetAllProductsWithPricelistsAsync()
-        {
-            if (!CanConnect()) throw new StorageUnavailableException();
-
-            return await Context.Products
-                .Include(p => p.Versions)
-                .Select(product => new ProductWithPricelist(
-                    product,
-                    Context.Pricelists.First(pricelist => pricelist.Id == product.PricelistId)
-                ))
-                .ToListAsync();
-        }
-
         public async Task<bool> UpdateAsync(Product entity)
         {
             if (!CanConnect()) throw new StorageUnavailableException();
 
-            if (!(await existsIdAsync(entity.PricelistId, entity.ProductCode))) throw new NotFoundException<Product>(entity.ProductCode);
+            if (!(await existsIdAsync(entity.Id))) throw new NotFoundException<Product>(entity.ProductCode);
 
             Context.Products.Update(entity);
             var res = await Context.SaveChangesAsync();
@@ -39,39 +26,61 @@ namespace pricelist_manager.Server.Repositories
             return res >= 1;
         }
 
-        public async Task<bool> ExistsIdAsync(Guid pricelistId, string productCode)
+        public async Task<bool> ExistsIdAsync(string productId)
         {
             if (!CanConnect()) throw new StorageUnavailableException();
 
-            return await existsIdAsync(pricelistId, productCode);
+            return await existsIdAsync(productId);
         }
 
-        private async Task<bool> existsIdAsync(Guid pricelistId, string productCode)
+        private async Task<bool> existsIdAsync(string productId)
         {
-            return await Context.ProductInstances.AnyAsync(pi => pi.PricelistId == pricelistId && pi.ProductCode == productCode);
+            return await Context.Products.AnyAsync(pi => pi.Id == productId);
         }
 
-        public async Task<ICollection<Product>> GetAllAsync(Guid pricelistId)
+        public async Task<ICollection<Product>> GetAllAsync()
         {
             if (!CanConnect()) throw new StorageUnavailableException();
 
-            var products = await Context.Products.Where(p => p.PricelistId == pricelistId).Include(p => p.Versions).ToListAsync();
+            var products = await Context.Products
+                .Include(p => p.Versions.OrderByDescending(v => v.Version))
+                .Include(p => p.Pricelist)
+                .Include(p => p.Company)
+                .ToListAsync();
 
             TrimProductsVersion(products);
 
             return products;
         }
 
-        public async Task<Product> GetByIdAsync(Guid pricelistId, string productCode)
+        public async Task<ICollection<Product>> GetByPricelistAsync(Guid pricelistId)
+        {
+            if (!CanConnect()) throw new StorageUnavailableException();
+
+            var products = await Context.Products
+                .Where(p => p.PricelistId == pricelistId)
+                .Include(p => p.Versions.OrderByDescending(v => v.Version))
+                .Include(p => p.Pricelist)
+                .Include(p => p.Company)
+                .ToListAsync();
+
+            TrimProductsVersion(products);
+
+            return products;
+        }
+
+        public async Task<Product> GetByIdAsync(string productId)
         {
             if (!CanConnect()) throw new StorageUnavailableException();
 
             var product = await Context.Products
-                                    .Where(p => p.ProductCode == productCode && p.PricelistId == pricelistId)
-                                    .Include(p => p.Versions)
+                                    .Where(p => p.Id == productId)
+                                    .Include(p => p.Versions.OrderByDescending(v => v.Version))
+                                    .Include(p => p.Pricelist)
+                                    .Include(p => p.Company)
                                     .FirstOrDefaultAsync();
 
-            if (product == null) throw new NotFoundException<Product>(productCode);
+            if (product == null) throw new NotFoundException<Product>(productId);
 
             TrimProductVersion(product);
 
@@ -84,7 +93,9 @@ namespace pricelist_manager.Server.Repositories
 
             var product = await Context.Products
                                     .Where(p => p.Versions.Last().Name.Contains(name))
-                                    .Include(p => p.Versions)
+                                    .Include(p => p.Versions.OrderByDescending(v => v.Version))
+                                    .Include(p => p.Pricelist)
+                                    .Include(p => p.Company)
                                     .ToListAsync();
 
             TrimProductsVersion(product);
@@ -100,7 +111,9 @@ namespace pricelist_manager.Server.Repositories
 
             var product = await Context.Products
                                     .Where(p => p.ProductCode == code)
-                                    .Include(p => p.Versions)
+                                    .Include(p => p.Versions.OrderByDescending(v => v.Version))
+                                    .Include(p => p.Pricelist)
+                                    .Include(p => p.Company)
                                     .ToListAsync();
 
             TrimProductsVersion(product);
@@ -110,11 +123,29 @@ namespace pricelist_manager.Server.Repositories
             return product;
         }
 
+        public async Task<ICollection<Product>> GetByCompany(string companyId)
+        {
+            if (!CanConnect()) throw new StorageUnavailableException();
+
+            var product = await Context.Products
+                                    .Where(p => p.CompanyId == companyId)
+                                    .Include(p => p.Versions.OrderByDescending(v => v.Version))
+                                    .Include(p => p.Pricelist)
+                                    .Include(p => p.Company)
+                                    .ToListAsync();
+
+            TrimProductsVersion(product);
+
+            if (product == null) throw new NotFoundException<Product>(companyId);
+
+            return product;
+        }
+
         public async Task<bool> CreateAsync(Product entity)
         {
             if (!CanConnect()) throw new StorageUnavailableException();
 
-            if (await existsIdAsync(entity.PricelistId, entity.ProductCode)) throw new AlreadyExistException<Product>(entity.ProductCode);
+            if (await existsIdAsync(entity.Id)) throw new AlreadyExistException<Product>(entity.Id);
 
             await Context.Products.AddAsync(entity);
             var res = await Context.SaveChangesAsync();
@@ -122,13 +153,13 @@ namespace pricelist_manager.Server.Repositories
             return res >= 1;
         }
 
-        public async Task<bool> DeleteAsync(Guid pricelistId, string productCode)
+        public async Task<bool> DeleteAsync(string productId)
         {
             if (!CanConnect()) throw new StorageUnavailableException();
 
-            var product = await Context.Products.FirstOrDefaultAsync(p => p.PricelistId == pricelistId && p.ProductCode == productCode);
+            var product = await Context.Products.FirstOrDefaultAsync(p => p.Id == productId);
 
-            if (product == null) throw new NotFoundException<Product>(productCode);
+            if (product == null) throw new NotFoundException<Product>(productId);
 
             Context.Products.Remove(product);
             var res = await Context.SaveChangesAsync();
@@ -138,23 +169,23 @@ namespace pricelist_manager.Server.Repositories
 
         private void TrimProductsVersion(List<Product> products)
         {
-            foreach (var product in products)
-                TrimProductVersion(product);
+            //foreach (var product in products)
+            //    TrimProductVersion(product);
         }
 
         private void TrimProductsVersion(List<IGrouping<Guid, Product>> products)
         {
-            foreach (var pricelist in products)
-                foreach (var product in pricelist)
-                    TrimProductVersion(product);
+            //foreach (var pricelist in products)
+            //    foreach (var product in pricelist)
+            //        TrimProductVersion(product);
         }
 
         private void TrimProductVersion(Product product)
         {
-            foreach (var version in product.Versions)
-            {
-                version.Product = null!;
-            }
+            //foreach (var version in product.Versions)
+            //{
+            //    version.Product = null!;
+            //}
         }
 
         public async Task<ProductStatistics> GetStatistics()

@@ -221,33 +221,57 @@ namespace pricelist_manager.Server.Migrations
 
             modelBuilder.Entity("pricelist_manager.Server.Models.Product", b =>
                 {
-                    b.Property<Guid>("PricelistId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("ProductCode")
+                    b.Property<string>("CompanyId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("LatestVersion")
                         .HasColumnType("int");
 
-                    b.HasKey("PricelistId", "ProductCode");
+                    b.Property<Guid>("PricelistId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ProductCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CompanyId");
+
+                    b.HasIndex("PricelistId");
 
                     b.ToTable("Products");
                 });
 
             modelBuilder.Entity("pricelist_manager.Server.Models.ProductInstance", b =>
                 {
-                    b.Property<Guid>("PricelistId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("ProductCode")
+                    b.Property<string>("ProductId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("Version")
                         .HasColumnType("int");
 
+                    b.Property<string>("AccountingControl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CDA")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("Cost")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
+
                     b.Property<string>("Description")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Id")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
@@ -258,7 +282,14 @@ namespace pricelist_manager.Server.Migrations
                         .HasPrecision(10, 2)
                         .HasColumnType("decimal(10,2)");
 
-                    b.HasKey("PricelistId", "ProductCode", "Version");
+                    b.Property<string>("SalesItem")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("ProductId", "Version");
 
                     b.ToTable("ProductInstances");
                 });
@@ -398,7 +429,7 @@ namespace pricelist_manager.Server.Migrations
             modelBuilder.Entity("pricelist_manager.Server.Models.Pricelist", b =>
                 {
                     b.HasOne("pricelist_manager.Server.Models.Company", "Company")
-                        .WithMany()
+                        .WithMany("Pricelists")
                         .HasForeignKey("CompanyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -406,12 +437,31 @@ namespace pricelist_manager.Server.Migrations
                     b.Navigation("Company");
                 });
 
+            modelBuilder.Entity("pricelist_manager.Server.Models.Product", b =>
+                {
+                    b.HasOne("pricelist_manager.Server.Models.Company", "Company")
+                        .WithMany("Products")
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("pricelist_manager.Server.Models.Pricelist", "Pricelist")
+                        .WithMany("Products")
+                        .HasForeignKey("PricelistId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Company");
+
+                    b.Navigation("Pricelist");
+                });
+
             modelBuilder.Entity("pricelist_manager.Server.Models.ProductInstance", b =>
                 {
                     b.HasOne("pricelist_manager.Server.Models.Product", "Product")
                         .WithMany("Versions")
-                        .HasForeignKey("PricelistId", "ProductCode")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Product");
@@ -426,6 +476,18 @@ namespace pricelist_manager.Server.Migrations
                         .IsRequired();
 
                     b.Navigation("Company");
+                });
+
+            modelBuilder.Entity("pricelist_manager.Server.Models.Company", b =>
+                {
+                    b.Navigation("Pricelists");
+
+                    b.Navigation("Products");
+                });
+
+            modelBuilder.Entity("pricelist_manager.Server.Models.Pricelist", b =>
+                {
+                    b.Navigation("Products");
                 });
 
             modelBuilder.Entity("pricelist_manager.Server.Models.Product", b =>

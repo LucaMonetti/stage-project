@@ -9,6 +9,8 @@ type Props<T extends any[]> = {
   Icon?: React.ComponentType<{ className?: string }>;
   getCallout?: (item: T[number]) => string;
   getline: (item: T[number]) => string;
+  getUniqueId: (item: T[number]) => string;
+  getRoute: (item: T[number]) => string;
 };
 
 const headerVariant = {
@@ -31,6 +33,8 @@ function ItemList<T extends any[]>({
   color = "blue",
   getline,
   getCallout,
+  getUniqueId,
+  getRoute,
 }: Props<T>) {
   return (
     <section className="flex-1 min-w-80 bg-gray-800 border-2 border-gray-700 rounded-md">
@@ -49,14 +53,14 @@ function ItemList<T extends any[]>({
           ) : fetch.errorMsg != undefined ? (
             <p className="text-red-500">{fetch.errorMsg}</p>
           ) : fetch.data && fetch.data.length > 0 ? (
-            fetch.data.map((item) => (
+            fetch.data.map((item: T[number]) => (
               <li
-                key={item.productCode}
+                key={getUniqueId(item)}
                 className="[&+li]:border-t-2 border-gray-700 py-2"
               >
                 <Link
                   className="flex justify-between gap-2 py-1"
-                  to={item.productCode}
+                  to={getRoute(item)}
                 >
                   <p>{getline(item)}</p>
                   {getCallout !== undefined && (

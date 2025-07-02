@@ -1,4 +1,6 @@
 
+using Asp.Versioning.ApiExplorer;
+using Asp.Versioning.Conventions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -6,6 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using pricelist_manager.Server.Data;
 using pricelist_manager.Server.Interfaces;
+using pricelist_manager.Server.Mappers;
 using pricelist_manager.Server.Middlewares;
 using pricelist_manager.Server.Models;
 using pricelist_manager.Server.Repositories;
@@ -71,6 +74,23 @@ namespace pricelist_manager.Server
                 options.AddPolicy("UserPolicy", policy => policy.RequireRole("User"));
             });
 
+            // API Versioning
+            builder.Services.AddApiVersioning(options =>
+            {
+                options.AssumeDefaultVersionWhenUnspecified = true;
+                options.DefaultApiVersion = new Asp.Versioning.ApiVersion(1, 0);
+                options.ReportApiVersions = true;
+            }).AddMvc(options =>
+            {
+                options.Conventions.Add(new VersionByNamespaceConvention());
+            }).AddApiExplorer(options =>
+            {
+                options.GroupNameFormat = "'v'V";
+                options.SubstituteApiVersionInUrl = true;
+            });
+
+            builder.Services.ConfigureOptions<ConfigureSwaggerOptions>();
+
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(options =>
@@ -92,6 +112,21 @@ namespace pricelist_manager.Server
             builder.Services.AddScoped<IProductInstanceRepository, ProductInstanceRepository>();
             builder.Services.AddScoped<IUserRepository, UserRepository>();
 
+            builder.Services.AddScoped<IProductMappingService, ProductMappingService>();
+            builder.Services.AddScoped<IProductLiteMappingService, ProductLiteMappingService>();
+            builder.Services.AddScoped<IProductInstanceMappingService, ProductInstanceMappingService>();
+
+            builder.Services.AddScoped<ICompanyMappingService, CompanyMappingService>();
+            builder.Services.AddScoped<ICompanyLiteMappingService, CompanyLiteMappingService>();
+
+            builder.Services.AddScoped<IPricelistMappingService, PricelistMappingService>();
+            builder.Services.AddScoped<IPricelistLiteMappingService, PricelistLiteMappingService>();
+
+            builder.Services.AddScoped<IUserMappingService, UserMappingService>();
+            builder.Services.AddScoped<IUserLiteMappingService, UserLiteMappingService>();
+
+
+
             var app = builder.Build();
 
             app.UseDefaultFiles();
@@ -101,7 +136,15 @@ namespace pricelist_manager.Server
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
-                app.UseSwaggerUI();
+                app.UseSwaggerUI(options =>
+                {
+                    var providers = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
+
+                    foreach (var description in providers.ApiVersionDescriptions)
+                    {
+                        options.SwaggerEndpoint($"/swagger/{description.GroupName}/swagger.json", description.GroupName.ToUpperInvariant());
+                    }
+                });
             }
 
             //Middlewares

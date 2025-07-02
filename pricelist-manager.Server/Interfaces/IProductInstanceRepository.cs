@@ -6,11 +6,11 @@ namespace pricelist_manager.Server.Interfaces
     {
         /// <exception cref="StorageUnavailableException">The database is not available</exception>
         /// <exception cref="NotFoundException">The ProductInstance doesn't exists.</exception>
-        public Task<ICollection<ProductInstance>> GetAllAsync(Guid pricelistId, string productCode);
+        public Task<ICollection<ProductInstance>> GetAllAsync(string productId);
 
         /// <exception cref="StorageUnavailableException">The database is not available</exception>
         /// <exception cref="NotFoundException">The ProductInstance doesn't exists.</exception>
-        public Task<ProductInstance> GetByVersionAsync(Guid pricelistId, string productCode, int version);
+        public Task<ProductInstance> GetByVersionAsync(string productId, int version);
         
         /// <exception cref="StorageUnavailableException">The database is not available</exception>
         /// <exception cref="AlreadyExistsException">The Company already exists.</exception>

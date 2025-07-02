@@ -1,5 +1,6 @@
 import { z } from "zod/v4";
 import { CompanySchema } from "./Company";
+import { CompanyLiteSchema } from "./CompanyLite";
 
 // User
 export const UserSchema = z.object({
@@ -9,7 +10,8 @@ export const UserSchema = z.object({
   username: z.string(),
   email: z.email(),
   phone: z.string(),
-  company: CompanySchema,
+  roles: z.array(z.string()),
+  company: CompanyLiteSchema,
 });
 
 export type User = z.infer<typeof UserSchema>;
@@ -24,3 +26,13 @@ export const UserStatisticsSchema = z.object({
 });
 
 export type UserStatistics = z.infer<typeof UserStatisticsSchema>;
+
+// User Statistics
+export const UserFilterSchema = z.object({
+  username: z.string(),
+  email: z.string(),
+  phone: z.string(),
+  company_id: z.string(),
+});
+
+export type UserFilter = z.infer<typeof UserFilterSchema>;

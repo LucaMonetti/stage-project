@@ -30,5 +30,9 @@ namespace pricelist_manager.Server.Models
 
         [Length(7, 7)]
         public string InterfaceColor { get; set; } = string.Empty;
+
+        public virtual ICollection<Pricelist> Pricelists { get; set; } = [];
+        public virtual ICollection<Product> Products { get; set; } = [];
+
     }
 }

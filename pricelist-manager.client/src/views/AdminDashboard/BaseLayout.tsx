@@ -5,7 +5,7 @@ const AdminDashboardLayout = () => {
   return (
     <div className="flex">
       <Sidebar />
-      <main className="flex-1 ml-64">
+      <main className="flex-1 max-w-[calc(100vw-256px)] ml-64">
         <Outlet />
       </main>
     </div>
