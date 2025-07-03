@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using pricelist_manager.Server.Data;
 
@@ -11,9 +12,11 @@ using pricelist_manager.Server.Data;
 namespace pricelist_manager.Server.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20250703132604_FixUpdateList1")]
+    partial class FixUpdateList1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -238,11 +241,16 @@ namespace pricelist_manager.Server.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("UpdateListId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CompanyId");
 
                     b.HasIndex("PricelistId");
+
+                    b.HasIndex("UpdateListId");
 
                     b.ToTable("Products");
                 });
@@ -296,18 +304,18 @@ namespace pricelist_manager.Server.Migrations
 
             modelBuilder.Entity("pricelist_manager.Server.Models.ProductToUpdateList", b =>
                 {
-                    b.Property<int>("UpdateListId")
-                        .HasColumnType("int");
-
                     b.Property<string>("ProductId")
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("UpdateListId")
+                        .HasColumnType("int");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
-                    b.HasKey("UpdateListId", "ProductId");
+                    b.HasKey("ProductId", "UpdateListId");
 
-                    b.HasIndex("ProductId");
+                    b.HasIndex("UpdateListId");
 
                     b.ToTable("ProductsToUpdateLists");
                 });
@@ -496,6 +504,10 @@ namespace pricelist_manager.Server.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("pricelist_manager.Server.Models.UpdateList", null)
+                        .WithMany("Products")
+                        .HasForeignKey("UpdateListId");
+
                     b.Navigation("Company");
 
                     b.Navigation("Pricelist");
@@ -517,13 +529,13 @@ namespace pricelist_manager.Server.Migrations
                     b.HasOne("pricelist_manager.Server.Models.Product", "Product")
                         .WithMany("ProductsToUpdateLists")
                         .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("pricelist_manager.Server.Models.UpdateList", "UpdateList")
                         .WithMany("ProductsToUpdateLists")
                         .HasForeignKey("UpdateListId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Product");
@@ -563,6 +575,8 @@ namespace pricelist_manager.Server.Migrations
 
             modelBuilder.Entity("pricelist_manager.Server.Models.UpdateList", b =>
                 {
+                    b.Navigation("Products");
+
                     b.Navigation("ProductsToUpdateLists");
                 });
 #pragma warning restore 612, 618
