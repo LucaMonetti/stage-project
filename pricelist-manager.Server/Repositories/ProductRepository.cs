@@ -87,6 +87,24 @@ namespace pricelist_manager.Server.Repositories
             return product;
         }
 
+        public async Task<ICollection<Product>> GetByIdsAsync(ICollection<string> productIds)
+        {
+            if (!CanConnect()) throw new StorageUnavailableException();
+
+            var product = await Context.Products
+                                    .Where(p => productIds.Contains(p.Id))
+                                    .Include(p => p.Versions.OrderByDescending(v => v.Version))
+                                    .Include(p => p.Pricelist)
+                                    .Include(p => p.Company)
+                                    .ToListAsync();
+
+            if (product == null) throw new NotFoundException<Product>(productIds.Aggregate((prev, item) => $"${prev}, item"));
+
+            TrimProductsVersion(product);
+
+            return product;
+        }
+
         public async Task<ICollection<Product>> GetByNameAsync(string name)
         {
             if (!CanConnect()) throw new StorageUnavailableException();
@@ -214,21 +232,6 @@ namespace pricelist_manager.Server.Repositories
             TrimProductsVersion(groupedProd);
 
             return groupedProd;
-        }
-
-        public async Task<ICollection<Product>> GetByIdsAsync(ICollection<string> productIds)
-        {
-            if (!CanConnect()) throw new StorageUnavailableException();
-
-            var product = await Context.Products
-                                    .Where(p => productIds.Contains(p.Id))
-                                    .Include(p => p.Versions.FirstOrDefault(v => v.Version == p.LatestVersion))
-                                    .ToListAsync();
-
-            if (product == null)
-                throw new NotFoundException<Product>("");
-
-            return product;
         }
     }
 }

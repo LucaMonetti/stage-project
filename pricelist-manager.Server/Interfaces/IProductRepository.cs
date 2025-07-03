@@ -20,6 +20,10 @@ namespace pricelist_manager.Server.Interfaces
 
         /// <exception cref="StorageUnavailableException">The database is not available</exception>
         /// <exception cref="NotFoundException">The Product doesn't exists.</exception>
+        Task<ICollection<Product>> GetByIdsAsync(ICollection<string> productIds);
+
+        /// <exception cref="StorageUnavailableException">The database is not available</exception>
+        /// <exception cref="NotFoundException">The Product doesn't exists.</exception>
         Task<ICollection<Product>> GetByNameAsync(string name);
 
         /// <exception cref="StorageUnavailableException">The database is not available</exception>

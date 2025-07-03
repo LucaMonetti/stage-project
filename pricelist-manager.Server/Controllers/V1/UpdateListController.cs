@@ -69,10 +69,35 @@ namespace pricelist_manager.Server.Controllers.V1
             try
             {
                 // Create UpdateList
-                var item = await UpdateListRepository.CreateAsync(UpdateListMappingService.MapToUpdateList(dto)); 
+                var item = await UpdateListRepository.CreateAsync(UpdateListMappingService.MapToUpdateList(dto));
 
                 // Add Products To List
                 var res = UpdateListRepository.AddProducts(ProductToUpdateListMappingService.MapToModels(item.Id, dto.Products ?? []));
+
+                return base.Ok(res);
+            }
+            catch (Exceptions.AlreadyExistException<UpdateList> e)
+            {
+                return base.Conflict(e.Message);
+            }
+            catch (Exceptions.AlreadyExistException<ProductToUpdateList> e)
+            {
+                return base.Conflict(e.Message);
+            }
+        }
+
+        [HttpPost("{id:int}/products")]
+        public async Task<IActionResult> AddProducts([FromBody] AddProductsUpdateListDTO dto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                // Add Products To List
+                var res = await UpdateListRepository.AddProducts(ProductToUpdateListMappingService.MapToModels(dto.Id, dto.ProductIds ?? []));
 
                 return base.Ok(res);
             }
