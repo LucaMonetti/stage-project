@@ -1,0 +1,111 @@
+﻿using Microsoft.EntityFrameworkCore;
+using pricelist_manager.Server.Data;
+using pricelist_manager.Server.DTOs.V1;
+using pricelist_manager.Server.Exceptions;
+using pricelist_manager.Server.Interfaces;
+using pricelist_manager.Server.Models;
+
+namespace pricelist_manager.Server.Repositories
+{
+    public class UpdateListRepository : BaseRepository, IUpdateListRepository
+    {
+        public UpdateListRepository(DataContext dataContext) : base(dataContext)
+        { }
+
+        public async Task<bool> AddProducts(ICollection<ProductToUpdateList> dto)
+        {
+            if (!CanConnect())
+                throw new StorageUnavailableException();
+
+            await Context.ProductsToUpdateLists.AddRangeAsync(dto);
+            var res = await Context.SaveChangesAsync();
+
+            return res >= 1;
+        }
+
+        public async Task<UpdateList> CreateAsync(UpdateList dto)
+        {
+            if (!CanConnect())
+                throw new StorageUnavailableException();
+
+            if (existsID(dto.Id))
+                throw new AlreadyExistException<UpdateList>(dto.Id);
+
+            var item = await Context.AddAsync(dto);
+            var res = await Context.SaveChangesAsync();
+
+
+            // ToDo(Luca): Create a better exception
+            if (item == null)
+                throw new StorageUnavailableException();
+
+            return item.Entity;
+        }
+
+        public async Task<bool> DeleteAsync(int id)
+        {
+            if (!CanConnect())
+                throw new StorageUnavailableException();
+
+            var item = await Context.UpdateLists.FirstOrDefaultAsync(ul => ul.Id == id);
+
+            if (item == null)
+                throw new NotFoundException<UpdateList>(id);
+
+            Context.UpdateLists.Remove(item);
+            var res = await Context.SaveChangesAsync();
+
+            return res >= 1;
+        }
+
+        public async Task<ICollection<UpdateList>> GetAllAsync()
+        {
+            if (!CanConnect())
+                throw new StorageUnavailableException();
+
+            var res = await Context.UpdateLists
+                .Include(ul => ul.ProductsToUpdateLists)
+                .ThenInclude(ptul => ptul.Product)
+                .ThenInclude(p => p.Versions)
+                .ToListAsync();
+
+            return res;
+        }
+
+        public async Task<UpdateList> GetByIdAsync(int id)
+        {
+            if (!CanConnect())
+                throw new StorageUnavailableException();
+
+            var res = await Context.UpdateLists
+                .Include(ul => ul.ProductsToUpdateLists)
+                .ThenInclude(ptul => ptul.Product)
+                .ThenInclude(p => p.Versions)
+                .FirstOrDefaultAsync(ul => ul.Id == id);
+
+            if (res == null)
+                throw new NotFoundException<UpdateList>(id);
+
+            return res;
+        }
+
+        public  async Task<bool> UpdateAsync(UpdateList dto)
+        {
+            if (!CanConnect())
+                throw new StorageUnavailableException();
+
+            if (!existsID(dto.Id))
+                throw new AlreadyExistException<UpdateList>(dto.Id);
+
+            Context.Update(dto);
+            var res = await Context.SaveChangesAsync();
+
+            return res >= 1;
+        }
+
+        private bool existsID(int id)
+        {
+            return Context.UpdateLists.Any(ul => ul.Id == id);
+        }
+    }
+}
