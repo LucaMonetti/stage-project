@@ -7,6 +7,7 @@ namespace pricelist_manager.Server.Interfaces
     {
         UpdateListDTO MapToDTO(UpdateList updateList);
         UpdateList MapToUpdateList(CreateUpdateListDTO dto);
+        UpdateList MapToUpdateList(UpdateList old, UpdateUpdateListDTO dto);
 
         ICollection<UpdateListDTO> MapToDTOs(ICollection<UpdateList> updateLists);
     }

@@ -1,6 +1,7 @@
 ﻿using pricelist_manager.Server.DTOs.V1;
 using pricelist_manager.Server.Interfaces;
 using pricelist_manager.Server.Models;
+using System.Reflection.Metadata.Ecma335;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace pricelist_manager.Server.Mappers
@@ -49,6 +50,17 @@ namespace pricelist_manager.Server.Mappers
                 Description = dto.Description,
                 Name = dto.Name,
             };
+        }
+
+        public UpdateList MapToUpdateList(UpdateList model, UpdateUpdateListDTO dto)
+        {
+            ArgumentNullException.ThrowIfNull(dto);
+
+            model.Description = dto.Description ?? model.Description;
+            model.Name = dto.Name ?? model.Name;
+            model.Status = dto.Status ?? model.Status;
+
+            return model;
         }
     }
 }
