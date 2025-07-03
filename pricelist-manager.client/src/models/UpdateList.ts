@@ -1,5 +1,4 @@
 import { z } from "zod/v4";
-import { ProductInstanceSchema } from "./ProductInstance";
 import { UpdateListProductArraySchema } from "./UpdateListProduct";
 
 export const Status = {
@@ -21,7 +20,7 @@ export const UpdateListSchema = z.object({
   ),
   status: z.enum(Status),
   totalProducts: z.number(),
-  editeProducts: z.number(),
+  editedProducts: z.number(),
   products: UpdateListProductArraySchema,
 });
 
