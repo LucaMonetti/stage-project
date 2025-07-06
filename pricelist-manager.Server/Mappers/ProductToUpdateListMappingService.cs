@@ -13,19 +13,20 @@ namespace pricelist_manager.Server.Mappers
             ProductInstanceMappingService = productInstanceMappingService;
         }
 
-        public UpdateListProductDTO MapToDTO(Product product)
+        public UpdateListProductDTO MapToDTO(ProductToUpdateList product)
         {
             ArgumentNullException.ThrowIfNull(product);
 
             return new UpdateListProductDTO
             {
-                Id = product.Id,
-                LatestVersion = product.LatestVersion,
-                CurrentInstance = ProductInstanceMappingService.MapToInstanceDTO(product.Versions.First(pi => pi.Version == product.LatestVersion))
+                Id = product.Product.Id,
+                LatestVersion = product.Product.LatestVersion,
+                Status = product.Status,
+                CurrentInstance = ProductInstanceMappingService.MapToInstanceDTO(product.Product.Versions.First(pi => pi.Version == product.Product.LatestVersion))
             };
         }
 
-        public ICollection<UpdateListProductDTO> MapToDTOs(ICollection<Product> products)
+        public ICollection<UpdateListProductDTO> MapToDTOs(ICollection<ProductToUpdateList> products)
         {
             ArgumentNullException.ThrowIfNull(products);
 

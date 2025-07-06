@@ -1,8 +1,9 @@
 import { Link } from "react-router";
+import type { AllowedColors } from "../../types";
 
 type Props = {
   route: string;
-  color: "blue" | "purple" | "yellow" | "green";
+  color: AllowedColors;
   Icon: React.ComponentType<{ className?: string }>;
   className?: string;
   text?: string;
@@ -13,6 +14,7 @@ const bgColor = {
   purple: "bg-purple-600",
   yellow: "bg-yellow-600",
   green: "bg-green-600",
+  red: "bg-red-600",
 };
 
 const SimpleIconButton = ({

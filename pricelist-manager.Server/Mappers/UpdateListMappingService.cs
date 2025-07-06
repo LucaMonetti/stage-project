@@ -26,7 +26,7 @@ namespace pricelist_manager.Server.Mappers
                 Description = updateList.Description,
                 Status = updateList.Status,
                 Name = updateList.Name,
-                Products = ProductToUpdateListMappingService.MapToDTOs(updateList.ProductsToUpdateLists.Select(ptul => ptul.Product).ToList() ?? []),
+                Products = ProductToUpdateListMappingService.MapToDTOs(updateList.ProductsToUpdateLists),
                 TotalProducts = updateList.ProductsToUpdateLists.Count,
                 EditedProducts = updateList.ProductsToUpdateLists
                                             .Where(p => p.Status == Status.Edited)
@@ -59,6 +59,15 @@ namespace pricelist_manager.Server.Mappers
             model.Description = dto.Description ?? model.Description;
             model.Name = dto.Name ?? model.Name;
             model.Status = dto.Status ?? model.Status;
+
+            return model;
+        }
+
+        public UpdateList MapToUpdateList(UpdateList model, UpdateListStatusDTO dto)
+        {
+            ArgumentNullException.ThrowIfNull(dto);
+
+            model.Status = dto.Status;
 
             return model;
         }

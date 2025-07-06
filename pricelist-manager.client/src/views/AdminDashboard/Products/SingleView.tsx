@@ -40,11 +40,13 @@ const SingleProductView = () => {
           {
             color: "purple",
             Icon: FaPencil,
+            type: "link",
             route: `/admin-dashboard/edit/products/${productId}`,
             text: "Modifica",
           },
           {
             color: "blue",
+            type: "link",
             Icon: FaDownload,
             route: `/admin-dashboard/download/products/${productId}`,
             text: "Scarica",

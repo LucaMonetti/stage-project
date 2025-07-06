@@ -91,7 +91,11 @@ export function useGet<T extends ZodType>(props: GETProps<T>) {
     fetchData();
   }, [props.endpoint]);
 
-  return { isLoading, data, errorMsg } satisfies FetchData<z.infer<T>>;
+  const refetch = () => {
+    fetchData();
+  };
+
+  return { isLoading, data, errorMsg, refetch } satisfies FetchData<z.infer<T>>;
 }
 
 export function usePost<T extends ZodType<any> & { _output: FieldValues }>(

@@ -11,6 +11,8 @@ namespace pricelist_manager.Server.Interfaces
 
         Task<UpdateList> CreateAsync(UpdateList dto);
         Task<Boolean> UpdateAsync(UpdateList dto);
+        Task<Boolean> UpdateProductStatusAsync(string productId, int editUpdateList, Status status);
+
         Task<Boolean> DeleteAsync(int id);
 
         Task<Boolean> AddProducts(ICollection<ProductToUpdateList> dto);

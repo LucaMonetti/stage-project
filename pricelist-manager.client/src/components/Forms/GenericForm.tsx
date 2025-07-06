@@ -174,6 +174,35 @@ function RenderInputField<T extends FieldValues>(
               isClearable={!input.isDisabled}
             />
           );
+        case "company":
+          return (
+            <SearchSelect<T, Company>
+              key={key}
+              isDisabled={input.isDisabled}
+              {...commonProps}
+              control={control}
+              fetchData={input.fetchData as FetchData<Company[]>}
+              onChange={input.onChange ?? undefined}
+              getLabel={(p) => `${p.name} (${p.id})`}
+              getValue={(p) => p.id}
+              isClearable={!input.isDisabled}
+            />
+          );
+        case "product":
+          return (
+            <SearchSelect<T, Product>
+              key={key}
+              isDisabled={input.isDisabled}
+              {...commonProps}
+              control={control}
+              fetchData={input.fetchData as FetchData<Product[]>}
+              onChange={input.onChange ?? undefined}
+              getLabel={(p) => `${p.id} - ${p.currentInstance.name}`}
+              getValue={(p) => p.id}
+              isClearable={!input.isDisabled}
+              isMulti={true}
+            />
+          );
       }
       break;
     case "textarea":

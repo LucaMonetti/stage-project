@@ -1,5 +1,6 @@
 import { z } from "zod/v4";
-import { Status, UpdateListProductArraySchema } from "./UpdateListProduct";
+import { UpdateListProductArraySchema } from "./UpdateListProduct";
+import { Status } from "../types";
 
 // Create
 export const CreateUpdateListSchema = z.object({

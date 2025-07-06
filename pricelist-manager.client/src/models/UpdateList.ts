@@ -1,13 +1,6 @@
 import { z } from "zod/v4";
 import { UpdateListProductArraySchema } from "./UpdateListProduct";
-
-export const Status = {
-  Edited: 0,
-  Pending: 1,
-  Deleted: 2,
-} as const;
-
-export type Status = (typeof Status)[keyof typeof Status];
+import { Status } from "../types";
 
 // Product
 export const UpdateListSchema = z.object({

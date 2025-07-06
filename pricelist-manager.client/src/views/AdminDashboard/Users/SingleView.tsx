@@ -37,12 +37,14 @@ const SingleUserView = () => {
         actions={[
           {
             color: "purple",
+            type: "link",
             Icon: FaPencil,
             route: `/admin-dashboard/edit/users/${userId}`,
             text: "Modifica",
           },
           {
             color: "blue",
+            type: "link",
             Icon: FaDownload,
             route: `/admin-dashboard/download/users/${userId}`,
             text: "Scarica",

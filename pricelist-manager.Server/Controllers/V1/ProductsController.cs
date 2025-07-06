@@ -17,16 +17,18 @@ namespace pricelist_manager.Server.Controllers.V1
         private readonly IProductRepository ProductRepository;
         private readonly IPricelistRepository PricelistRepository;
         private readonly IProductInstanceRepository ProductInstanceRepository;
+        private readonly IUpdateListRepository UpdateListRepository;
         private readonly IProductMappingService ProductMapping;
         private readonly IProductInstanceMappingService ProductInstanceMapping;
 
-        public ProductsController(IProductRepository productRepository, IPricelistRepository pricelistRepository, IProductInstanceRepository productInstanceRepository, IProductMappingService productMapping, IProductInstanceMappingService productInstanceMapping)
+        public ProductsController(IProductRepository productRepository, IPricelistRepository pricelistRepository, IProductInstanceRepository productInstanceRepository, IProductMappingService productMapping, IProductInstanceMappingService productInstanceMapping, IUpdateListRepository updateListRepository)
         {
             ProductRepository = productRepository;
             PricelistRepository = pricelistRepository;
             ProductInstanceRepository = productInstanceRepository;
             ProductMapping = productMapping;
             ProductInstanceMapping = productInstanceMapping;
+            UpdateListRepository = updateListRepository;
         }
 
         [HttpGet]
@@ -86,7 +88,7 @@ namespace pricelist_manager.Server.Controllers.V1
         }
 
         [HttpPut("{productId}")]
-        public async Task<IActionResult> Update(string productId, [FromBody] UpdateProductDTO dto)
+        public async Task<IActionResult> Update(string productId, [FromBody] UpdateProductDTO dto, [FromQuery] int? editUpdateList)
         {
             if (!ModelState.IsValid)
             {
@@ -113,6 +115,12 @@ namespace pricelist_manager.Server.Controllers.V1
                 oldProd.Versions.Add(newInstance);
 
                 var res = await ProductRepository.UpdateAsync(oldProd);
+
+                if (editUpdateList != null)
+                {
+                    res &= await UpdateListRepository.UpdateProductStatusAsync(productId, editUpdateList.Value, Status.Edited);
+                }
+
                 return Ok(res);
             }
             catch (NotFoundException<Product> e)

@@ -140,24 +140,53 @@ namespace pricelist_manager.Server.Controllers.V1
             }
         }
 
-        //[HttpDelete("{id:guid}")]
-        //public async Task<IActionResult> DeleteProduct(Guid id)
-        //{
-        //    if (!ModelState.IsValid)
-        //    {
-        //        return BadRequest(ModelState);
-        //    }
+        [HttpPut("{id:int}/status")]
+        public async Task<IActionResult> UpdateListStatus(int id, [FromBody] UpdateListStatusDTO dto)
+        {
+            if (id != dto.Id)
+            {
+                ModelState.AddModelError("", "The IDs doesn't match!");
+                return BadRequest(ModelState);
+            }
 
-        //    try
-        //    {
-        //        var res = await PricelistRepository.DeleteAsync(id);
-        //        return Ok(res);
-        //    }
-        //    catch (NotFoundException<Company> e)
-        //    {
-        //        return NotFound(e.Message);
-        //    }
-        //}
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                var item = await UpdateListRepository.GetByIdAsync(id);
+
+                var model = UpdateListMappingService.MapToUpdateList(item, dto);
+
+                var res = await UpdateListRepository.UpdateAsync(model);
+                return Ok(res);
+            }
+            catch (NotFoundException<UpdateList> e)
+            {
+                return NotFound(e.Message);
+            }
+        }
+
+        [HttpDelete("{id:int}")]
+        public async Task<IActionResult> DeleteList(int id)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                var res = await UpdateListRepository.DeleteAsync(id);
+                return Ok(res);
+            }
+            catch (NotFoundException<UpdateList> e)
+            {
+                return NotFound(e.Message);
+            }
+        }
 
     }
 }

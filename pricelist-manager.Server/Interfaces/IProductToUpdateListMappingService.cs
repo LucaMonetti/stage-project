@@ -5,10 +5,10 @@ namespace pricelist_manager.Server.Interfaces
 {
     public interface IProductToUpdateListMappingService
     {
-        UpdateListProductDTO MapToDTO(Product product);
+        UpdateListProductDTO MapToDTO(ProductToUpdateList product);
         ProductToUpdateList MapToModel(int updateListId, string productId);
 
-        ICollection<UpdateListProductDTO> MapToDTOs(ICollection<Product> products);
+        ICollection<UpdateListProductDTO> MapToDTOs(ICollection<ProductToUpdateList> products);
 
 
         ICollection<ProductToUpdateList> MapToModels(int updateListId, ICollection<string> productIds);

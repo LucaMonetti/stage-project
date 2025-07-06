@@ -109,6 +109,7 @@ const UsersListView = () => {
               color: "blue",
               Icon: FaPlus,
               route: `/admin-dashboard/create/users`,
+              type: "link",
             },
           ]}
         />

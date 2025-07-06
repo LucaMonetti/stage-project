@@ -97,7 +97,25 @@ namespace pricelist_manager.Server.Repositories
             if (!existsID(dto.Id))
                 throw new AlreadyExistException<UpdateList>(dto.Id);
 
-            Context.Update(dto);
+            Context.UpdateLists.Update(dto);
+            var res = await Context.SaveChangesAsync();
+
+            return res >= 1;
+        }
+
+        public async Task<bool> UpdateProductStatusAsync(string productId, int editUpdateList, Status status)
+        {
+            if (!CanConnect())
+                throw new StorageUnavailableException();
+
+            if (!existsProduct(editUpdateList, productId))
+                throw new AlreadyExistException<ProductToUpdateList>($"{productId} nella lista {editUpdateList}");
+
+            var item = Context.ProductsToUpdateLists.First(ptul => ptul.UpdateListId == editUpdateList && ptul.ProductId == productId);
+
+            item.Status = status;
+            
+            Context.ProductsToUpdateLists.Update(item);
             var res = await Context.SaveChangesAsync();
 
             return res >= 1;
@@ -106,6 +124,11 @@ namespace pricelist_manager.Server.Repositories
         private bool existsID(int id)
         {
             return Context.UpdateLists.Any(ul => ul.Id == id);
+        }
+
+        private bool existsProduct(int updateListId, string productId)
+        {
+            return Context.ProductsToUpdateLists.Any(ptul => ptul.UpdateListId == updateListId && ptul.ProductId == productId);
         }
     }
 }

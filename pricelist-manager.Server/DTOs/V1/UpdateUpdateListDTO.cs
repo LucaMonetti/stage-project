@@ -15,4 +15,10 @@ namespace pricelist_manager.Server.DTOs.V1
         public required int Id { get; set; }
         public required ICollection<string>? ProductIds { get; set; } = [];
     }
+
+    public class UpdateListStatusDTO
+    {
+        public required int Id { get; set; }
+        public required Status Status { get; set; }
+    }
 }
