@@ -6,7 +6,7 @@ import { Status } from "../types";
 export const CreateUpdateListSchema = z.object({
   name: z.string(),
   description: z.string(),
-  products: UpdateListProductArraySchema,
+  products: z.array(z.string()),
 });
 
 export type CreateUpdateList = z.infer<typeof CreateUpdateListSchema>;

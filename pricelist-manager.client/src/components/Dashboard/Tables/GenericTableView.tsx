@@ -1,12 +1,7 @@
-import { Link, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 import type { FetchData } from "../../../types";
 import BasicLoader from "../../Loader/BasicLoader";
-import {
-  useEffect,
-  useImperativeHandle,
-  useState,
-  type MouseEventHandler,
-} from "react";
+import { useEffect, useState } from "react";
 import type { FieldValues, Path } from "react-hook-form";
 import {
   flexRender,
@@ -32,6 +27,10 @@ type Prods<T extends Record<string, any>, TFilter extends FieldValues> = {
   config?: TableConfig<T>;
   filterConfig?: Config<TFilter>;
   onTableReady?: (item: Table<T>) => void;
+
+  selectedItems?: T[];
+  enableCheckbox?: boolean;
+  onRowSelect?: (item: T) => void;
 };
 
 export interface Column<T> {
@@ -66,6 +65,9 @@ function GenericTableView<
   },
   filterConfig,
   onTableReady,
+  selectedItems,
+  enableCheckbox = false,
+  onRowSelect,
 }: Prods<T, TFilter>) {
   const navigate = useNavigate();
 
@@ -81,6 +83,19 @@ function GenericTableView<
     },
     onColumnFiltersChange: setColumnFilters,
   });
+
+  const handleRowSelect = (item: T) => {
+    if (onRowSelect) {
+      onRowSelect(item);
+    }
+  };
+
+  const isRowSelected = (item: T) => {
+    if (!selectedItems) return false;
+    return selectedItems.some(
+      (selectedItem) => selectedItem[keyField] === item[keyField]
+    );
+  };
 
   const getValue = (key: keyof T, row: T) => {
     let keys: (keyof T)[] = (key as string).split(".");
@@ -138,11 +153,55 @@ function GenericTableView<
   return (
     <div>
       {filterConfig && <FilterRenderer config={filterConfig} />}
+
+      {enableCheckbox && (
+        <div className="bg-gray-800 rounded p-4 border-2 border-gray-700 my-4">
+          <p className="text-sm">
+            {selectedItems?.length ?? 0} Prodott
+            {selectedItems?.length !== 1 ? "i" : "o"}
+          </p>
+        </div>
+      )}
+
       <div className="overflow-x-auto">
         <table className="min-w-full border-collapse">
           <thead>
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id} className="bg-gray-800">
+                {enableCheckbox && (
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider whitespace-nowrap">
+                    <input
+                      type="checkbox"
+                      className="rounded"
+                      onChange={() => {
+                        if (!data.data) return;
+                        const allSelected =
+                          selectedItems &&
+                          data.data.every((item) =>
+                            selectedItems.some(
+                              (selected) =>
+                                selected[keyField] === item[keyField]
+                            )
+                          );
+                        if (allSelected) {
+                          // Deselect all
+                          data.data.forEach((item) => {
+                            if (isRowSelected(item)) {
+                              onRowSelect && onRowSelect(item);
+                            }
+                          });
+                        } else {
+                          // Select all
+                          data.data.forEach((item) => {
+                            if (!isRowSelected(item)) {
+                              onRowSelect && onRowSelect(item);
+                            }
+                          });
+                        }
+                      }}
+                    />
+                  </th>
+                )}
                 {headerGroup.headers.map((header) => (
                   <th
                     key={header.id}
@@ -160,73 +219,96 @@ function GenericTableView<
           {data.isLoading ? (
             <tbody>
               <tr>
-                <td colSpan={columns.length} className="px-6 py-4">
+                <td
+                  colSpan={columns.length + (enableCheckbox ? 1 : 0)}
+                  className="px-6 py-4"
+                >
                   <BasicLoader />
                 </td>
               </tr>
             </tbody>
           ) : data.data && data.data.length > 0 ? (
             <tbody className="bg-gray-900 divide-y divide-gray-700">
-              {table.getRowModel().rows.map((row, rowIndex) => (
-                <tr
-                  onClick={
-                    config.enableLink
-                      ? (
-                          e: React.MouseEvent<HTMLTableRowElement, MouseEvent>
-                        ) => {
-                          handleClickRow(
-                            e,
-                            data.data ? data.data[rowIndex] : undefined
-                          );
-                        }
-                      : undefined
-                  }
-                  key={row.id}
-                  className="hover:bg-gray-700"
-                >
-                  {row.getVisibleCells().map((cell, colIndex) => (
-                    <td
-                      onClick={
-                        columns[colIndex].linkUrl
-                          ? (
-                              e: React.MouseEvent<
-                                HTMLTableCellElement,
-                                MouseEvent
-                              >
-                            ) => {
-                              console.log(rowIndex);
-                              handleCellClick(
-                                e,
-                                columns[colIndex],
-                                data.data ? data.data[rowIndex] : undefined
-                              );
+              {table.getRowModel().rows.map((row, rowIndex) => {
+                const rowData = data.data ? data.data[rowIndex] : undefined;
+                return (
+                  <tr
+                    onClick={
+                      config.enableLink
+                        ? (
+                            e: React.MouseEvent<HTMLTableRowElement, MouseEvent>
+                          ) => {
+                            // Don't navigate if clicking on checkbox
+                            if (
+                              (e.target as HTMLElement).closest(
+                                'input[type="checkbox"]'
+                              )
+                            ) {
+                              return;
                             }
-                          : undefined
-                      }
-                      key={cell.id}
-                      className={`px-6 py-4 ${
-                        cell.column.columnDef.meta
-                          ? (
-                              cell.column.columnDef.meta as {
-                                className?: string;
+                            handleClickRow(e, rowData);
+                          }
+                        : undefined
+                    }
+                    key={row.id}
+                    className="hover:bg-gray-700"
+                  >
+                    {enableCheckbox && rowData && (
+                      <td className="px-6 py-4">
+                        <input
+                          type="checkbox"
+                          className="rounded"
+                          checked={isRowSelected(rowData)}
+                          onChange={(e) => {
+                            e.stopPropagation();
+                            handleRowSelect(rowData);
+                          }}
+                        />
+                      </td>
+                    )}
+                    {row.getVisibleCells().map((cell, colIndex) => (
+                      <td
+                        onClick={
+                          columns[colIndex].linkUrl
+                            ? (
+                                e: React.MouseEvent<
+                                  HTMLTableCellElement,
+                                  MouseEvent
+                                >
+                              ) => {
+                                console.log(rowIndex);
+                                handleCellClick(e, columns[colIndex], rowData);
                               }
-                            ).className ?? ""
-                          : ""
-                      } ${columns[colIndex].linkUrl ? "cursor-pointer" : ""}`}
-                    >
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </td>
-                  ))}
-                </tr>
-              ))}
+                            : undefined
+                        }
+                        key={cell.id}
+                        className={`px-6 py-4 ${
+                          cell.column.columnDef.meta
+                            ? (
+                                cell.column.columnDef.meta as {
+                                  className?: string;
+                                }
+                              ).className ?? ""
+                            : ""
+                        } ${columns[colIndex].linkUrl ? "cursor-pointer" : ""}`}
+                      >
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </td>
+                    ))}
+                  </tr>
+                );
+              })}
             </tbody>
           ) : (
             <tbody>
               <tr>
-                <td colSpan={6} className="px-6 py-4 text-sm text-gray-500">
+                <td
+                  colSpan={columns.length + (enableCheckbox ? 1 : 0)}
+                  className="px-6 py-4 text-sm text-gray-500"
+                >
                   Non sono stati registrati prodotti all'interno del database!
                 </td>
               </tr>

@@ -3,7 +3,9 @@ import Fieldset from "./Fieldset";
 import Input from "./Input";
 import Textarea from "./Textarea";
 import {
+  FormProvider,
   useForm,
+  useFormContext,
   type Control,
   type FieldErrors,
   type FieldValues,
@@ -32,6 +34,7 @@ interface Props<T extends FieldValues> {
   method?: "POST" | "PUT" | "DELETE";
   id: string;
   isRow?: boolean;
+  externalProvider?: boolean;
 }
 
 interface BaseInput<T extends FieldValues> {
@@ -212,7 +215,19 @@ function RenderInputField<T extends FieldValues>(
   }
 }
 
-function GenericForm<T extends FieldValues>({
+function GenericForm<T extends FieldValues>(prop: Props<T>) {
+  if (prop.externalProvider) {
+    return <GenericActualForm<T> {...prop} />;
+  }
+
+  return (
+    <GenericFormProvider schema={prop.schema}>
+      <GenericActualForm<T> {...prop} />
+    </GenericFormProvider>
+  );
+}
+
+function GenericActualForm<T extends FieldValues>({
   className,
   schema,
   config,
@@ -221,20 +236,9 @@ function GenericForm<T extends FieldValues>({
   id,
   isRow = false,
 }: Props<T>) {
-  const {
-    register,
-    handleSubmit,
-    control,
-    setError,
-    reset,
-    formState: { errors },
-  } = useForm<T>({
-    mode: "all",
-    resolver: zodResolver(schema),
-  });
   const errorDiv = useRef<HTMLDivElement>(null);
-
   const [isLoading, setIsLoading] = useState(false);
+  const methods = useFormContext<T>();
 
   const onSubmit: SubmitHandler<T> = (data) => {
     console.log(values, data);
@@ -244,30 +248,32 @@ function GenericForm<T extends FieldValues>({
       body: data,
       method: method,
       schema: schema,
-      fieldErrors: errors,
-      setError: setError,
+      fieldErrors: methods.formState.errors,
+      setError: methods.setError,
       setIsLoading: setIsLoading,
     });
   };
 
   useEffect(() => {
     if (values) {
-      reset(values);
+      methods.reset(values);
     }
   }, [values]);
 
   return (
     <form
       className={`flex flex-col gap-4 ${className}`}
-      onSubmit={handleSubmit(onSubmit)}
+      onSubmit={methods.handleSubmit(onSubmit)}
       method={method}
       id={id}
     >
-      {errors.root && (
+      {methods.formState.errors.root && (
         <div className="bg-opacity-10 border border-l-8 border-red-400 p-3 rounded-r-md">
           <div className="flex items-center gap-2">
             <FaExclamation className="text-red-400" />
-            <span className="text-red-400">{errors.root.message}</span>
+            <span className="text-red-400">
+              {methods.formState.errors.root.message}
+            </span>
           </div>
         </div>
       )}
@@ -281,9 +287,9 @@ function GenericForm<T extends FieldValues>({
           {fieldset.inputs.map((input, inputIndex) => {
             return RenderInputField<T>(
               input,
-              register,
-              control,
-              errors,
+              methods.register,
+              methods.control,
+              methods.formState.errors,
               values,
               `${index}-${inputIndex}`
             );
@@ -292,6 +298,21 @@ function GenericForm<T extends FieldValues>({
       ))}
     </form>
   );
+}
+
+export function GenericFormProvider<T extends FieldValues>({
+  schema,
+  children,
+}: {
+  schema: InferredZodSchema<T>;
+  children: React.ReactNode;
+}) {
+  const methods = useForm<T>({
+    mode: "all",
+    resolver: zodResolver(schema),
+  });
+
+  return <FormProvider {...methods}>{children}</FormProvider>;
 }
 
 export default GenericForm;

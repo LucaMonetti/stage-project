@@ -72,7 +72,7 @@ namespace pricelist_manager.Server.Controllers.V1
                 var item = await UpdateListRepository.CreateAsync(UpdateListMappingService.MapToUpdateList(dto));
 
                 // Add Products To List
-                var res = UpdateListRepository.AddProducts(ProductToUpdateListMappingService.MapToModels(item.Id, dto.Products ?? []));
+                var res = await UpdateListRepository.AddProducts(ProductToUpdateListMappingService.MapToModels(item.Id, dto.Products ?? []));
 
                 return base.Ok(res);
             }

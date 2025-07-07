@@ -1,7 +1,4 @@
 import FormButton from "../../../components/Buttons/FormButton";
-import GenericForm, {
-  type Config,
-} from "../../../components/Forms/GenericForm";
 
 import { FaPlus } from "react-icons/fa6";
 import { useGet } from "../../../hooks/useGenericFetch";
@@ -10,15 +7,16 @@ import {
   CreateUpdateListSchema,
   type CreateUpdateList,
 } from "../../../models/FormUpdateList";
-import { ProductArraySchema } from "../../../models/Product";
+import { ProductArraySchema, type Product } from "../../../models/Product";
+import GenericForm, {
+  GenericFormProvider,
+  type Config,
+} from "../../../components/Forms/GenericForm";
+import GenericTableView from "../../../components/Dashboard/Tables/GenericTableView";
+import { useEffect, useState } from "react";
+import { useFormContext } from "react-hook-form";
 
 const CreateUpdatelistForm = () => {
-  const products = useGet({
-    endpoint: "products",
-    method: "GET",
-    schema: ProductArraySchema,
-  });
-
   const config = {
     fieldset: [
       {
@@ -38,30 +36,6 @@ const CreateUpdatelistForm = () => {
             label: "Descrizione Lista",
             type: "textarea",
             placeholder: "Inserire la descrizione.",
-          },
-        ],
-      },
-      {
-        title: "Prodotti",
-        inputs: [
-          {
-            id: "products",
-            label: "Prodotti",
-            type: "searchable",
-            placeholder: "Seleziona i prodotti",
-            fetchData: useGet({
-              endpoint: "products",
-              method: "GET",
-              schema: ProductArraySchema,
-            }),
-            schema: "product",
-            registerOptions: {
-              required: "Necessario selezionare un prodotto!",
-              setValueAs: (value) => {
-                console.log(value);
-                return [value];
-              },
-            },
           },
         ],
       },
@@ -86,15 +60,80 @@ const CreateUpdatelistForm = () => {
         />
       </header>
 
-      <GenericForm
-        schema={CreateUpdateListSchema}
-        className="mt-4"
-        config={config}
-        id="create-updatelist-form"
-        method={"POST"}
-      />
+      <GenericFormProvider schema={CreateUpdateListSchema}>
+        <GenericForm
+          schema={CreateUpdateListSchema}
+          className="mt-4"
+          config={config}
+          id="create-updatelist-form"
+          method={"POST"}
+          externalProvider={true}
+        />
+        <ProductTable />
+      </GenericFormProvider>
     </div>
   );
 };
+
+function ProductTable() {
+  const products = useGet({
+    endpoint: "products",
+    method: "GET",
+    schema: ProductArraySchema,
+  });
+
+  const [selectedItem, setSelectedItem] = useState<Product[]>([]);
+  const methods = useFormContext<CreateUpdateList>();
+
+  useEffect(() => {
+    methods.setValue(
+      "products",
+      selectedItem.map((item) => item.id) // Assuming you want to store only the IDs of the selected products
+    );
+  }, [selectedItem, methods]);
+
+  return (
+    <GenericTableView
+      data={useGet({
+        endpoint: "products",
+        method: "GET",
+        schema: ProductArraySchema,
+      })}
+      keyField="id"
+      config={{
+        enableLink: false,
+        baseUrl: "/admin-dashboard/products",
+        columnId: {},
+      }}
+      columns={[
+        {
+          id: "name",
+          header: "Name",
+          accessorFn: (item) => item.currentInstance.name,
+        },
+        {
+          id: "price",
+          header: "Price",
+          accessorFn: (item) => item.currentInstance.price,
+        },
+        {
+          id: "description",
+          header: "Description",
+          accessorFn: (item) => item.id,
+        },
+      ]}
+      selectedItems={selectedItem}
+      enableCheckbox={true}
+      onRowSelect={(item) => {
+        setSelectedItem((prev) => {
+          if (prev.some((i) => i.id === item.id)) {
+            return prev.filter((i) => i.id !== item.id);
+          }
+          return [...prev, item];
+        });
+      }}
+    />
+  );
+}
 
 export default CreateUpdatelistForm;
