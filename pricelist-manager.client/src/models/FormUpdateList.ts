@@ -1,6 +1,4 @@
 import { z } from "zod/v4";
-import { UpdateListProductArraySchema } from "./UpdateListProduct";
-import { Status } from "../types";
 
 // Create
 export const CreateUpdateListSchema = z.object({
@@ -12,14 +10,13 @@ export const CreateUpdateListSchema = z.object({
 export type CreateUpdateList = z.infer<typeof CreateUpdateListSchema>;
 
 // Create
-export const UpdateUpdateListSchema = z.object({
+export const EditUpdateListSchema = z.object({
   id: z.string(),
   name: z.string().optional(),
   description: z.string().optional(),
-  status: z.enum(Status).optional(),
 });
 
-export type UpdateUpdateList = z.infer<typeof UpdateUpdateListSchema>;
+export type EditUpdateList = z.infer<typeof EditUpdateListSchema>;
 
 // AddProducts
 export const AddProductsUpdateListSchema = z.object({

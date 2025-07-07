@@ -23,6 +23,7 @@ import UpdateListListView from "../views/AdminDashboard/UpdateLists/ListView";
 import UpdateListSingleView from "../views/AdminDashboard/UpdateLists/SingleView";
 import CreateUpdatelistForm from "../views/AdminDashboard/Create/CreateUpdatelist";
 import Sandbox from "../views/Sandbox";
+import EditUpdatelistForm from "../views/AdminDashboard/Edit/EditUpdatelist";
 
 const router = createBrowserRouter([
   {
@@ -88,6 +89,10 @@ const router = createBrowserRouter([
               {
                 path: "users/:userId",
                 Component: EditUserForm,
+              },
+              {
+                path: "updatelists/:updateListId",
+                Component: EditUpdatelistForm,
               },
             ],
           },
