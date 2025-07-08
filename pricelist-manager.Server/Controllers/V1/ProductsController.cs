@@ -1,7 +1,9 @@
 ﻿using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using pricelist_manager.Server.DTOs.V1;
 using pricelist_manager.Server.Exceptions;
+using pricelist_manager.Server.Helpers;
 using pricelist_manager.Server.Interfaces;
 using pricelist_manager.Server.Models;
 using pricelist_manager.Server.Repositories;
@@ -20,8 +22,9 @@ namespace pricelist_manager.Server.Controllers.V1
         private readonly IUpdateListRepository UpdateListRepository;
         private readonly IProductMappingService ProductMapping;
         private readonly IProductInstanceMappingService ProductInstanceMapping;
+        private readonly IMetadataMappingService<Product> MetadataMapping;
 
-        public ProductsController(IProductRepository productRepository, IPricelistRepository pricelistRepository, IProductInstanceRepository productInstanceRepository, IProductMappingService productMapping, IProductInstanceMappingService productInstanceMapping, IUpdateListRepository updateListRepository)
+        public ProductsController(IProductRepository productRepository, IPricelistRepository pricelistRepository, IProductInstanceRepository productInstanceRepository, IProductMappingService productMapping, IProductInstanceMappingService productInstanceMapping, IUpdateListRepository updateListRepository, IMetadataMappingService<Product> metadataMapping)
         {
             ProductRepository = productRepository;
             PricelistRepository = pricelistRepository;
@@ -29,21 +32,24 @@ namespace pricelist_manager.Server.Controllers.V1
             ProductMapping = productMapping;
             ProductInstanceMapping = productInstanceMapping;
             UpdateListRepository = updateListRepository;
+            MetadataMapping = metadataMapping;
         }
 
         [HttpGet]
-        public async Task<ActionResult<ICollection<ProductDTO>>> GetAll()
+        public async Task<ActionResult<PagedList<ProductDTO>>> GetAll()
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             var data = await ProductRepository.GetAllAsync();
 
+            Response.Headers["X-Pagination"] = JsonConvert.SerializeObject(MetadataMapping.MapToMetadata(data));
+
             return Ok(ProductMapping.MapToDTOs(data));
         }
 
         [HttpGet("{productId}")]
-        public async Task<ActionResult<ICollection<ProductDTO>>> GetById(string productId)
+        public async Task<ActionResult<ProductDTO>> GetById(string productId)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -61,7 +67,7 @@ namespace pricelist_manager.Server.Controllers.V1
         }
 
         [HttpPost]
-        public async Task<ActionResult<ICollection<ProductDTO>>> Create([FromBody] CreateProductDTO dto)
+        public async Task<ActionResult<Boolean>> Create([FromBody] CreateProductDTO dto)
         {
             if (!ModelState.IsValid)
             {
