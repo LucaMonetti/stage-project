@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http.Metadata;
 using Microsoft.EntityFrameworkCore;
 using pricelist_manager.Server.Data;
+using pricelist_manager.Server.DTOs.V1.QueryParams;
 using pricelist_manager.Server.DTOs.V1.Statistics;
 using pricelist_manager.Server.Exceptions;
 using pricelist_manager.Server.Helpers;
@@ -57,13 +58,13 @@ namespace pricelist_manager.Server.Repositories
             return await Context.Companies.AnyAsync(e => e.Id == id);
         }
 
-        public async Task<PagedList<Company>> GetAllAsync()
+        public async Task<PagedList<Company>> GetAllAsync(CompanyQueryParams requestParams)
         {
             if (!CanConnect()) throw new StorageUnavailableException();
 
             var query = Context.Companies.Include(c => c.Products).ThenInclude(p => p.Versions).Include(c => c.Pricelists);
 
-            return await PagedList<Company>.ToPagedList(query, 1, 10);
+            return await PagedList<Company>.ToPagedList(query, requestParams.Pagination.PageNumber, requestParams.Pagination.PageSize);
         }
 
         public async Task<Company> GetByIdAsync(string id)

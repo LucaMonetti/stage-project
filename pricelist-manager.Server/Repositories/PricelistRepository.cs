@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using pricelist_manager.Server.Data;
+using pricelist_manager.Server.DTOs.V1.QueryParams;
 using pricelist_manager.Server.DTOs.V1.Statistics;
 using pricelist_manager.Server.Exceptions;
 using pricelist_manager.Server.Helpers;
@@ -52,22 +53,22 @@ namespace pricelist_manager.Server.Repositories
             return await Context.Pricelists.AnyAsync(x => x.Id == id);
         }
 
-        public async Task<PagedList<Pricelist>> GetAllAsync()
+        public async Task<PagedList<Pricelist>> GetAllAsync(PricelistQueryParams requestParams)
         {
             if (!CanConnect()) throw new StorageUnavailableException();
 
             var query = Context.Pricelists.Include(p => p.Products).ThenInclude(p => p.Versions).Include(p => p.Company);
 
-            return await PagedList<Pricelist>.ToPagedList(query, 1, 10);
+            return await PagedList<Pricelist>.ToPagedList(query, requestParams.Pagination.PageNumber, requestParams.Pagination.PageSize);
         }
 
-        public async Task<PagedList<Pricelist>> GetByCompanyAsync(string companyId)
+        public async Task<PagedList<Pricelist>> GetByCompanyAsync(string companyId, PricelistQueryParams requestParams)
         {
             if (!CanConnect()) throw new StorageUnavailableException();
 
             var query = Context.Pricelists.Where(p => p.CompanyId == companyId).Include(p => p.Products).ThenInclude(p => p.Versions).Include(p => p.Company);
 
-            return await PagedList<Pricelist>.ToPagedList(query, 1, 10);
+            return await PagedList<Pricelist>.ToPagedList(query, requestParams.Pagination.PageNumber, requestParams.Pagination.PageSize);
         }
 
         public async Task<Pricelist> GetByIdAsync(Guid id)

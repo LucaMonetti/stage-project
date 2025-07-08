@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using pricelist_manager.Server.Data;
 using pricelist_manager.Server.DTOs.V1;
+using pricelist_manager.Server.DTOs.V1.QueryParams;
 using pricelist_manager.Server.Exceptions;
 using pricelist_manager.Server.Helpers;
 using pricelist_manager.Server.Interfaces;
@@ -80,7 +81,7 @@ namespace pricelist_manager.Server.Repositories
             return res >= 1;
         }
 
-        public async Task<PagedList<UpdateList>> GetAllAsync()
+        public async Task<PagedList<UpdateList>> GetAllAsync(UpdateListQueryParams requestParams)
         {
             if (!CanConnect())
                 throw new StorageUnavailableException();
@@ -90,7 +91,7 @@ namespace pricelist_manager.Server.Repositories
                 .ThenInclude(ptul => ptul.Product)
                 .ThenInclude(p => p.Versions);
 
-            return await PagedList<UpdateList>.ToPagedList(query, 1, 10);
+            return await PagedList<UpdateList>.ToPagedList(query, requestParams.Pagination.PageNumber, requestParams.Pagination.PageSize);
         }
 
         public async Task<UpdateList> GetByIdAsync(int id)

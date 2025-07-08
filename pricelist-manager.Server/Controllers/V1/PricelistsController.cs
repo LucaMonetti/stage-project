@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using pricelist_manager.Server.Data;
 using pricelist_manager.Server.DTOs.V1;
+using pricelist_manager.Server.DTOs.V1.QueryParams;
 using pricelist_manager.Server.Exceptions;
 using pricelist_manager.Server.Helpers;
 using pricelist_manager.Server.Interfaces;
@@ -37,12 +38,12 @@ namespace pricelist_manager.Server.Controllers.V1
         }
 
         [HttpGet]
-        public async Task<ActionResult<PagedList<PricelistDTO>>> GetAll()
+        public async Task<ActionResult<PagedList<PricelistDTO>>> GetAll([FromQuery] PricelistQueryParams requestParams)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var data = await PricelistRepository.GetAllAsync();
+            var data = await PricelistRepository.GetAllAsync(requestParams);
 
             Response.Headers["X-Pagination"] = JsonConvert.SerializeObject(MetadataMapping.MapToMetadata(data));
 
@@ -70,14 +71,14 @@ namespace pricelist_manager.Server.Controllers.V1
         }
 
         [HttpGet("{pricelistId:guid}/products")]
-        public async Task<ActionResult<PagedList<ProductDTO>>> GetAll(Guid pricelistId)
+        public async Task<ActionResult<PagedList<ProductDTO>>> GetAll(Guid pricelistId, ProductQueryParams requestParams)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             try
             {
-                var data = await ProductRepository.GetByPricelistAsync(pricelistId);
+                var data = await ProductRepository.GetByPricelistAsync(pricelistId, requestParams);
 
                 Response.Headers["X-Pagination"] = JsonConvert.SerializeObject(MetadataMapping.MapToMetadata(data));
 

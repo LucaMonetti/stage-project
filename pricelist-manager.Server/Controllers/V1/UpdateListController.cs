@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using pricelist_manager.Server.DTOs.V1;
+using pricelist_manager.Server.DTOs.V1.QueryParams;
 using pricelist_manager.Server.Exceptions;
 using pricelist_manager.Server.Helpers;
 using pricelist_manager.Server.Interfaces;
@@ -31,14 +32,14 @@ namespace pricelist_manager.Server.Controllers.V1
         }
 
         [HttpGet]
-        public async Task<ActionResult<PagedList<UpdateListDTO>>> GetAll()
+        public async Task<ActionResult<PagedList<UpdateListDTO>>> GetAll([FromQuery] UpdateListQueryParams requestParams)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var data = await UpdateListRepository.GetAllAsync();
+            var data = await UpdateListRepository.GetAllAsync(requestParams);
 
             Response.Headers["X-Pagination"] = JsonConvert.SerializeObject(MetadataMapping.MapToMetadata(data));
 
