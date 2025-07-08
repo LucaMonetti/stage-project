@@ -17,7 +17,7 @@ namespace pricelist_manager.Server.Repositories
             if (!CanConnect())
                 throw new StorageUnavailableException();
 
-            if (dto.Any())
+            if (dto.Count != 0)
             {
                 await Context.ProductsToUpdateLists.AddRangeAsync(dto);
             }
@@ -31,7 +31,7 @@ namespace pricelist_manager.Server.Repositories
             if (!CanConnect())
                 throw new StorageUnavailableException();
 
-            if (dto.Any())
+            if (dto.Count != 0)
             {
                 var idsToRemove = dto.Select(p => p.ProductId).ToList();
                 await Context.ProductsToUpdateLists
@@ -119,6 +119,19 @@ namespace pricelist_manager.Server.Repositories
 
             if (res == null)
                 throw new NotFoundException<UpdateList>(id);
+
+            return res;
+        }
+
+        public async Task<ICollection<ProductToUpdateList>> GetProductsByStatus(int updateListId, Status status)
+        {
+            if (!CanConnect())
+                throw new StorageUnavailableException();
+
+            var res = await Context.ProductsToUpdateLists.Where(ptul => ptul.UpdateListId == updateListId && ptul.Status == status).ToListAsync();
+
+            if (res == null)
+                throw new NotFoundException<UpdateList>(updateListId);
 
             return res;
         }

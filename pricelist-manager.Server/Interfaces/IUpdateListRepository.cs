@@ -7,6 +7,7 @@ namespace pricelist_manager.Server.Interfaces
     {
         Task<ICollection<UpdateList>> GetAllAsync();
         Task<ICollection<ProductToUpdateList>> GetProductsByList(int id);
+        Task<ICollection<ProductToUpdateList>> GetProductsByStatus(int updateListId, Status status);
         
         Task<UpdateList> GetByIdAsync(int id);
 

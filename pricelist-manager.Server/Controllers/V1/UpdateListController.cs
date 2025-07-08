@@ -96,6 +96,7 @@ namespace pricelist_manager.Server.Controllers.V1
 
             try
             {
+                // Sync products list
                 var existingProducts = await UpdateListRepository.GetProductsByList(id);
                 var existingProductIds = existingProducts.Select(p => p.ProductId).ToHashSet();
 
@@ -111,6 +112,20 @@ namespace pricelist_manager.Server.Controllers.V1
 
                 var res = await UpdateListRepository.AddProducts(productsToAdd);
                 res &= await UpdateListRepository.RemoveProducts(productsToRemove);
+
+                // Update status of update list
+                var products = await UpdateListRepository.GetProductsByStatus(id, Status.Pending);
+                var updatelist = await UpdateListRepository.GetByIdAsync(id);
+
+                if (products.Count != 0 && updatelist.Status != Status.Pending)
+                {
+                    updatelist.Status = Status.Pending;
+                    res &= await UpdateListRepository.UpdateAsync(updatelist);
+                } else if (products.Count == 0 && updatelist.Status != Status.Edited)
+                {
+                    updatelist.Status = Status.Edited;
+                    res &= await UpdateListRepository.UpdateAsync(updatelist);
+                }
 
                 return base.Ok(res);
             }

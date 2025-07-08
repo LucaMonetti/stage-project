@@ -119,11 +119,26 @@ namespace pricelist_manager.Server.Controllers.V1
                 if (editUpdateList != null)
                 {
                     res &= await UpdateListRepository.UpdateProductStatusAsync(productId, editUpdateList.Value, Status.Edited);
+                    
+                    // Check if there are still products to edit
+                    var products = await UpdateListRepository.GetProductsByStatus(editUpdateList.Value, Status.Pending);
+                    if (products.Count == 0) 
+                    {
+                        var item = await UpdateListRepository.GetByIdAsync(editUpdateList.Value);
+
+                        item.Status = Status.Edited;
+
+                        res &= await UpdateListRepository.UpdateAsync(item);
+                    }
                 }
 
                 return Ok(res);
             }
             catch (NotFoundException<Product> e)
+            {
+                return NotFound(e.Message);
+            }
+            catch (NotFoundException<UpdateList> e)
             {
                 return NotFound(e.Message);
             }

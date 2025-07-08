@@ -23,6 +23,7 @@ import type { z, ZodType } from "zod/v4";
 import type { FetchData } from "../../types";
 import type { Company } from "../../models/Company";
 import type { Product } from "../../models/Product";
+import isEqual from "lodash.isequal";
 
 type InferredZodSchema<T extends FieldValues> = z.ZodType<T, any, any>;
 
@@ -177,20 +178,6 @@ function RenderInputField<T extends FieldValues>(
               isClearable={!input.isDisabled}
             />
           );
-        case "company":
-          return (
-            <SearchSelect<T, Company>
-              key={key}
-              isDisabled={input.isDisabled}
-              {...commonProps}
-              control={control}
-              fetchData={input.fetchData as FetchData<Company[]>}
-              onChange={input.onChange ?? undefined}
-              getLabel={(p) => `${p.name} (${p.id})`}
-              getValue={(p) => p.id}
-              isClearable={!input.isDisabled}
-            />
-          );
         case "product":
           return (
             <SearchSelect<T, Product>
@@ -241,7 +228,9 @@ function GenericActualForm<T extends FieldValues>({
   const methods = useFormContext<T>();
 
   const onSubmit: SubmitHandler<T> = (data) => {
-    console.log(values, data);
+    if (isEqual(data, values)) {
+      return;
+    }
 
     usePost({
       endpoint: config.endpoint,
