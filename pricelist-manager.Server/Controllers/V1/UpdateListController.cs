@@ -87,7 +87,7 @@ namespace pricelist_manager.Server.Controllers.V1
         }
 
         [HttpPost("{id:int}/products")]
-        public async Task<IActionResult> AddProducts([FromBody] AddProductsUpdateListDTO dto)
+        public async Task<IActionResult> AddProducts(int id, [FromBody] AddProductsUpdateListDTO dto)
         {
             if (!ModelState.IsValid)
             {
@@ -96,8 +96,21 @@ namespace pricelist_manager.Server.Controllers.V1
 
             try
             {
-                // Add Products To List
-                var res = await UpdateListRepository.AddProducts(ProductToUpdateListMappingService.MapToModels(dto.Id, dto.ProductIds ?? []));
+                var existingProducts = await UpdateListRepository.GetProductsByList(id);
+                var existingProductIds = existingProducts.Select(p => p.ProductId).ToHashSet();
+
+                var newProducts = ProductToUpdateListMappingService.MapToModels(dto.Id, dto.ProductIds ?? []);
+                var newProductIDs = dto.ProductIds?.ToHashSet();
+
+                var productsToAdd = newProducts
+                    .Where(p => !existingProductIds.Contains(p.ProductId))
+                    .ToList();
+                var productsToRemove = existingProducts
+                    .Where(p => newProductIDs != null ? !newProductIDs.Contains(p.ProductId) : false)
+                    .ToList();
+
+                var res = await UpdateListRepository.AddProducts(productsToAdd);
+                res &= await UpdateListRepository.RemoveProducts(productsToRemove);
 
                 return base.Ok(res);
             }

@@ -1,16 +1,11 @@
 import { useNavigate, useParams } from "react-router";
-import { ProductArraySchema, type Product } from "../../../models/Product";
 import BasicLoader from "../../../components/Loader/BasicLoader";
 import { FaPencil, FaDownload, FaPlus } from "react-icons/fa6";
 import InfoWidget from "../../../components/SinglePage/Widgets/InfoWidget";
 import { useGet } from "../../../hooks/useGenericFetch";
-import { PricelistSchema } from "../../../models/Pricelist";
 import TableWidget from "../../../components/SinglePage/Widgets/TableWidget";
-import type {
-  Column,
-  CustomColumnDef,
-} from "../../../components/Dashboard/Tables/GenericTableView";
-import { UpdateListSchema, type UpdateList } from "../../../models/UpdateList";
+import type { CustomColumnDef } from "../../../components/Dashboard/Tables/GenericTableView";
+import { UpdateListSchema } from "../../../models/UpdateList";
 import { Status, type FetchData } from "../../../types";
 import type { UpdateListProduct } from "../../../models/UpdateListProduct";
 
@@ -56,12 +51,14 @@ const UpdateListSingleView = () => {
     schema: UpdateListSchema,
   });
 
+  // ToDo(Luca): Handle this better, maybe with a refactor of the table widget
   const toUpdateProducts: FetchData<UpdateListProduct[]> = {
     isLoading: updateList.isLoading,
     errorMsg: updateList.errorMsg,
     data: updateList.data?.products.filter(
       (item) => item.status == Status.Pending
     ),
+    refetch: () => {},
   };
 
   const updatedProducts: FetchData<UpdateListProduct[]> = {
@@ -70,13 +67,8 @@ const UpdateListSingleView = () => {
     data: updateList.data?.products.filter(
       (item) => item.status == Status.Edited
     ),
+    refetch: () => {},
   };
-
-  // const productsData = useGet({
-  //   method: "GET",
-  //   endpoint: `pricelists/${pricelistId}/products`,
-  //   schema: ProductArraySchema,
-  // });
 
   if (updateList.isLoading) {
     return (
@@ -95,11 +87,11 @@ const UpdateListSingleView = () => {
       <InfoWidget
         title={updateList.data?.name}
         subtitle={updateList.data?.description}
-        callout={`Completamento: ${
+        callout={`Completamento: ${(
           ((updateList.data?.editedProducts ?? 0) /
             (updateList.data?.totalProducts ?? 1)) *
           100
-        }%`}
+        ).toFixed(1)}%`}
         actions={[
           {
             color: "purple",
@@ -125,7 +117,7 @@ const UpdateListSingleView = () => {
             color: "blue",
             type: "link",
             Icon: FaPlus,
-            route: `/admin-dashboard/add/updatelists/{pricelistId}`,
+            route: `/admin-dashboard/updatelists/${updateListId}/products`,
           },
         ]}
         data={toUpdateProducts}
@@ -140,14 +132,6 @@ const UpdateListSingleView = () => {
 
       <TableWidget
         title="Prodotti aggiornati"
-        actions={[
-          {
-            color: "blue",
-            type: "link",
-            Icon: FaPlus,
-            route: `/admin-dashboard/add/updatelists/{pricelistId}`,
-          },
-        ]}
         data={updatedProducts}
         columns={productCols}
         config={{

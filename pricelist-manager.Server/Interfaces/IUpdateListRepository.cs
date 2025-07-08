@@ -6,6 +6,7 @@ namespace pricelist_manager.Server.Interfaces
     public interface IUpdateListRepository: IBaseRepository
     {
         Task<ICollection<UpdateList>> GetAllAsync();
+        Task<ICollection<ProductToUpdateList>> GetProductsByList(int id);
         
         Task<UpdateList> GetByIdAsync(int id);
 
@@ -16,5 +17,6 @@ namespace pricelist_manager.Server.Interfaces
         Task<Boolean> DeleteAsync(int id);
 
         Task<Boolean> AddProducts(ICollection<ProductToUpdateList> dto);
+        Task<Boolean> RemoveProducts(ICollection<ProductToUpdateList> dto);
     }
 }

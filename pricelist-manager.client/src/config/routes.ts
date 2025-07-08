@@ -24,6 +24,7 @@ import UpdateListSingleView from "../views/AdminDashboard/UpdateLists/SingleView
 import CreateUpdatelistForm from "../views/AdminDashboard/Create/CreateUpdatelist";
 import Sandbox from "../views/Sandbox";
 import EditUpdatelistForm from "../views/AdminDashboard/Edit/EditUpdatelist";
+import AddProductsForm from "../views/AdminDashboard/UpdateLists/AddProducts";
 
 const router = createBrowserRouter([
   {
@@ -157,7 +158,16 @@ const router = createBrowserRouter([
               },
               {
                 path: ":updateListId",
-                Component: UpdateListSingleView,
+                children: [
+                  {
+                    index: true,
+                    Component: UpdateListSingleView,
+                  },
+                  {
+                    path: "products",
+                    Component: AddProductsForm,
+                  },
+                ],
               },
             ],
           },

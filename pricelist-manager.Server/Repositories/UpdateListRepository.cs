@@ -17,10 +17,31 @@ namespace pricelist_manager.Server.Repositories
             if (!CanConnect())
                 throw new StorageUnavailableException();
 
-            await Context.ProductsToUpdateLists.AddRangeAsync(dto);
+            if (dto.Any())
+            {
+                await Context.ProductsToUpdateLists.AddRangeAsync(dto);
+            }
+
             var res = await Context.SaveChangesAsync();
 
-            return res >= 1;
+            return res > 0;
+        }
+        public async Task<bool> RemoveProducts(ICollection<ProductToUpdateList> dto)
+        {
+            if (!CanConnect())
+                throw new StorageUnavailableException();
+
+            if (dto.Any())
+            {
+                var idsToRemove = dto.Select(p => p.ProductId).ToList();
+                await Context.ProductsToUpdateLists
+                    .Where(p => idsToRemove.Contains(p.ProductId))
+                    .ExecuteDeleteAsync();
+            }
+
+            var res = await Context.SaveChangesAsync();
+
+            return res > 0;
         }
 
         public async Task<UpdateList> CreateAsync(UpdateList dto)
@@ -82,6 +103,19 @@ namespace pricelist_manager.Server.Repositories
                 .ThenInclude(ptul => ptul.Product)
                 .ThenInclude(p => p.Versions)
                 .FirstOrDefaultAsync(ul => ul.Id == id);
+
+            if (res == null)
+                throw new NotFoundException<UpdateList>(id);
+
+            return res;
+        }
+
+        public async Task<ICollection<ProductToUpdateList>> GetProductsByList(int id)
+        {
+            if (!CanConnect())
+                throw new StorageUnavailableException();
+
+            var res = await Context.ProductsToUpdateLists.Where(ptul => ptul.UpdateListId == id).ToListAsync();
 
             if (res == null)
                 throw new NotFoundException<UpdateList>(id);
