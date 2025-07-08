@@ -1,11 +1,12 @@
 ﻿using pricelist_manager.Server.DTOs.V1;
+using pricelist_manager.Server.Helpers;
 using pricelist_manager.Server.Models;
 
 namespace pricelist_manager.Server.Interfaces
 {
     public interface IUpdateListRepository: IBaseRepository
     {
-        Task<ICollection<UpdateList>> GetAllAsync();
+        Task<PagedList<UpdateList>> GetAllAsync();
         Task<ICollection<ProductToUpdateList>> GetProductsByList(int id);
         Task<ICollection<ProductToUpdateList>> GetProductsByStatus(int updateListId, Status status);
         

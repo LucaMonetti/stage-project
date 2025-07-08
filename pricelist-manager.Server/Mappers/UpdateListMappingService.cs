@@ -1,4 +1,5 @@
 ﻿using pricelist_manager.Server.DTOs.V1;
+using pricelist_manager.Server.Helpers;
 using pricelist_manager.Server.Interfaces;
 using pricelist_manager.Server.Models;
 using System.Reflection.Metadata.Ecma335;
@@ -34,11 +35,11 @@ namespace pricelist_manager.Server.Mappers
             };
         }
 
-        public ICollection<UpdateListDTO> MapToDTOs(ICollection<UpdateList> updateLists)
+        public PagedList<UpdateListDTO> MapToDTOs(PagedList<UpdateList> updateLists)
         {
             ArgumentNullException.ThrowIfNull(updateLists);
 
-            return [.. updateLists.Select(ul => MapToDTO(ul))];
+            return new PagedList<UpdateListDTO>([.. updateLists.Select(ul => MapToDTO(ul))], updateLists.TotalCount, updateLists.CurrentPage, updateLists.PageSize);
         }
 
         public UpdateList MapToUpdateList(CreateUpdateListDTO dto)

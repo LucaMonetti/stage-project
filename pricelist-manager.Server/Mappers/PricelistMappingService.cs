@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualBasic;
 using pricelist_manager.Server.DTOs.V1;
+using pricelist_manager.Server.Helpers;
 using pricelist_manager.Server.Interfaces;
 using pricelist_manager.Server.Models;
 
@@ -30,11 +31,11 @@ namespace pricelist_manager.Server.Mappers
             };
         }
 
-        public ICollection<PricelistDTO> MapToDTOs(ICollection<Pricelist> pricelists)
+        public PagedList<PricelistDTO> MapToDTOs(PagedList<Pricelist> pricelists)
         {
             ArgumentNullException.ThrowIfNull(pricelists);
 
-            return [.. pricelists.Select(p => MapToDTO(p))];
+            return new PagedList<PricelistDTO>([.. pricelists.Select(p => MapToDTO(p))], pricelists.TotalCount, pricelists.CurrentPage, pricelists.PageSize);
         }
 
         public Pricelist MapToPricelist(CreatePricelistDTO pricelist)

@@ -2,7 +2,17 @@
 
 namespace pricelist_manager.Server.Helpers
 {
-    public class PagedList<T> : List<T>
+    public interface IPagedList
+    {
+        public int CurrentPage { get; }
+        public int TotalPages { get; }
+        public int PageSize { get; }
+        public int TotalCount { get; }
+        public bool HasPrevious { get; }
+        public bool HasNext { get; }
+    }
+
+    public class PagedList<T> : List<T>, IPagedList
     {
         public int CurrentPage { get; private set; }
         public int TotalPages { get; private set; }

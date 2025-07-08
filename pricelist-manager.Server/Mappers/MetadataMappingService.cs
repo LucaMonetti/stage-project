@@ -3,15 +3,15 @@ using pricelist_manager.Server.Interfaces;
 
 namespace pricelist_manager.Server.Mappers
 {
-    public class MetadataMappingService<T> : IMetadataMappingService<T>
+    public class MetadataMappingService : IMetadataMappingService
     {
-        public Metadata MapToMetadata(PagedList<T> paged)
+        public Metadata MapToMetadata(IPagedList paged)
         {
             ArgumentNullException.ThrowIfNull(paged);
 
             return new Metadata
             {
-                CurrentPage = paged.Count,
+                CurrentPage = paged.CurrentPage,
                 HasPrevious = paged.HasPrevious,
                 HasNext = paged.HasNext,
                 PageSize = paged.PageSize,

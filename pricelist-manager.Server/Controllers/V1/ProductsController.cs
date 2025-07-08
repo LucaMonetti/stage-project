@@ -22,9 +22,9 @@ namespace pricelist_manager.Server.Controllers.V1
         private readonly IUpdateListRepository UpdateListRepository;
         private readonly IProductMappingService ProductMapping;
         private readonly IProductInstanceMappingService ProductInstanceMapping;
-        private readonly IMetadataMappingService<Product> MetadataMapping;
+        private readonly IMetadataMappingService MetadataMapping;
 
-        public ProductsController(IProductRepository productRepository, IPricelistRepository pricelistRepository, IProductInstanceRepository productInstanceRepository, IProductMappingService productMapping, IProductInstanceMappingService productInstanceMapping, IUpdateListRepository updateListRepository, IMetadataMappingService<Product> metadataMapping)
+        public ProductsController(IProductRepository productRepository, IPricelistRepository pricelistRepository, IProductInstanceRepository productInstanceRepository, IProductMappingService productMapping, IProductInstanceMappingService productInstanceMapping, IUpdateListRepository updateListRepository, IMetadataMappingService metadataMapping)
         {
             ProductRepository = productRepository;
             PricelistRepository = pricelistRepository;

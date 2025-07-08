@@ -2,6 +2,7 @@
 using pricelist_manager.Server.Data;
 using pricelist_manager.Server.DTOs.V1;
 using pricelist_manager.Server.Exceptions;
+using pricelist_manager.Server.Helpers;
 using pricelist_manager.Server.Interfaces;
 using pricelist_manager.Server.Models;
 
@@ -79,18 +80,17 @@ namespace pricelist_manager.Server.Repositories
             return res >= 1;
         }
 
-        public async Task<ICollection<UpdateList>> GetAllAsync()
+        public async Task<PagedList<UpdateList>> GetAllAsync()
         {
             if (!CanConnect())
                 throw new StorageUnavailableException();
 
-            var res = await Context.UpdateLists
+            var query = Context.UpdateLists
                 .Include(ul => ul.ProductsToUpdateLists)
                 .ThenInclude(ptul => ptul.Product)
-                .ThenInclude(p => p.Versions)
-                .ToListAsync();
+                .ThenInclude(p => p.Versions);
 
-            return res;
+            return await PagedList<UpdateList>.ToPagedList(query, 1, 10);
         }
 
         public async Task<UpdateList> GetByIdAsync(int id)

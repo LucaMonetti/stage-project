@@ -130,7 +130,7 @@ namespace pricelist_manager.Server
             builder.Services.AddScoped<IUpdateListMappingService, UpdateListMappingService>();
             builder.Services.AddScoped<IProductToUpdateListMappingService, ProductToUpdateListMappingService>();
 
-
+            builder.Services.AddScoped<IMetadataMappingService, MetadataMappingService>();
 
             var app = builder.Build();
 

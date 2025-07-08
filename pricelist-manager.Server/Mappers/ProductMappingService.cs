@@ -47,7 +47,7 @@ namespace pricelist_manager.Server.Mappers
         {
             ArgumentNullException.ThrowIfNull(products);
 
-            return new PagedList<ProductDTO>([.. products.Select(p => MapToDTO(p))], products.Count, products.CurrentPage, products.PageSize);
+            return new PagedList<ProductDTO>([.. products.Select(p => MapToDTO(p))], products.TotalCount, products.CurrentPage, products.PageSize);
         }
 
         private static ProductInstance GetCurrentInstance(Product product)

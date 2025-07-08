@@ -1,7 +1,9 @@
 ﻿using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using pricelist_manager.Server.DTOs.V1;
 using pricelist_manager.Server.Exceptions;
+using pricelist_manager.Server.Helpers;
 using pricelist_manager.Server.Interfaces;
 using pricelist_manager.Server.Models;
 using pricelist_manager.Server.Repositories;
@@ -17,17 +19,19 @@ namespace pricelist_manager.Server.Controllers.V1
         private readonly IProductRepository ProductRepository;
         private readonly IProductToUpdateListMappingService ProductToUpdateListMappingService;
         private readonly IUpdateListMappingService UpdateListMappingService;
+        private readonly IMetadataMappingService MetadataMapping;
 
-        public UpdateListController(IUpdateListRepository updateListRepository, IProductRepository productRepository, IUpdateListMappingService updateListMappingService, IProductToUpdateListMappingService productToUpdateListMappingService)
+        public UpdateListController(IUpdateListRepository updateListRepository, IProductRepository productRepository, IUpdateListMappingService updateListMappingService, IProductToUpdateListMappingService productToUpdateListMappingService, IMetadataMappingService metadataMapping)
         {
             UpdateListRepository = updateListRepository;
             ProductRepository = productRepository;
             UpdateListMappingService = updateListMappingService;
             ProductToUpdateListMappingService = productToUpdateListMappingService;
+            MetadataMapping = metadataMapping;
         }
 
         [HttpGet]
-        public async Task<ActionResult<ICollection<UpdateListDTO>>> GetAll()
+        public async Task<ActionResult<PagedList<UpdateListDTO>>> GetAll()
         {
             if (!ModelState.IsValid)
             {
@@ -35,6 +39,8 @@ namespace pricelist_manager.Server.Controllers.V1
             }
 
             var data = await UpdateListRepository.GetAllAsync();
+
+            Response.Headers["X-Pagination"] = JsonConvert.SerializeObject(MetadataMapping.MapToMetadata(data));
 
             return Ok(UpdateListMappingService.MapToDTOs(data));
         }

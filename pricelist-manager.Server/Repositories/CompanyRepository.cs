@@ -1,7 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Http.Metadata;
+using Microsoft.EntityFrameworkCore;
 using pricelist_manager.Server.Data;
 using pricelist_manager.Server.DTOs.V1.Statistics;
 using pricelist_manager.Server.Exceptions;
+using pricelist_manager.Server.Helpers;
 using pricelist_manager.Server.Interfaces;
 using pricelist_manager.Server.Models;
 using System.Diagnostics.CodeAnalysis;
@@ -55,11 +57,13 @@ namespace pricelist_manager.Server.Repositories
             return await Context.Companies.AnyAsync(e => e.Id == id);
         }
 
-        public async Task<ICollection<Company>> GetAllAsync()
+        public async Task<PagedList<Company>> GetAllAsync()
         {
             if (!CanConnect()) throw new StorageUnavailableException();
 
-            return await Context.Companies.Include(c => c.Products).ThenInclude(p => p.Versions).Include(c => c.Pricelists).ToListAsync();
+            var query = Context.Companies.Include(c => c.Products).ThenInclude(p => p.Versions).Include(c => c.Pricelists);
+
+            return await PagedList<Company>.ToPagedList(query, 1, 10);
         }
 
         public async Task<Company> GetByIdAsync(string id)

@@ -1,4 +1,5 @@
 ﻿using pricelist_manager.Server.DTOs.V1.Statistics;
+using pricelist_manager.Server.Helpers;
 using pricelist_manager.Server.Models;
 
 namespace pricelist_manager.Server.Interfaces
@@ -6,7 +7,7 @@ namespace pricelist_manager.Server.Interfaces
     public interface ICompanyRepository
     {
         /// <exception cref="StorageUnavailableException">The database is not available</exception>
-        Task<ICollection<Company>> GetAllAsync();
+        Task<PagedList<Company>> GetAllAsync();
 
         /// <exception cref="StorageUnavailableException">The database is not available</exception>
         /// <exception cref="NotFoundException">The Company doesn't exists.</exception>

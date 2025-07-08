@@ -2,8 +2,8 @@
 
 namespace pricelist_manager.Server.Interfaces
 {
-    public interface IMetadataMappingService<T>
+    public interface IMetadataMappingService
     {
-        Metadata MapToMetadata(PagedList<T> paged);
+        Metadata MapToMetadata(IPagedList paged);
     }
 }

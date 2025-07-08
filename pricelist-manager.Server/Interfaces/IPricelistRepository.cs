@@ -1,4 +1,5 @@
 ﻿using pricelist_manager.Server.DTOs.V1.Statistics;
+using pricelist_manager.Server.Helpers;
 using pricelist_manager.Server.Models;
 
 namespace pricelist_manager.Server.Interfaces
@@ -6,10 +7,10 @@ namespace pricelist_manager.Server.Interfaces
     public interface IPricelistRepository: IBaseRepository
     {
         /// <exception cref="StorageUnavailableException">The database is not available</exception>
-        Task<ICollection<Pricelist>> GetAllAsync();
+        Task<PagedList<Pricelist>> GetAllAsync();
 
         /// <exception cref="StorageUnavailableException">The database is not available</exception>
-        Task<ICollection<Pricelist>> GetByCompanyAsync(string companyId);
+        Task<PagedList<Pricelist>> GetByCompanyAsync(string companyId);
 
         /// <exception cref="StorageUnavailableException">The database is not available</exception>
         /// <exception cref="NotFoundException">The Pricelist doesn't exists.</exception>
