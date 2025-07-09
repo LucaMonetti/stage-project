@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using pricelist_manager.Server.Data;
 
@@ -11,9 +12,11 @@ using pricelist_manager.Server.Data;
 namespace pricelist_manager.Server.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20250708135243_AddMarginColToProducts")]
+    partial class AddMarginColToProducts
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -275,8 +278,8 @@ namespace pricelist_manager.Server.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Margin")
-                        .HasPrecision(3, 2)
-                        .HasColumnType("decimal(3,2)");
+                        .HasPrecision(2, 2)
+                        .HasColumnType("decimal(2,2)");
 
                     b.Property<string>("Name")
                         .IsRequired()

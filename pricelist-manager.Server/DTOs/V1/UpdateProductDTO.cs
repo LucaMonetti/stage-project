@@ -19,7 +19,10 @@ namespace pricelist_manager.Server.DTOs.V1
         public decimal Price { get; set; }
 
         [Precision(10, 2)]
-        public decimal Cost { get; set; } = decimal.Zero;
+        public decimal Cost { get; set; }
+
+        [Precision(2, 2)]
+        public decimal Margin { get; set; }
 
         public string AccountingControl { get; set; } = string.Empty;
         public string CDA { get; set; } = string.Empty;

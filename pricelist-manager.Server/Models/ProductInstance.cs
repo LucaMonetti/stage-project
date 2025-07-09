@@ -25,6 +25,9 @@ namespace pricelist_manager.Server.Models
 
         public string AccountingControl { get; set; } = String.Empty;
 
+        [Precision(3, 2)]
+        public Decimal Margin { get; set; } = 1.0M;
+
         public string CDA {  get; set; } = String.Empty;
 
         public string SalesItem { get; set; } = String.Empty;
