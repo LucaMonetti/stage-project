@@ -74,6 +74,16 @@ const EditProductForm = () => {
             },
           },
           {
+            id: "margin",
+            label: "Marginalità",
+            type: "number",
+            placeholder: "Inserire la marginalità",
+            registerOptions: {
+              valueAsNumber: true,
+              required: "Necessario inserire la marginalità.",
+            },
+          },
+          {
             id: "price",
             label: "Prezzo Articolo",
             type: "number",
@@ -140,6 +150,7 @@ const EditProductForm = () => {
       cda: product.data.currentInstance.cda ?? "",
       salesItem: product.data.currentInstance.salesItem ?? "",
       productId: productId ?? "",
+      margin: product.data.currentInstance.margin ?? 1.0,
     };
   }
 

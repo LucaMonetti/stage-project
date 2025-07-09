@@ -108,6 +108,7 @@ const SingleProductView = () => {
           x: {
             price: item.price,
             cost: item.cost,
+            margin: (item.cost * item.margin).toFixed(2),
           },
         })}
         lineCols={[
@@ -120,6 +121,13 @@ const SingleProductView = () => {
             dataKey: "x.cost",
             stroke: "red",
             name: "Costo",
+          },
+          {
+            dataKey: "x.margin",
+            stroke: "yellow",
+            name: "Margine",
+            strokeDashed: true,
+            dot: false,
           },
         ]}
       />

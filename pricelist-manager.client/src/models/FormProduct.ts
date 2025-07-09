@@ -17,6 +17,9 @@ export const CreateProductSchema = z.object({
   accountingControl: z.string(),
   cda: z.string(),
   salesItem: z.string(),
+  margin: z
+    .number("Necessario inserire un valore per la marginalità!")
+    .nonnegative("La marginalità non può essere negativa!"),
 });
 
 export const CreateProductArraySchema = z.array(CreateProductSchema);

@@ -19,6 +19,9 @@ export type LineConfig<DataType> = {
   stroke: string;
   label?: string;
   name?: string;
+  stokeWidth?: number;
+  dot?: boolean;
+  strokeDashed?: boolean;
 };
 
 type Props<T, DataType> = {
@@ -41,29 +44,78 @@ function GraphWidget<T, DataType extends { y: any; x: any }>({
   useEffect(() => {
     let datas: DataType[] = dataset.map(getData);
 
+    if (datas.length === 0) {
+      setData([]);
+      return;
+    }
+
+    // Create a map for existing data grouped by day
     const lastPerDayMap = new Map<string, DataType>();
 
     datas.forEach((entry) => {
-      if (entry.y instanceof Date) {
-        const day = entry.y.toISOString().split("T")[0];
+      // Handle both Date objects and date strings
+      const dateValue = entry.y instanceof Date ? entry.y : new Date(entry.y);
+
+      if (!isNaN(dateValue.getTime())) {
+        const day = dateValue.toISOString().split("T")[0];
         const existing = lastPerDayMap.get(day);
 
-        if (!existing || entry.y > existing.y) {
-          lastPerDayMap.set(day, entry);
+        // Create entry with proper Date object
+        const dateEntry = { ...entry, y: dateValue } as DataType;
+
+        if (!existing || dateValue > new Date(existing.y)) {
+          lastPerDayMap.set(day, dateEntry);
         }
       }
-
-      lastPerDayMap.set(entry.y, entry);
     });
 
-    const filteredData = Array.from(lastPerDayMap.values()).sort(
-      (a, b) => a.y.getTime() - b.y.getTime()
-    );
+    // Find the date range from the map values
+    const allValidDates = Array.from(lastPerDayMap.values())
+      .map((entry) => new Date(entry.y))
+      .filter((date) => !isNaN(date.getTime()))
+      .sort((a, b) => a.getTime() - b.getTime());
 
-    setData(filteredData);
-    console.log("Filtered Data", filteredData);
-    console.log("Data State", data);
-  }, [dataset]);
+    if (allValidDates.length === 0) {
+      setData([]);
+      return;
+    }
+
+    const startDate = allValidDates[0];
+    const endDate = allValidDates[allValidDates.length - 1];
+    endDate.setDate(endDate.getDate() + 1);
+
+    // Generate complete date range
+    const completeDateRange: DataType[] = [];
+    const currentDate = new Date(startDate);
+
+    while (currentDate <= endDate) {
+      const dayKey = currentDate.toISOString().split("T")[0];
+      const existingData = lastPerDayMap.get(dayKey);
+
+      console.log("Checking date:", dayKey, "Existing data:", existingData);
+
+      if (existingData) {
+        completeDateRange.push(existingData);
+      } else {
+        // Create empty entry for missing dates
+        const emptyEntry = {
+          y: new Date(currentDate),
+          x: null,
+        } as DataType;
+
+        // Set all line data keys to null for missing dates
+        lineCols.forEach((line) => {
+          (emptyEntry as any)[line.dataKey] = null;
+        });
+
+        completeDateRange.push(emptyEntry);
+      }
+
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+
+    setData(completeDateRange);
+  }, [dataset, lineCols]);
 
   return (
     <WidgetBase dimensions={dimensions}>
@@ -104,11 +156,16 @@ function GraphWidget<T, DataType extends { y: any; x: any }>({
           {lineCols.map((line, index) => (
             <Line
               type="monotone"
-              strokeWidth={2}
               key={index}
-              {...line}
-              activeDot={{ r: 8 }}
-              dot={{ r: 4 }}
+              dataKey={line.dataKey}
+              stroke={line.stroke}
+              strokeWidth={line.stokeWidth ?? 2}
+              dot={line.dot !== false ? { r: 4, fill: "#101828" } : false}
+              name={line.name}
+              label={line.label}
+              activeDot={line.dot !== false ? { r: 6, fill: "#101828" } : false}
+              connectNulls={true}
+              strokeDasharray={line.strokeDashed ? "6 4" : "none"}
             />
           ))}
         </LineChart>
