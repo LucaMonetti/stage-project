@@ -137,6 +137,7 @@ const ProductsListView = () => {
               color: "blue",
               Icon: FaPlus,
               route: `/admin-dashboard/create/products`,
+              type: "link",
             },
           ]}
         />

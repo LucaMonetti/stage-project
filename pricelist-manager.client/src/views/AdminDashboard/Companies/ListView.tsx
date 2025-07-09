@@ -103,6 +103,7 @@ const CompanyListView = () => {
               color: "blue",
               Icon: FaPlus,
               route: `/admin-dashboard/create/companies`,
+              type: "link",
             },
           ]}
         />

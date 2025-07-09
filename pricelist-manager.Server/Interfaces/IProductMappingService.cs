@@ -1,4 +1,5 @@
 ﻿using pricelist_manager.Server.DTOs.V1;
+using pricelist_manager.Server.Helpers;
 using pricelist_manager.Server.Models;
 
 namespace pricelist_manager.Server.Interfaces
@@ -8,6 +9,6 @@ namespace pricelist_manager.Server.Interfaces
         ProductDTO MapToDTO(Product product);
         Product MapToProduct(CreateProductDTO createProductDTO, string companyId);
 
-        ICollection<ProductDTO> MapToDTOs(ICollection<Product> products);
+        PagedList<ProductDTO> MapToDTOs(PagedList<Product> products);
     }
 }

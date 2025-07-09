@@ -19,6 +19,12 @@ import CreateUserForm from "../views/AdminDashboard/Create/CreateUser";
 import UsersListView from "../views/AdminDashboard/Users/ListView";
 import SingleUserView from "../views/AdminDashboard/Users/SingleView";
 import EditUserForm from "../views/AdminDashboard/Edit/EditUser";
+import UpdateListListView from "../views/AdminDashboard/UpdateLists/ListView";
+import UpdateListSingleView from "../views/AdminDashboard/UpdateLists/SingleView";
+import CreateUpdatelistForm from "../views/AdminDashboard/Create/CreateUpdatelist";
+import Sandbox from "../views/Sandbox";
+import EditUpdatelistForm from "../views/AdminDashboard/Edit/EditUpdatelist";
+import AddProductsForm from "../views/AdminDashboard/UpdateLists/AddProducts";
 
 const router = createBrowserRouter([
   {
@@ -28,6 +34,10 @@ const router = createBrowserRouter([
       {
         index: true,
         Component: HomeView,
+      },
+      {
+        path: "sandbox",
+        Component: Sandbox,
       },
       {
         path: "admin-dashboard",
@@ -56,6 +66,10 @@ const router = createBrowserRouter([
                 path: "users",
                 Component: CreateUserForm,
               },
+              {
+                path: "updatelists",
+                Component: CreateUpdatelistForm,
+              },
             ],
           },
           {
@@ -76,6 +90,10 @@ const router = createBrowserRouter([
               {
                 path: "users/:userId",
                 Component: EditUserForm,
+              },
+              {
+                path: "updatelists/:updateListId",
+                Component: EditUpdatelistForm,
               },
             ],
           },
@@ -128,6 +146,28 @@ const router = createBrowserRouter([
               {
                 path: ":userId",
                 Component: SingleUserView,
+              },
+            ],
+          },
+          {
+            path: "updatelists",
+            children: [
+              {
+                index: true,
+                Component: UpdateListListView,
+              },
+              {
+                path: ":updateListId",
+                children: [
+                  {
+                    index: true,
+                    Component: UpdateListSingleView,
+                  },
+                  {
+                    path: "products",
+                    Component: AddProductsForm,
+                  },
+                ],
               },
             ],
           },

@@ -1,18 +1,21 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Client;
 using pricelist_manager.Server.Data;
+using pricelist_manager.Server.DTOs.V1.QueryParams;
 using pricelist_manager.Server.DTOs.V1.Statistics;
 using pricelist_manager.Server.Exceptions;
+using pricelist_manager.Server.Helpers;
 using pricelist_manager.Server.Interfaces;
 using pricelist_manager.Server.Models;
 using System.Reflection;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace pricelist_manager.Server.Repositories
 {
     public class ProductRepository : BaseRepository, IProductRepository
     {
         public ProductRepository(DataContext dataContext) : base(dataContext)
-        {}
+        { }
 
         public async Task<bool> UpdateAsync(Product entity)
         {
@@ -38,35 +41,29 @@ namespace pricelist_manager.Server.Repositories
             return await Context.Products.AnyAsync(pi => pi.Id == productId);
         }
 
-        public async Task<ICollection<Product>> GetAllAsync()
+        public async Task<PagedList<Product>> GetAllAsync(ProductQueryParams requestParams)
         {
             if (!CanConnect()) throw new StorageUnavailableException();
 
-            var products = await Context.Products
+            var query = Context.Products
                 .Include(p => p.Versions.OrderByDescending(v => v.Version))
                 .Include(p => p.Pricelist)
-                .Include(p => p.Company)
-                .ToListAsync();
+                .Include(p => p.Company);
 
-            TrimProductsVersion(products);
-
-            return products;
+            return await PagedList<Product>.ToPagedList(query, requestParams.Pagination.PageNumber, requestParams.Pagination.PageSize);
         }
 
-        public async Task<ICollection<Product>> GetByPricelistAsync(Guid pricelistId)
+        public async Task<PagedList<Product>> GetByPricelistAsync(Guid pricelistId, ProductQueryParams requestParams)
         {
             if (!CanConnect()) throw new StorageUnavailableException();
 
-            var products = await Context.Products
+            var query = Context.Products
                 .Where(p => p.PricelistId == pricelistId)
                 .Include(p => p.Versions.OrderByDescending(v => v.Version))
                 .Include(p => p.Pricelist)
-                .Include(p => p.Company)
-                .ToListAsync();
+                .Include(p => p.Company);
 
-            TrimProductsVersion(products);
-
-            return products;
+            return await PagedList<Product>.ToPagedList(query, requestParams.Pagination.PageNumber, requestParams.Pagination.PageSize);
         }
 
         public async Task<Product> GetByIdAsync(string productId)
@@ -82,63 +79,62 @@ namespace pricelist_manager.Server.Repositories
 
             if (product == null) throw new NotFoundException<Product>(productId);
 
-            TrimProductVersion(product);
-
             return product;
         }
 
-        public async Task<ICollection<Product>> GetByNameAsync(string name)
+        public async Task<ICollection<Product>> GetByIdsAsync(ICollection<string> productIds)
         {
             if (!CanConnect()) throw new StorageUnavailableException();
 
             var product = await Context.Products
-                                    .Where(p => p.Versions.Last().Name.Contains(name))
+                                    .Where(p => productIds.Contains(p.Id))
                                     .Include(p => p.Versions.OrderByDescending(v => v.Version))
                                     .Include(p => p.Pricelist)
                                     .Include(p => p.Company)
                                     .ToListAsync();
 
-            TrimProductsVersion(product);
-
-            if (product == null) throw new NotFoundException<Product>(name);
+            if (product == null) throw new NotFoundException<Product>(productIds.Aggregate((prev, item) => $"${prev}, item"));
 
             return product;
         }
 
-        public async Task<ICollection<Product>> GetByCodeAsync(string code)
+        public async Task<PagedList<Product>> GetByNameAsync(string name, ProductQueryParams requestParams)
         {
             if (!CanConnect()) throw new StorageUnavailableException();
 
-            var product = await Context.Products
-                                    .Where(p => p.ProductCode == code)
-                                    .Include(p => p.Versions.OrderByDescending(v => v.Version))
-                                    .Include(p => p.Pricelist)
-                                    .Include(p => p.Company)
-                                    .ToListAsync();
+            var query = Context.Products
+                            .Where(p => p.Versions.Last().Name.Contains(name))
+                            .Include(p => p.Versions.OrderByDescending(v => v.Version))
+                            .Include(p => p.Pricelist)
+                            .Include(p => p.Company);
 
-            TrimProductsVersion(product);
-
-            if (product == null) throw new NotFoundException<Product>(code);
-
-            return product;
+            return await PagedList<Product>.ToPagedList(query, requestParams.Pagination.PageNumber, requestParams.Pagination.PageSize);
         }
 
-        public async Task<ICollection<Product>> GetByCompany(string companyId)
+        public async Task<PagedList<Product>> GetByCodeAsync(string code, ProductQueryParams requestParams)
         {
             if (!CanConnect()) throw new StorageUnavailableException();
 
-            var product = await Context.Products
-                                    .Where(p => p.CompanyId == companyId)
-                                    .Include(p => p.Versions.OrderByDescending(v => v.Version))
-                                    .Include(p => p.Pricelist)
-                                    .Include(p => p.Company)
-                                    .ToListAsync();
+            var query = Context.Products
+                            .Where(p => p.ProductCode == code)
+                            .Include(p => p.Versions.OrderByDescending(v => v.Version))
+                            .Include(p => p.Pricelist)
+                            .Include(p => p.Company);
 
-            TrimProductsVersion(product);
+            return await PagedList<Product>.ToPagedList(query, requestParams.Pagination.PageNumber, requestParams.Pagination.PageSize);
+        }
 
-            if (product == null) throw new NotFoundException<Product>(companyId);
+        public async Task<PagedList<Product>> GetByCompany(string companyId, ProductQueryParams requestParams)
+        {
+            if (!CanConnect()) throw new StorageUnavailableException();
 
-            return product;
+            var query = Context.Products
+                            .Where(p => p.CompanyId == companyId)
+                            .Include(p => p.Versions.OrderByDescending(v => v.Version))
+                            .Include(p => p.Pricelist)
+                            .Include(p => p.Company);
+
+            return await PagedList<Product>.ToPagedList(query, requestParams.Pagination.PageNumber, requestParams.Pagination.PageSize);
         }
 
         public async Task<bool> CreateAsync(Product entity)
@@ -167,27 +163,6 @@ namespace pricelist_manager.Server.Repositories
             return res >= 1;
         }
 
-        private void TrimProductsVersion(List<Product> products)
-        {
-            //foreach (var product in products)
-            //    TrimProductVersion(product);
-        }
-
-        private void TrimProductsVersion(List<IGrouping<Guid, Product>> products)
-        {
-            //foreach (var pricelist in products)
-            //    foreach (var product in pricelist)
-            //        TrimProductVersion(product);
-        }
-
-        private void TrimProductVersion(Product product)
-        {
-            //foreach (var version in product.Versions)
-            //{
-            //    version.Product = null!;
-            //}
-        }
-
         public async Task<ProductStatistics> GetStatistics()
         {
             if (!CanConnect()) throw new StorageUnavailableException();
@@ -204,16 +179,14 @@ namespace pricelist_manager.Server.Repositories
             return data;
         }
 
-        public async Task<ICollection<IGrouping<Guid, Product>>> GetAllGroupPricelistAsync()
+        public async Task<PagedList<IGrouping<Guid, Product>>> GetAllGroupPricelistAsync(ProductQueryParams requestParams)
         {
             if (!CanConnect()) throw new StorageUnavailableException();
 
             var products = await Context.Products.Include(p => p.Versions).ToListAsync();
-            var groupedProd = products.GroupBy(p => p.PricelistId).ToList();
+            var groupedProd = products.GroupBy(p => p.PricelistId).AsQueryable();
 
-            TrimProductsVersion(groupedProd);
-
-            return groupedProd;
+            return await PagedList<IGrouping<Guid, Product>>.ToPagedList(groupedProd, requestParams.Pagination.PageNumber, requestParams.Pagination.PageSize);
         }
     }
 }

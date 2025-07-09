@@ -19,6 +19,9 @@ const Sidebar = () => {
         <li>
           <Link to={"users"}>Utenti</Link>
         </li>
+        <li>
+          <Link to={"updatelists"}>Liste di Aggiornamento</Link>
+        </li>
       </ul>
 
       <Link to={"/settings"}>Impostazioni</Link>

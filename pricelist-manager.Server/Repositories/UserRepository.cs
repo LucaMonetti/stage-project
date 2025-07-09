@@ -23,34 +23,33 @@ namespace pricelist_manager.Server.Repositories
         {
             if (!CanConnect()) throw new StorageUnavailableException();
 
-            var data = await Context.Users.Include(u => u.Company).ToListAsync();
+            var users = await Context.Users.Include(u => u.Company).ToListAsync();
+            var data = new List<(User user, ICollection<string> roles)>();
 
-            var res = new List<(User user, ICollection<string> roles)>();
-
-            foreach (var user in data)
+            foreach (var user in users)
             {
                 var userRoles = await UserManager.GetRolesAsync(user);
-                res.Add((user, userRoles));
+                data.Add((user, userRoles));
             }
 
-            return res;
+            return data;
         }
 
         public async Task<ICollection<(User user, ICollection<string> roles)>> GetByCompany(string companyId)
         {
             if (!CanConnect()) throw new StorageUnavailableException();
 
-            var data = await Context.Users.Where(u => u.CompanyId == companyId).Include(u => u.Company).ToListAsync();
+            var users = await Context.Users.Where(u => u.CompanyId == companyId).Include(u => u.Company).ToListAsync();
 
-            var res = new List<(User user, ICollection<string> roles)>();
+            var data = new List<(User user, ICollection<string> roles)>();
 
-            foreach (var user in data)
+            foreach (var user in users)
             {
                 var userRoles = await UserManager.GetRolesAsync(user);
-                res.Add((user, userRoles));
+                data.Add((user, userRoles));
             }
 
-            return res;
+            return data;
         }
 
         public async Task<(User user, ICollection<string> roles)> GetById(string userId)

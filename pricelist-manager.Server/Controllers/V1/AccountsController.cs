@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 using pricelist_manager.Server.Data;
 using pricelist_manager.Server.DTOs.V1;
 using pricelist_manager.Server.Exceptions;
@@ -28,8 +29,9 @@ namespace pricelist_manager.Server.Controllers.V1
         private readonly DataContext Context;
 
         private readonly IUserMappingService UserMapping;
+        private readonly IMetadataMappingService MetadataMapping;
 
-        public AccountsController(UserManager<User> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration, DataContext context, IUserRepository userRepository, IUserMappingService userMapping)
+        public AccountsController(UserManager<User> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration, DataContext context, IUserRepository userRepository, IUserMappingService userMapping, IMetadataMappingService metadataMapping)
         {
             UserManager = userManager;
             RoleManager = roleManager;
@@ -37,10 +39,11 @@ namespace pricelist_manager.Server.Controllers.V1
             Context = context;
             UserRepository = userRepository;
             UserMapping = userMapping;
+            MetadataMapping = metadataMapping;
         }
 
         [HttpGet("{userId}")]
-        public async Task<ActionResult<ICollection<UserDTO>>> GetById(string userId)
+        public async Task<ActionResult<UserDTO>> GetById(string userId)
         {
             if (!ModelState.IsValid)
             {

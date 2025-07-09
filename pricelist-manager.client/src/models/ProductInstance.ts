@@ -14,6 +14,7 @@ export const ProductInstanceSchema = z.object({
     (arg) => (typeof arg === "string" ? new Date(arg) : arg),
     z.date()
   ),
+  margin: z.number().nonnegative(),
 });
 
 export const ProductInstanceArraySchema = z.array(ProductInstanceSchema);

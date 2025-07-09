@@ -274,6 +274,10 @@ namespace pricelist_manager.Server.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<decimal>("Margin")
+                        .HasPrecision(3, 2)
+                        .HasColumnType("decimal(3,2)");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -292,6 +296,51 @@ namespace pricelist_manager.Server.Migrations
                     b.HasKey("ProductId", "Version");
 
                     b.ToTable("ProductInstances");
+                });
+
+            modelBuilder.Entity("pricelist_manager.Server.Models.ProductToUpdateList", b =>
+                {
+                    b.Property<int>("UpdateListId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ProductId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.HasKey("UpdateListId", "ProductId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("ProductsToUpdateLists");
+                });
+
+            modelBuilder.Entity("pricelist_manager.Server.Models.UpdateList", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("UpdateLists");
                 });
 
             modelBuilder.Entity("pricelist_manager.Server.Models.User", b =>
@@ -467,6 +516,25 @@ namespace pricelist_manager.Server.Migrations
                     b.Navigation("Product");
                 });
 
+            modelBuilder.Entity("pricelist_manager.Server.Models.ProductToUpdateList", b =>
+                {
+                    b.HasOne("pricelist_manager.Server.Models.Product", "Product")
+                        .WithMany("ProductsToUpdateLists")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("pricelist_manager.Server.Models.UpdateList", "UpdateList")
+                        .WithMany("ProductsToUpdateLists")
+                        .HasForeignKey("UpdateListId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+
+                    b.Navigation("UpdateList");
+                });
+
             modelBuilder.Entity("pricelist_manager.Server.Models.User", b =>
                 {
                     b.HasOne("pricelist_manager.Server.Models.Company", "Company")
@@ -492,7 +560,14 @@ namespace pricelist_manager.Server.Migrations
 
             modelBuilder.Entity("pricelist_manager.Server.Models.Product", b =>
                 {
+                    b.Navigation("ProductsToUpdateLists");
+
                     b.Navigation("Versions");
+                });
+
+            modelBuilder.Entity("pricelist_manager.Server.Models.UpdateList", b =>
+                {
+                    b.Navigation("ProductsToUpdateLists");
                 });
 #pragma warning restore 612, 618
         }

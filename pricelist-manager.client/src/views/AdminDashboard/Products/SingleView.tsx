@@ -40,11 +40,13 @@ const SingleProductView = () => {
           {
             color: "purple",
             Icon: FaPencil,
+            type: "link",
             route: `/admin-dashboard/edit/products/${productId}`,
             text: "Modifica",
           },
           {
             color: "blue",
+            type: "link",
             Icon: FaDownload,
             route: `/admin-dashboard/download/products/${productId}`,
             text: "Scarica",
@@ -106,6 +108,7 @@ const SingleProductView = () => {
           x: {
             price: item.price,
             cost: item.cost,
+            margin: (item.cost * item.margin).toFixed(2),
           },
         })}
         lineCols={[
@@ -118,6 +121,13 @@ const SingleProductView = () => {
             dataKey: "x.cost",
             stroke: "red",
             name: "Costo",
+          },
+          {
+            dataKey: "x.margin",
+            stroke: "yellow",
+            name: "Margine",
+            strokeDashed: true,
+            dot: false,
           },
         ]}
       />

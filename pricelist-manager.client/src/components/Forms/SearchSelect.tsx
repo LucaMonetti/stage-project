@@ -93,6 +93,7 @@ type Props<T extends FieldValues, OptionItem> = {
   groupBy?: (item: OptionItem) => { id: string; name: string };
   onChange?: (value: string) => void;
   isClearable?: boolean;
+  isMulti?: boolean;
 };
 
 function SearchSelect<T extends FieldValues, OptionItem>({
@@ -110,6 +111,7 @@ function SearchSelect<T extends FieldValues, OptionItem>({
   isDisabled = false,
   onChange: customOnChange,
   isClearable = true,
+  isMulti: isMultiValue = false,
 }: Props<T, OptionItem>) {
   const [groupedOptions, setGroupedOptions] = useState<GroupedOptions[]>([]);
 
@@ -171,6 +173,7 @@ function SearchSelect<T extends FieldValues, OptionItem>({
               <AsyncSelect<Option, false>
                 cacheOptions
                 {...(isClearable && { isClearable: true })}
+                closeMenuOnSelect={false}
                 value={selectedOption}
                 loadOptions={(input) => {
                   const filtered = groupedOptions

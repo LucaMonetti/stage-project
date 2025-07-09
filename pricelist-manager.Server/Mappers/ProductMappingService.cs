@@ -1,4 +1,5 @@
 ﻿using pricelist_manager.Server.DTOs.V1;
+using pricelist_manager.Server.Helpers;
 using pricelist_manager.Server.Interfaces;
 using pricelist_manager.Server.Models;
 using System;
@@ -42,11 +43,11 @@ namespace pricelist_manager.Server.Mappers
             };
         }
 
-        public ICollection<ProductDTO> MapToDTOs(ICollection<Product> products)
+        public PagedList<ProductDTO> MapToDTOs(PagedList<Product> products)
         {
             ArgumentNullException.ThrowIfNull(products);
 
-            return [.. products.Select(p => MapToDTO(p))];
+            return new PagedList<ProductDTO>([.. products.Select(p => MapToDTO(p))], products.TotalCount, products.CurrentPage, products.PageSize);
         }
 
         private static ProductInstance GetCurrentInstance(Product product)

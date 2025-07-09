@@ -1,4 +1,5 @@
 ﻿using pricelist_manager.Server.DTOs.V1;
+using pricelist_manager.Server.Helpers;
 using pricelist_manager.Server.Interfaces;
 using pricelist_manager.Server.Models;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
@@ -52,11 +53,11 @@ namespace pricelist_manager.Server.Mappers
             };
         }
 
-        public ICollection<CompanyDTO> MapToDTOs(ICollection<Company> companies)
+        public PagedList<CompanyDTO> MapToDTOs(PagedList<Company> companies)
         {
             ArgumentNullException.ThrowIfNull(companies);
 
-            return [.. companies.Select(c => MapToDTO(c))];
+            return new PagedList<CompanyDTO>([.. companies.Select(c => MapToDTO(c))], companies.TotalCount, companies.CurrentPage, companies.PageSize);
         }
     }
 }

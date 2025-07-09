@@ -27,5 +27,8 @@ namespace pricelist_manager.Server.Models
 
         [ForeignKey(nameof(CompanyId))]
         public virtual Company Company { get; set; } = null!;
+
+        public virtual ICollection<ProductToUpdateList> ProductsToUpdateLists { get; set; } = [];
+
     }
 }

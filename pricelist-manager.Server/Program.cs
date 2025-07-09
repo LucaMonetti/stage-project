@@ -111,6 +111,7 @@ namespace pricelist_manager.Server
             builder.Services.AddScoped<IProductRepository, ProductRepository>();
             builder.Services.AddScoped<IProductInstanceRepository, ProductInstanceRepository>();
             builder.Services.AddScoped<IUserRepository, UserRepository>();
+            builder.Services.AddScoped<IUpdateListRepository, UpdateListRepository>();
 
             builder.Services.AddScoped<IProductMappingService, ProductMappingService>();
             builder.Services.AddScoped<IProductLiteMappingService, ProductLiteMappingService>();
@@ -124,8 +125,12 @@ namespace pricelist_manager.Server
 
             builder.Services.AddScoped<IUserMappingService, UserMappingService>();
             builder.Services.AddScoped<IUserLiteMappingService, UserLiteMappingService>();
+            
+            builder.Services.AddScoped<IUpdateListLiteMappingService, UpdateListLiteMappingService>();
+            builder.Services.AddScoped<IUpdateListMappingService, UpdateListMappingService>();
+            builder.Services.AddScoped<IProductToUpdateListMappingService, ProductToUpdateListMappingService>();
 
-
+            builder.Services.AddScoped<IMetadataMappingService, MetadataMappingService>();
 
             var app = builder.Build();
 

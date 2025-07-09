@@ -1,4 +1,5 @@
 ﻿using pricelist_manager.Server.DTOs.V1;
+using pricelist_manager.Server.Helpers;
 using pricelist_manager.Server.Models;
 
 namespace pricelist_manager.Server.Interfaces
@@ -8,8 +9,6 @@ namespace pricelist_manager.Server.Interfaces
         PricelistDTO MapToDTO(Pricelist pricelist);
         Pricelist MapToPricelist(CreatePricelistDTO pricelist);
         Pricelist MapToPricelist(UpdatePricelistDTO pricelist);
-
-
-        ICollection<PricelistDTO> MapToDTOs(ICollection<Pricelist> pricelists);
+        PagedList<PricelistDTO> MapToDTOs(PagedList<Pricelist> pricelists);
     }
 }

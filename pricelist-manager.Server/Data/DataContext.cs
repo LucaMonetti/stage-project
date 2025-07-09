@@ -16,6 +16,8 @@ namespace pricelist_manager.Server.Data
         public DbSet<Product> Products { get; set; }
         public DbSet<ProductInstance> ProductInstances { get; set; }
         public DbSet<Pricelist> Pricelists { get; set; }
+        public DbSet<UpdateList> UpdateLists { get; set; }
+        public DbSet<ProductToUpdateList> ProductsToUpdateLists { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -66,6 +68,34 @@ namespace pricelist_manager.Server.Data
                 .HasOne(p => p.Pricelist)
                 .WithMany(c => c.Products)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            // UpdateList - ProductToUpdateList - Product
+
+            builder.Entity<ProductToUpdateList>()
+                .HasKey(ptul => new {ptul.UpdateListId, ptul.ProductId});
+
+            builder.Entity<ProductToUpdateList>()
+                .HasOne(ptul => ptul.Product)
+                .WithMany(p => p.ProductsToUpdateLists)
+                .HasForeignKey(ptul => ptul.ProductId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<ProductToUpdateList>()
+                .HasOne(ptul => ptul.UpdateList)
+                .WithMany(ul => ul.ProductsToUpdateLists)
+                .HasForeignKey(ptul => ptul.UpdateListId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+
+            builder.Entity<UpdateList>()
+                .HasMany(ul => ul.ProductsToUpdateLists)
+                .WithOne(ptul => ptul.UpdateList)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            builder.Entity<Product>()
+                .HasMany(ul => ul.ProductsToUpdateLists)
+                .WithOne(ptul => ptul.Product)
+                .OnDelete(DeleteBehavior.NoAction);   
         }
     }
 }

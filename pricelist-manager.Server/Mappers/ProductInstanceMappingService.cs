@@ -22,6 +22,7 @@ namespace pricelist_manager.Server.Mappers
                 AccountingControl = dto.AccountingControl,
                 CDA = dto.CDA,
                 SalesItem = dto.SalesItem,
+                Margin = dto.Margin
             };
         }
 
@@ -39,7 +40,8 @@ namespace pricelist_manager.Server.Mappers
                 CDA = dto.CDA,
                 Cost = dto.Cost,
                 AccountingControl = dto.AccountingControl,
-                SalesItem = dto.SalesItem
+                SalesItem = dto.SalesItem,
+                Margin = dto.Margin
             };
         }
 
@@ -58,7 +60,8 @@ namespace pricelist_manager.Server.Mappers
                 CDA = dto.CDA,
                 SalesItem = dto.SalesItem,
                 Cost = dto.Cost,
-                UpdatedAt = dto.UpdatedAt
+                UpdatedAt = dto.UpdatedAt,
+                Margin = dto.Margin
             };
         }
 
@@ -78,6 +81,7 @@ namespace pricelist_manager.Server.Mappers
                 CDA = product.CDA,
                 SalesItem = product.SalesItem,
                 UpdatedAt = product.UpdatedAt,
+                Margin = product.Margin
             };
         }
 

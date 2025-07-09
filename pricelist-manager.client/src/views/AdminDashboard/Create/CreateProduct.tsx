@@ -56,6 +56,16 @@ const CreateProductForm = () => {
             },
           },
           {
+            id: "margin",
+            label: "Marginalità",
+            type: "number",
+            placeholder: "Inserire la marginalità",
+            registerOptions: {
+              valueAsNumber: true,
+              required: "Necessario inserire la marginalità.",
+            },
+          },
+          {
             id: "price",
             label: "Prezzo Articolo",
             type: "number",

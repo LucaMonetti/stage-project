@@ -1,4 +1,4 @@
-import { useParams } from "react-router";
+import { useParams, useSearchParams } from "react-router";
 import FormButton from "../../../components/Buttons/FormButton";
 
 import { FaPlus } from "react-icons/fa6";
@@ -20,6 +20,8 @@ const EditProductForm = () => {
   let data: EditProduct | undefined = undefined;
 
   const { productId } = useParams();
+  const [searchParams, setSearchParams] = useSearchParams();
+
   const product = useGet({
     endpoint: `products/${productId}`,
     method: "GET",
@@ -69,6 +71,16 @@ const EditProductForm = () => {
             placeholder: "Inserisci il nome dell'Articolo",
             registerOptions: {
               required: "Necessario inserire il nome dell'Articolo.",
+            },
+          },
+          {
+            id: "margin",
+            label: "Marginalità",
+            type: "number",
+            placeholder: "Inserire la marginalità",
+            registerOptions: {
+              valueAsNumber: true,
+              required: "Necessario inserire la marginalità.",
             },
           },
           {
@@ -138,6 +150,7 @@ const EditProductForm = () => {
       cda: product.data.currentInstance.cda ?? "",
       salesItem: product.data.currentInstance.salesItem ?? "",
       productId: productId ?? "",
+      margin: product.data.currentInstance.margin ?? 1.0,
     };
   }
 
@@ -162,7 +175,14 @@ const EditProductForm = () => {
 
       <GenericForm<CreateProduct>
         id="edit-product-form"
-        config={{ ...config, endpoint: `products/${productId}` }}
+        config={{
+          ...config,
+          endpoint: `products/${productId}${
+            searchParams.get("editUpdateList") != null
+              ? "?editUpdateList=" + searchParams.get("editUpdateList")
+              : ""
+          }`,
+        }}
         schema={EditProductSchema}
         values={data}
         method="PUT"

@@ -2,12 +2,16 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using pricelist_manager.Server.DTOs.V1;
+using pricelist_manager.Server.DTOs.V1.QueryParams;
 using pricelist_manager.Server.Exceptions;
+using pricelist_manager.Server.Helpers;
 using pricelist_manager.Server.Interfaces;
 using pricelist_manager.Server.Models;
 using pricelist_manager.Server.Repositories;
 using System.Globalization;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace pricelist_manager.Server.Controllers.V1
 {
@@ -24,8 +28,9 @@ namespace pricelist_manager.Server.Controllers.V1
         private readonly IProductMappingService ProductMapping;
         private readonly IPricelistMappingService PricelistMapping;
         private readonly IUserMappingService UserMapping;
+        private readonly IMetadataMappingService MetadataMapping;
 
-        public CompaniesController(ICompanyRepository companyRepository, IUserRepository userRepository, IProductRepository productRepository, IPricelistRepository pricelistRepository, ICompanyMappingService companyMapping, IProductMappingService productMapping, IPricelistMappingService pricelistMapping, IUserMappingService userMapping)
+        public CompaniesController(ICompanyRepository companyRepository, IUserRepository userRepository, IProductRepository productRepository, IPricelistRepository pricelistRepository, ICompanyMappingService companyMapping, IProductMappingService productMapping, IPricelistMappingService pricelistMapping, IUserMappingService userMapping, IMetadataMappingService metadataMapping)
         {
             CompanyRepository = companyRepository;
             UserRepository = userRepository;
@@ -35,17 +40,20 @@ namespace pricelist_manager.Server.Controllers.V1
             ProductMapping = productMapping;
             PricelistMapping = pricelistMapping;
             UserMapping = userMapping;
+            MetadataMapping = metadataMapping;
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] CompanyQueryParams requestParams)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var res = await CompanyRepository.GetAllAsync();
+            var data = await CompanyRepository.GetAllAsync(requestParams);
 
-            return Ok(CompanyMapping.MapToDTOs(res));
+            Response.Headers["X-Pagination"] = JsonConvert.SerializeObject(MetadataMapping.MapToMetadata(data));
+
+            return Ok(CompanyMapping.MapToDTOs(data));
         }
 
         [HttpGet("{id}")]
@@ -58,8 +66,8 @@ namespace pricelist_manager.Server.Controllers.V1
 
             try
             {
-                var res = await CompanyRepository.GetByIdAsync(id);
-                return Ok(CompanyMapping.MapToDTO(res));
+                var data = await CompanyRepository.GetByIdAsync(id);
+                return Ok(CompanyMapping.MapToDTO(data));
             }
             catch (NotFoundException<Company> e)
             {
@@ -75,35 +83,39 @@ namespace pricelist_manager.Server.Controllers.V1
                 return BadRequest(ModelState);
             }
 
-            var res = await UserRepository.GetByCompany(id);
+            var data = await UserRepository.GetByCompany(id);
 
-            return Ok(UserMapping.MapToDTOs(res));
+            return Ok(UserMapping.MapToDTOs(data));
         }
 
         [HttpGet("{id}/products")]
-        public async Task<ActionResult<ICollection<ProductDTO>>> GetProductsByCompany(string id)
+        public async Task<ActionResult<PagedList<ProductDTO>>> GetProductsByCompany(string id, ProductQueryParams requestParams)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var res = await ProductRepository.GetByCompany(id);
+            var data = await ProductRepository.GetByCompany(id, requestParams);
 
-            return Ok(ProductMapping.MapToDTOs(res));
+            Response.Headers["X-Pagination"] = JsonConvert.SerializeObject(MetadataMapping.MapToMetadata(data));
+
+            return Ok(ProductMapping.MapToDTOs(data));
         }
 
         [HttpGet("{id}/pricelists")]
-        public async Task<ActionResult<ICollection<ProductDTO>>> GetPricelistsByCompany(string id)
+        public async Task<ActionResult<PagedList<PricelistDTO>>> GetPricelistsByCompany(string id, [FromQuery] PricelistQueryParams requestParams)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var res = await PricelistRepository.GetByCompanyAsync(id);
+            var data = await PricelistRepository.GetByCompanyAsync(id, requestParams);
 
-            return Ok(PricelistMapping.MapToDTOs(res));
+            Response.Headers["X-Pagination"] = JsonConvert.SerializeObject(MetadataMapping.MapToMetadata(data));
+
+            return Ok(PricelistMapping.MapToDTOs(data));
         }
 
         [HttpPost]

@@ -56,12 +56,14 @@ const SingleCompanyView = () => {
         actions={[
           {
             color: "purple",
+            type: "link",
             Icon: FaPencil,
             route: `/admin-dashboard/edit/companies/${companyId}`,
             text: "Modifica",
           },
           {
             color: "blue",
+            type: "link",
             Icon: FaDownload,
             route: `/admin-dashboard/download/companies/${companyId}`,
             text: "Scarica",
@@ -104,6 +106,7 @@ const SingleCompanyView = () => {
         actions={[
           {
             color: "blue",
+            type: "link",
             Icon: FaPlus,
             route: `/admin-dashboard/create/pricelists?companyId=${companyId}`,
           },
@@ -152,6 +155,7 @@ const SingleCompanyView = () => {
         actions={[
           {
             color: "blue",
+            type: "link",
             Icon: FaPlus,
             route: `/admin-dashboard/create/products?companyId=${companyId}`,
           },

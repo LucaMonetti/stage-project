@@ -126,6 +126,7 @@ const PricelistListView = () => {
               color: "blue",
               Icon: FaPlus,
               route: `/admin-dashboard/create/pricelists`,
+              type: "link",
             },
           ]}
         />

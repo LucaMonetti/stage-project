@@ -1,7 +1,10 @@
 ﻿using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using pricelist_manager.Server.DTOs.V1;
+using pricelist_manager.Server.DTOs.V1.QueryParams;
 using pricelist_manager.Server.Exceptions;
+using pricelist_manager.Server.Helpers;
 using pricelist_manager.Server.Interfaces;
 using pricelist_manager.Server.Models;
 using pricelist_manager.Server.Repositories;
@@ -17,31 +20,37 @@ namespace pricelist_manager.Server.Controllers.V1
         private readonly IProductRepository ProductRepository;
         private readonly IPricelistRepository PricelistRepository;
         private readonly IProductInstanceRepository ProductInstanceRepository;
+        private readonly IUpdateListRepository UpdateListRepository;
         private readonly IProductMappingService ProductMapping;
         private readonly IProductInstanceMappingService ProductInstanceMapping;
+        private readonly IMetadataMappingService MetadataMapping;
 
-        public ProductsController(IProductRepository productRepository, IPricelistRepository pricelistRepository, IProductInstanceRepository productInstanceRepository, IProductMappingService productMapping, IProductInstanceMappingService productInstanceMapping)
+        public ProductsController(IProductRepository productRepository, IPricelistRepository pricelistRepository, IProductInstanceRepository productInstanceRepository, IProductMappingService productMapping, IProductInstanceMappingService productInstanceMapping, IUpdateListRepository updateListRepository, IMetadataMappingService metadataMapping)
         {
             ProductRepository = productRepository;
             PricelistRepository = pricelistRepository;
             ProductInstanceRepository = productInstanceRepository;
             ProductMapping = productMapping;
             ProductInstanceMapping = productInstanceMapping;
+            UpdateListRepository = updateListRepository;
+            MetadataMapping = metadataMapping;
         }
 
         [HttpGet]
-        public async Task<ActionResult<ICollection<ProductDTO>>> GetAll()
+        public async Task<ActionResult<PagedList<ProductDTO>>> GetAll([FromQuery] ProductQueryParams requestParams)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var data = await ProductRepository.GetAllAsync();
+            var data = await ProductRepository.GetAllAsync(requestParams);
+
+            Response.Headers["X-Pagination"] = JsonConvert.SerializeObject(MetadataMapping.MapToMetadata(data));
 
             return Ok(ProductMapping.MapToDTOs(data));
         }
 
         [HttpGet("{productId}")]
-        public async Task<ActionResult<ICollection<ProductDTO>>> GetById(string productId)
+        public async Task<ActionResult<ProductDTO>> GetById(string productId)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -59,7 +68,7 @@ namespace pricelist_manager.Server.Controllers.V1
         }
 
         [HttpPost]
-        public async Task<ActionResult<ICollection<ProductDTO>>> Create([FromBody] CreateProductDTO dto)
+        public async Task<ActionResult<Boolean>> Create([FromBody] CreateProductDTO dto)
         {
             if (!ModelState.IsValid)
             {
@@ -86,7 +95,7 @@ namespace pricelist_manager.Server.Controllers.V1
         }
 
         [HttpPut("{productId}")]
-        public async Task<IActionResult> Update(string productId, [FromBody] UpdateProductDTO dto)
+        public async Task<IActionResult> Update(string productId, [FromBody] UpdateProductDTO dto, [FromQuery] int? editUpdateList)
         {
             if (!ModelState.IsValid)
             {
@@ -113,9 +122,30 @@ namespace pricelist_manager.Server.Controllers.V1
                 oldProd.Versions.Add(newInstance);
 
                 var res = await ProductRepository.UpdateAsync(oldProd);
+
+                if (editUpdateList != null)
+                {
+                    res &= await UpdateListRepository.UpdateProductStatusAsync(productId, editUpdateList.Value, Status.Edited);
+                    
+                    // Check if there are still products to edit
+                    var products = await UpdateListRepository.GetProductsByStatus(editUpdateList.Value, Status.Pending);
+                    if (products.Count == 0) 
+                    {
+                        var item = await UpdateListRepository.GetByIdAsync(editUpdateList.Value);
+
+                        item.Status = Status.Edited;
+
+                        res &= await UpdateListRepository.UpdateAsync(item);
+                    }
+                }
+
                 return Ok(res);
             }
             catch (NotFoundException<Product> e)
+            {
+                return NotFound(e.Message);
+            }
+            catch (NotFoundException<UpdateList> e)
             {
                 return NotFound(e.Message);
             }
