@@ -89,7 +89,7 @@ namespace pricelist_manager.Server.Controllers.V1
         }
 
         [HttpGet("{id}/products")]
-        public async Task<ActionResult<PagedList<ProductDTO>>> GetProductsByCompany(string id, ProductQueryParams requestParams)
+        public async Task<ActionResult<PagedList<ProductDTO>>> GetProductsByCompany(string id, [FromQuery] ProductQueryParams requestParams)
         {
             if (!ModelState.IsValid)
             {

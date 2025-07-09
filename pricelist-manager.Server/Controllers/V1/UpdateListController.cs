@@ -65,6 +65,25 @@ namespace pricelist_manager.Server.Controllers.V1
             }
         }
 
+        [HttpGet("{id:int}/products")]
+        public async Task<ActionResult<ProductDTO>> GetProductsById(int id, [FromQuery] UpdateListQueryParams requestParams)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                var data = await UpdateListRepository.GetProductsByList(id, requestParams);
+                return Ok(ProductToUpdateListMappingService.MapToDTOs(data));
+            }
+            catch (NotFoundException<UpdateList> e)
+            {
+                return NotFound(e.Message);
+            }
+        }
+
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateUpdateListDTO dto)
         {

@@ -71,7 +71,7 @@ namespace pricelist_manager.Server.Controllers.V1
         }
 
         [HttpGet("{pricelistId:guid}/products")]
-        public async Task<ActionResult<PagedList<ProductDTO>>> GetAll(Guid pricelistId, ProductQueryParams requestParams)
+        public async Task<ActionResult<PagedList<ProductDTO>>> GetAll(Guid pricelistId, [FromQuery] ProductQueryParams requestParams)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

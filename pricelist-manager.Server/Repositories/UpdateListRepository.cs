@@ -111,12 +111,28 @@ namespace pricelist_manager.Server.Repositories
             return res;
         }
 
+        public async Task<ICollection<ProductToUpdateList>> GetProductsByList(int id, UpdateListQueryParams requestParams)
+        {
+            Console.WriteLine("TESTTT", requestParams.ToString());
+
+            if (!CanConnect())
+                throw new StorageUnavailableException();
+
+            var res = await Context.ProductsToUpdateLists.Where(ptul => ptul.UpdateListId == id && 
+                (requestParams.status.HasValue ? requestParams.status.Value == ptul.Status : true)).Include(ptul => ptul.Product).ThenInclude(p => p.Versions).ToListAsync();
+
+            if (res == null)
+                throw new NotFoundException<UpdateList>(id);
+
+            return res;
+        }
+
         public async Task<ICollection<ProductToUpdateList>> GetProductsByList(int id)
         {
             if (!CanConnect())
                 throw new StorageUnavailableException();
 
-            var res = await Context.ProductsToUpdateLists.Where(ptul => ptul.UpdateListId == id).ToListAsync();
+            var res = await Context.ProductsToUpdateLists.Where(ptul => ptul.UpdateListId == id).Include(ptul => ptul.Product).ThenInclude(p => p.Versions).ToListAsync();
 
             if (res == null)
                 throw new NotFoundException<UpdateList>(id);
