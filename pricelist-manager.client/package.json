@@ -13,6 +13,7 @@
     "@hookform/resolvers": "^5.1.1",
     "@servicestack/client": "^2.1.11",
     "@tailwindcss/vite": "^4.1.10",
+    "@tanstack/react-query": "^5.81.5",
     "@tanstack/react-table": "^8.21.3",
     "axios": "^1.10.0",
     "lodash.isequal": "^4.5.0",

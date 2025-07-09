@@ -17,13 +17,11 @@ import {
   changeUpdateListStatus,
   deleteUpdateList,
 } from "../../../api/UpdateListAPI";
+import { useAllUpdateLists } from "../../../hooks/updatelists/useQueryUpdatelists";
 
 const UpdateListListView = () => {
-  const updatelists = useGet({
-    method: "GET",
-    endpoint: "updatelists",
-    schema: UpdateListArraySchema,
-  });
+  const { data, isPending, isError, error, refetch } = useAllUpdateLists();
+
   const [table, setTable] = useState<Table<UpdateList>>();
 
   const columns: CustomColumnDef<UpdateList>[] = [
@@ -84,7 +82,7 @@ const UpdateListListView = () => {
                 var res = await changeUpdateListStatus(id, Status.Edited);
 
                 if (res == true) {
-                  updatelists.refetch();
+                  refetch();
                 }
               },
             });
@@ -101,7 +99,7 @@ const UpdateListListView = () => {
                 var res = await deleteUpdateList(id);
 
                 if (res == true) {
-                  updatelists.refetch();
+                  refetch();
                 }
               },
             });
@@ -151,7 +149,10 @@ const UpdateListListView = () => {
       </div>
 
       <GenericTableView
-        data={updatelists}
+        data={data ?? []}
+        isPending={isPending}
+        isError={isError}
+        error={error}
         columns={columns}
         onTableReady={setTable}
         config={{

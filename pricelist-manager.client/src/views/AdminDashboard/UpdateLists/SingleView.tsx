@@ -2,12 +2,14 @@ import { useNavigate, useParams } from "react-router";
 import BasicLoader from "../../../components/Loader/BasicLoader";
 import { FaPencil, FaDownload, FaPlus } from "react-icons/fa6";
 import InfoWidget from "../../../components/SinglePage/Widgets/InfoWidget";
-import { useGet } from "../../../hooks/useGenericFetch";
 import TableWidget from "../../../components/SinglePage/Widgets/TableWidget";
 import type { CustomColumnDef } from "../../../components/Dashboard/Tables/GenericTableView";
-import { UpdateListSchema } from "../../../models/UpdateList";
-import { Status, type FetchData } from "../../../types";
+import { Status } from "../../../types";
 import type { UpdateListProduct } from "../../../models/UpdateListProduct";
+import {
+  useProductsByStatus,
+  useUpdateList,
+} from "../../../hooks/updatelists/useQueryUpdatelists";
 
 const productCols = [
   {
@@ -45,32 +47,22 @@ const UpdateListSingleView = () => {
   const navigate = useNavigate();
   const { updateListId } = useParams();
 
-  const updateList = useGet({
-    method: "GET",
-    endpoint: `updatelists/${updateListId}`,
-    schema: UpdateListSchema,
-  });
+  const { data, isPending, isError } = useUpdateList(updateListId ?? "");
 
-  // ToDo(Luca): Handle this better, maybe with a refactor of the table widget
-  const toUpdateProducts: FetchData<UpdateListProduct[]> = {
-    isLoading: updateList.isLoading,
-    errorMsg: updateList.errorMsg,
-    data: updateList.data?.products.filter(
-      (item) => item.status == Status.Pending
-    ),
-    refetch: () => {},
-  };
+  const {
+    data: toUpdateProducts,
+    isLoading: isToUpdateProductsLoading,
+    isError: isToUpdateProductsError,
+    error: toUpdateProductsError,
+  } = useProductsByStatus(updateListId ?? "", Status.Pending);
+  const {
+    data: updatedProducts,
+    isLoading: isUpdatedProductsLoading,
+    isError: isUpdatedProductsError,
+    error: updatedProductsError,
+  } = useProductsByStatus(updateListId ?? "", Status.Edited);
 
-  const updatedProducts: FetchData<UpdateListProduct[]> = {
-    isLoading: updateList.isLoading,
-    errorMsg: updateList.errorMsg,
-    data: updateList.data?.products.filter(
-      (item) => item.status == Status.Edited
-    ),
-    refetch: () => {},
-  };
-
-  if (updateList.isLoading) {
+  if (isPending) {
     return (
       <div className="px-8 py-4 flex justify-center align-center h-full">
         <BasicLoader />
@@ -78,18 +70,17 @@ const UpdateListSingleView = () => {
     );
   }
 
-  if (updateList.errorMsg) {
+  if (isError) {
     navigate("/error/404");
   }
 
   return (
     <div className="px-8 py-8 grid grid-cols-4 gap-4">
       <InfoWidget
-        title={updateList.data?.name}
-        subtitle={updateList.data?.description}
+        title={data?.name}
+        subtitle={data?.description}
         callout={`Completamento: ${(
-          ((updateList.data?.editedProducts ?? 0) /
-            (updateList.data?.totalProducts ?? 1)) *
+          ((data?.editedProducts ?? 0) / (data?.totalProducts ?? 1)) *
           100
         ).toFixed(1)}%`}
         actions={[
@@ -120,7 +111,10 @@ const UpdateListSingleView = () => {
             route: `/admin-dashboard/updatelists/${updateListId}/products`,
           },
         ]}
-        data={toUpdateProducts}
+        data={toUpdateProducts ?? []}
+        isPending={isToUpdateProductsLoading}
+        isError={isToUpdateProductsError}
+        error={toUpdateProductsError}
         columns={productCols}
         config={{
           baseUrl: `/admin-dashboard/edit/products/:pid?editUpdateList=${updateListId}`,
@@ -132,7 +126,10 @@ const UpdateListSingleView = () => {
 
       <TableWidget
         title="Prodotti aggiornati"
-        data={updatedProducts}
+        data={updatedProducts ?? []}
+        isPending={isUpdatedProductsLoading}
+        isError={isUpdatedProductsError}
+        error={updatedProductsError}
         columns={productCols}
         config={{
           baseUrl: "/admin-dashboard/products/:pid",

@@ -5,20 +5,16 @@ import DefinitionListWidget from "../../../components/SinglePage/Widgets/Definit
 import InfoWidget from "../../../components/SinglePage/Widgets/InfoWidget";
 import MoneyWidget from "../../../components/SinglePage/Widgets/MoneyWidget";
 import VersionWidget from "../../../components/SinglePage/Widgets/VersionWidget";
-import { useGet } from "../../../hooks/useGenericFetch";
-import { ProductSchema } from "../../../models/Product";
 import GraphWidget from "../../../components/SinglePage/Widgets/GraphWidget";
+import { useProduct } from "../../../hooks/products/useQueryProducts";
 
 const SingleProductView = () => {
   const navigate = useNavigate();
   const { productId } = useParams();
-  const product = useGet({
-    method: "GET",
-    endpoint: `products/${productId}`,
-    schema: ProductSchema,
-  });
 
-  if (product.isLoading) {
+  const { data, isPending, error, isError } = useProduct(productId ?? "");
+
+  if (isPending) {
     return (
       <div className="px-8 py-4 flex justify-center align-center h-full">
         <BasicLoader />
@@ -26,16 +22,16 @@ const SingleProductView = () => {
     );
   }
 
-  if (product.errorMsg) {
+  if (isError) {
     navigate("/error/404");
   }
 
   return (
     <div className="px-8 py-8 grid grid-cols-4 gap-4">
       <InfoWidget
-        title={product.data?.currentInstance.name}
-        subtitle={product.data?.currentInstance.description}
-        callout={`Versione ${product.data?.latestVersion}`}
+        title={data?.currentInstance.name}
+        subtitle={data?.currentInstance.description}
+        callout={`Versione ${data?.latestVersion}`}
         actions={[
           {
             color: "purple",
@@ -55,11 +51,11 @@ const SingleProductView = () => {
       />
       <MoneyWidget
         title="Prezzo corrente"
-        amount={product.data?.currentInstance.price}
+        amount={data?.currentInstance.price}
       />
       <MoneyWidget
         title="Costo corrente"
-        amount={product.data?.currentInstance.cost}
+        amount={data?.currentInstance.cost}
         color="red"
         dimensions={{
           default: { startCol: 1, endCol: 5 },
@@ -70,14 +66,14 @@ const SingleProductView = () => {
       <DefinitionListWidget
         title="Listino"
         values={[
-          { title: "Nome", value: product.data?.pricelist.name },
+          { title: "Nome", value: data?.pricelist.name },
           {
             title: "Codice",
-            value: product.data?.pricelist.id,
+            value: data?.pricelist.id,
           },
           {
             title: "Azienda",
-            value: product.data?.company.id,
+            value: data?.company.id,
           },
         ]}
       />
@@ -87,22 +83,22 @@ const SingleProductView = () => {
         values={[
           {
             title: "Mastrino",
-            value: product.data?.currentInstance.accountingControl,
+            value: data?.currentInstance.accountingControl,
           },
           {
             title: "CDA",
-            value: product.data?.currentInstance.cda,
+            value: data?.currentInstance.cda,
           },
           {
             title: "Voce Vendita",
-            value: product.data?.currentInstance.salesItem,
+            value: data?.currentInstance.salesItem,
           },
         ]}
       />
 
       <GraphWidget
         title="Andamento Prezzi / Costi"
-        dataset={product.data?.versions ?? []}
+        dataset={data?.versions ?? []}
         getData={(item) => ({
           y: item.updatedAt,
           x: {
@@ -133,8 +129,8 @@ const SingleProductView = () => {
       />
 
       <VersionWidget
-        versions={product.data?.versions}
-        lastVersion={product.data?.latestVersion}
+        versions={data?.versions}
+        lastVersion={data?.latestVersion}
       />
     </div>
   );

@@ -3,23 +3,15 @@ import ActionRenderer from "../../../components/Buttons/ActionRenderer";
 import GenericTableView, {
   type CustomColumnDef,
 } from "../../../components/Dashboard/Tables/GenericTableView";
-import { useFetch } from "../../../hooks/useFetch";
-import { useGet } from "../../../hooks/useGenericFetch";
-import {
-  CompanyArraySchema,
-  type Company,
-  type CompanyFilter,
-} from "../../../models/Company";
+import { type Company, type CompanyFilter } from "../../../models/Company";
 import { useState } from "react";
 import type { Table } from "@tanstack/react-table";
 import type { Config } from "../../../components/Forms/GenericForm";
+import { useAllCompanies } from "../../../hooks/companies/useQueryCompanies";
 
 const CompanyListView = () => {
-  const companies = useGet({
-    method: "GET",
-    endpoint: "companies",
-    schema: CompanyArraySchema,
-  });
+  const { data: companies, isPending, isError, error } = useAllCompanies();
+
   const [table, setTable] = useState<Table<Company>>();
 
   const columns: CustomColumnDef<Company>[] = [
@@ -109,7 +101,10 @@ const CompanyListView = () => {
         />
       </div>
       <GenericTableView
-        data={companies}
+        data={companies ?? []}
+        isPending={isPending}
+        isError={isError}
+        error={error}
         columns={columns}
         onTableReady={setTable}
         filterConfig={filterConfig}

@@ -1,43 +1,36 @@
 import { Link, useNavigate, useParams } from "react-router";
-import { ProductArraySchema, type Product } from "../../../models/Product";
 import BasicLoader from "../../../components/Loader/BasicLoader";
 import { FaPencil, FaDownload, FaPlus } from "react-icons/fa6";
 import InfoWidget from "../../../components/SinglePage/Widgets/InfoWidget";
-import { useGet } from "../../../hooks/useGenericFetch";
-import {
-  PricelistArraySchema,
-  type Pricelist,
-} from "../../../models/Pricelist";
 import TableWidget from "../../../components/SinglePage/Widgets/TableWidget";
-import { CompanySchema } from "../../../models/Company";
 import DefinitionListWidget from "../../../components/SinglePage/Widgets/DefinitionListWidget";
-import type {
-  Column,
-  CustomColumnDef,
-} from "../../../components/Dashboard/Tables/GenericTableView";
+import { useCompany } from "../../../hooks/companies/useQueryCompanies";
+import { useAllProductsByCompany } from "../../../hooks/products/useQueryProducts";
+import { useAllPricelistsByCompany } from "../../../hooks/pricelists/useQueryPricelists";
 
 const SingleCompanyView = () => {
   const navigate = useNavigate();
   const { companyId } = useParams();
-  const company = useGet({
-    method: "GET",
-    endpoint: `companies/${companyId}`,
-    schema: CompanySchema,
-  });
 
-  const productsData = useGet({
-    method: "GET",
-    endpoint: `companies/${companyId}/products`,
-    schema: ProductArraySchema,
-  });
+  const {
+    data: company,
+    isPending: isCompanyPending,
+    error: companyError,
+  } = useCompany(companyId ?? "");
 
-  const pricelists = useGet({
-    method: "GET",
-    endpoint: `companies/${companyId}/pricelists`,
-    schema: PricelistArraySchema,
-  });
+  const {
+    data: products,
+    isPending: isProductsPending,
+    error: productsError,
+  } = useAllProductsByCompany(companyId ?? "");
 
-  if (company.isLoading) {
+  const {
+    data: pricelists,
+    isPending: isPricelistsPending,
+    error: pricelistsError,
+  } = useAllPricelistsByCompany(companyId ?? "");
+
+  if (isCompanyPending) {
     return (
       <div className="px-8 py-4 flex justify-center align-center h-full">
         <BasicLoader />
@@ -45,14 +38,14 @@ const SingleCompanyView = () => {
     );
   }
 
-  if (company.errorMsg) {
+  if (companyError) {
     navigate("/error/404");
   }
 
   return (
     <div className="px-8 py-8 grid grid-cols-4 gap-4">
       <InfoWidget
-        title={`${company.data?.id} - ${company.data?.name}`}
+        title={`${company?.id} - ${company?.name}`}
         actions={[
           {
             color: "purple",
@@ -76,27 +69,23 @@ const SingleCompanyView = () => {
         values={[
           {
             title: "Ragione Sociale",
-            value: company.data?.name,
+            value: company?.name,
           },
           {
             title: "Telefono",
-            value: (
-              <Link to={`tel:${company.data?.phone}`}>
-                {company.data?.phone}
-              </Link>
-            ),
+            value: <Link to={`tel:${company?.phone}`}>{company?.phone}</Link>,
           },
           {
             title: "Indirizzo",
-            value: company.data?.address,
+            value: company?.address,
           },
           {
             title: "Provincia",
-            value: company.data?.province,
+            value: company?.province,
           },
           {
             title: "Codice Postale",
-            value: company.data?.postalCode,
+            value: company?.postalCode,
           },
         ]}
       />
@@ -112,6 +101,9 @@ const SingleCompanyView = () => {
           },
         ]}
         data={pricelists}
+        isPending={isPricelistsPending}
+        isError={!!pricelistsError}
+        error={pricelistsError}
         columns={[
           {
             accessorKey: "id",
@@ -160,7 +152,10 @@ const SingleCompanyView = () => {
             route: `/admin-dashboard/create/products?companyId=${companyId}`,
           },
         ]}
-        data={productsData}
+        data={products ?? []}
+        isPending={isProductsPending}
+        isError={!!productsError}
+        error={productsError}
         columns={[
           {
             accessorKey: "id",

@@ -1,4 +1,8 @@
+import { useAllCompanies } from "../../../hooks/companies/useQueryCompanies";
+import { useAllPricelists } from "../../../hooks/pricelists/useQueryPricelists";
+import { useAllProducts } from "../../../hooks/products/useQueryProducts";
 import { useFetch } from "../../../hooks/useFetch";
+import { useAllUsers } from "../../../hooks/users/useQueryUsers";
 import { CompanyArraySchema } from "../../../models/Company";
 import { PricelistArraySchema } from "../../../models/Pricelist";
 import { ProductArraySchema } from "../../../models/Product";
@@ -6,16 +10,42 @@ import { UserArrraySchema } from "../../../models/User";
 import ItemList from "./ItemList";
 
 const ItemListGroup = () => {
-  const products = useFetch("products", ProductArraySchema);
-  const pricelists = useFetch("pricelists", PricelistArraySchema);
-  const companies = useFetch("companies", CompanyArraySchema);
-  const users = useFetch("accounts", UserArrraySchema);
+  const {
+    data: products,
+    isPending: isProductsPending,
+    isError: isProductError,
+    error: productErrot,
+  } = useAllProducts();
+
+  const {
+    data: pricelists,
+    isPending: isPricelistsPending,
+    isError: isPricelistsError,
+    error: pricelistsError,
+  } = useAllPricelists();
+
+  const {
+    data: companies,
+    isPending: isCompaniesPending,
+    isError: isCompaniesError,
+    error: companiesError,
+  } = useAllCompanies();
+
+  const {
+    data: users,
+    isPending: isUsersPending,
+    isError: isUsersError,
+    error: usersError,
+  } = useAllUsers();
 
   return (
     <div className="flex flex-col flex-wrap gap-8 mt-8">
       <ItemList
         title="Aziende"
-        fetch={companies}
+        data={companies ?? []}
+        isPending={isCompaniesPending}
+        isError={isCompaniesError}
+        error={companiesError}
         getline={(item) => item.name}
         getCallout={(item) => item.id}
         getUniqueId={(item) => item.id}
@@ -23,7 +53,10 @@ const ItemListGroup = () => {
       />
       <ItemList
         title="Listini"
-        fetch={pricelists}
+        data={pricelists ?? []}
+        isPending={isPricelistsPending}
+        isError={isPricelistsError}
+        error={pricelistsError}
         getline={(item) => item.name}
         getCallout={(item) =>
           item.products ? item.products.length.toString() : "0"
@@ -33,7 +66,10 @@ const ItemListGroup = () => {
       />
       <ItemList
         title="Prodotti"
-        fetch={products}
+        data={products ?? []}
+        isPending={isProductsPending}
+        isError={isProductError}
+        error={productErrot}
         getline={(item) => item.currentInstance.name}
         getCallout={(item) => item.productCode}
         getUniqueId={(item) => item.id}
@@ -41,7 +77,10 @@ const ItemListGroup = () => {
       />
       <ItemList
         title="Utenti"
-        fetch={users}
+        data={users ?? []}
+        isPending={isUsersPending}
+        isError={isUsersError}
+        error={usersError}
         getline={(item) => item.username}
         getUniqueId={(item) => item.id}
         getRoute={(item) => `/admin-dashboard/users/${item.id}`}
