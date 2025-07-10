@@ -16,6 +16,19 @@ export const API_OPTIONS_POST = {
     accept: "application/json",
   },
 };
+export const API_OPTIONS_PUT = {
+  method: "PUT",
+  headers: {
+    "Content-Type": "application/json",
+    accept: "application/json",
+  },
+};
+export const API_OPTIONS_DELETE = {
+  method: "DELETE",
+  headers: {
+    accept: "application/json",
+  },
+};
 
 export const queryEndpoint = (
   endpotin: string,

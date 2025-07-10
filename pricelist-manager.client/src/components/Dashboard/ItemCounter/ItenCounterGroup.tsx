@@ -3,12 +3,7 @@ import {
   usePricelistStatistics,
   useProductStatistics,
   useUserStatistics,
-} from "../../../hooks/statistsics/useQueryStatistics";
-import { useFetch } from "../../../hooks/useFetch";
-import { CompanyStatisticsSchema } from "../../../models/CompanyStatistics";
-import { PricelistStatisticsSchema } from "../../../models/PricelistStatistics";
-import { ProductStatisticsSchema } from "../../../models/ProductStatistics";
-import { UserStatisticsSchema } from "../../../models/User";
+} from "../../../hooks/statistics/useQueryStatistics";
 import ItemCounter from "./ItemCounter";
 import { FaBuilding, FaListUl, FaUser } from "react-icons/fa6";
 

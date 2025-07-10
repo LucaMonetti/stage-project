@@ -14,6 +14,14 @@ import { useAllUsers } from "../../../hooks/users/useQueryUsers";
 const UsersListView = () => {
   const { data, isPending, isError, error } = useAllUsers();
 
+  // Add debugging
+  console.log("useAllUsers result:", { data, isPending, isError, error });
+  console.log("Data type:", typeof data);
+  console.log(
+    "Data length:",
+    Array.isArray(data) ? data.length : "Not an array"
+  );
+
   const [table, setTable] = useState<Table<User>>();
 
   const columns: CustomColumnDef<User>[] = [

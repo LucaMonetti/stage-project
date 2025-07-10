@@ -5,13 +5,12 @@ import GenericForm, {
 
 import { FaPlus } from "react-icons/fa6";
 import {
-  CreateCompanySchema,
   EditCompanySchema,
   type EditCompany,
 } from "../../../models/FormCompany";
 import { useParams } from "react-router";
-import { useGet } from "../../../hooks/useGenericFetch";
-import { CompanySchema } from "../../../models/Company";
+import { useCompany } from "../../../hooks/companies/useQueryCompanies";
+import { useEditCompany } from "../../../hooks/companies/useMutationCompanies";
 
 const config = {
   fieldset: [
@@ -103,11 +102,8 @@ const EditCompanyForm = () => {
   let data: EditCompany | undefined = undefined;
 
   const { companyId } = useParams();
-  const company = useGet({
-    endpoint: `companies/${companyId}`,
-    method: "GET",
-    schema: CompanySchema,
-  });
+  const company = useCompany(companyId ?? "");
+  const mutation = useEditCompany();
 
   if (company.data) {
     data = {
@@ -140,6 +136,7 @@ const EditCompanyForm = () => {
         config={{ ...config, endpoint: `companies/${companyId}` }}
         id="edit-company-form"
         method={"PUT"}
+        mutation={mutation}
       />
     </div>
   );

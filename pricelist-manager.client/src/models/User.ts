@@ -1,5 +1,4 @@
 import { z } from "zod/v4";
-import { CompanySchema } from "./Company";
 import { CompanyLiteSchema } from "./CompanyLite";
 
 // User
@@ -16,7 +15,7 @@ export const UserSchema = z.object({
 
 export type User = z.infer<typeof UserSchema>;
 
-export const UserArrraySchema = z.array(UserSchema);
+export const UserArraySchema = z.array(UserSchema);
 
 // User Statistics
 export const UserStatisticsSchema = z.object({

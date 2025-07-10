@@ -7,7 +7,7 @@ import { FaPlus } from "react-icons/fa6";
 import { CreateUserSchema, type CreateUser } from "../../../models/FormUser";
 import { useGet } from "../../../hooks/useGenericFetch";
 import { CompanyArraySchema } from "../../../models/Company";
-import { useCreateUser } from "../../../hooks/users/useMutationUpdateList";
+import { useCreateUser } from "../../../hooks/users/useMutationUsers";
 
 const CreateUserForm = () => {
   const config = {

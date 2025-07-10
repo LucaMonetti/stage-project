@@ -15,6 +15,8 @@ import {
   PricelistArraySchema,
   PricelistSchema,
 } from "../../../models/Pricelist";
+import { useProduct } from "../../../hooks/products/useQueryProducts";
+import { useEditProduct } from "../../../hooks/products/useMutationProduct";
 
 const EditProductForm = () => {
   let data: EditProduct | undefined = undefined;
@@ -22,11 +24,8 @@ const EditProductForm = () => {
   const { productId } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const product = useGet({
-    endpoint: `products/${productId}`,
-    method: "GET",
-    schema: ProductSchema,
-  });
+  const product = useProduct(productId ?? "");
+  const mutation = useEditProduct();
 
   const config = {
     fieldset: [
@@ -173,7 +172,7 @@ const EditProductForm = () => {
         />
       </header>
 
-      <GenericForm<CreateProduct>
+      <GenericForm
         id="edit-product-form"
         config={{
           ...config,
@@ -186,6 +185,7 @@ const EditProductForm = () => {
         schema={EditProductSchema}
         values={data}
         method="PUT"
+        mutation={mutation}
       />
     </div>
   );

@@ -6,7 +6,7 @@ import { useAllUsers } from "../../../hooks/users/useQueryUsers";
 import { CompanyArraySchema } from "../../../models/Company";
 import { PricelistArraySchema } from "../../../models/Pricelist";
 import { ProductArraySchema } from "../../../models/Product";
-import { UserArrraySchema } from "../../../models/User";
+import { UserArraySchema } from "../../../models/User";
 import ItemList from "./ItemList";
 
 const ItemListGroup = () => {

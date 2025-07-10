@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { UserArrraySchema, UserSchema, type User } from "../../models/User";
+import { UserArraySchema, UserSchema, type User } from "../../models/User";
 import { API_OPTIONS_GET, queryEndpoint } from "../../config/apiConfig";
 
 // Fetch all users from the API
@@ -9,7 +9,11 @@ const fetchAllUsers = async (): Promise<User[]> => {
     throw new Error("Failed to fetch users");
   }
   const rawData = await response.json();
-  return UserArrraySchema.parse(rawData);
+
+  console.log("Raw data fetched:", rawData); // Debugging line
+  console.log("Parser: ", UserArraySchema.parse(rawData)); // Debugging line
+
+  return UserArraySchema.parse(rawData);
 };
 
 export const useAllUsers = () => {

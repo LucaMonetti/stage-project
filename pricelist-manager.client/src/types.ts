@@ -24,3 +24,13 @@ export const StatusLabel: Record<Status, string> = {
 };
 
 export type Status = (typeof Status)[keyof typeof Status];
+
+export interface UseCreateOptions<T> {
+  onSuccess?: (data: T) => void;
+  onError?: (error: Error) => void;
+}
+
+export interface UseEditOptions<T> {
+  onSuccess?: (data: T) => void;
+  onError?: (error: Error) => void;
+}

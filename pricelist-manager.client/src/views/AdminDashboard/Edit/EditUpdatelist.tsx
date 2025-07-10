@@ -11,16 +11,15 @@ import GenericForm, {
 } from "../../../components/Forms/GenericForm";
 import { UpdateListSchema } from "../../../models/UpdateList";
 import { useParams } from "react-router";
+import { useUpdateList } from "../../../hooks/updatelists/useQueryUpdatelists";
+import { useEditUpdateList } from "../../../hooks/updatelists/useMutationUpdateList";
 
 const EditUpdatelistForm = () => {
   let data: EditUpdateList | undefined = undefined;
 
   const { updateListId } = useParams();
-  const updatelist = useGet({
-    endpoint: `updatelists/${updateListId}`,
-    method: "GET",
-    schema: UpdateListSchema,
-  });
+  const updatelist = useUpdateList(updateListId ?? "");
+  const mutation = useEditUpdateList();
 
   const config = {
     fieldset: [
@@ -88,6 +87,7 @@ const EditUpdatelistForm = () => {
         config={{ ...config, endpoint: `updatelists/${updateListId}` }}
         id="edit-updatelist-form"
         method={"PUT"}
+        mutation={mutation}
       />
     </div>
   );

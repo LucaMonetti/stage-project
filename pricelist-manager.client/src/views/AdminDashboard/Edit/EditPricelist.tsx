@@ -10,8 +10,9 @@ import {
 } from "../../../models/FormPricelist";
 import { useParams } from "react-router";
 import { useGet } from "../../../hooks/useGenericFetch";
-import { PricelistSchema } from "../../../models/Pricelist";
 import { CompanyArraySchema } from "../../../models/Company";
+import { usePricelist } from "../../../hooks/pricelists/useQueryPricelists";
+import { useEditPricelist } from "../../../hooks/pricelists/useMutationPricelists";
 
 const EditPricelistForm = () => {
   const config = {
@@ -65,11 +66,8 @@ const EditPricelistForm = () => {
   let data: EditPricelist | undefined = undefined;
 
   const { pricelistId } = useParams();
-  const pricelist = useGet({
-    endpoint: `pricelists/${pricelistId}`,
-    method: "GET",
-    schema: PricelistSchema,
-  });
+  const pricelist = usePricelist(pricelistId ?? "");
+  const mutation = useEditPricelist();
 
   if (pricelist.data) {
     data = {
@@ -103,6 +101,7 @@ const EditPricelistForm = () => {
         config={{ ...config, endpoint: `pricelists/${pricelistId}` }}
         id="create-pricelist-form"
         method={"PUT"}
+        mutation={mutation}
       />
     </div>
   );
