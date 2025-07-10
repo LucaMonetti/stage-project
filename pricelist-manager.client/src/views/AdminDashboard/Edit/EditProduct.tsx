@@ -25,7 +25,9 @@ const EditProductForm = () => {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const product = useProduct(productId ?? "");
-  const mutation = useEditProduct();
+  const mutation = useEditProduct(
+    searchParams.get("editUpdateList") ?? undefined
+  );
 
   const config = {
     fieldset: [

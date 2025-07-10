@@ -56,7 +56,8 @@ export const useCreateProduct = (options?: UseCreateOptions<Product>) => {
 // Edit product function
 const editProduct = async (
   productId: string,
-  updateProductData: EditProduct
+  updateProductData: EditProduct,
+  editUpdateList?: string
 ): Promise<Product> => {
   const parsedData = EditProductSchema.safeParse(updateProductData);
 
@@ -69,7 +70,14 @@ const editProduct = async (
     body: JSON.stringify(parsedData.data),
   };
 
-  const response = await fetch(queryEndpoint(`products/${productId}`), options);
+  const response = await fetch(
+    queryEndpoint(
+      `products/${productId}${
+        editUpdateList ? `?editUpdateList=${editUpdateList}` : ""
+      }`
+    ),
+    options
+  );
 
   if (!response.ok) {
     throw new Error(`Failed to update product with ID: ${productId}`);
@@ -80,11 +88,14 @@ const editProduct = async (
 };
 
 // Custom hook to encapsulate the useMutation logic for editing products
-export const useEditProduct = (options?: UseEditOptions<Product>) => {
+export const useEditProduct = (
+  editUpdateList?: string,
+  options?: UseEditOptions<Product>
+) => {
   const queryClient = useQueryClient();
 
   return useMutation<Product, Error, EditProduct>({
-    mutationFn: (data) => editProduct(data.productId, data),
+    mutationFn: (data) => editProduct(data.productId, data, editUpdateList),
     onSuccess: (data) => {
       // Invalidate queries to ensure the cache is updated
       queryClient.invalidateQueries({ queryKey: ["products", data.id] });
