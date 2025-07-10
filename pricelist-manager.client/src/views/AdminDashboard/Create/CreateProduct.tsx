@@ -10,6 +10,7 @@ import {
 } from "../../../models/FormProduct";
 import { useGet } from "../../../hooks/useGenericFetch";
 import { PricelistArraySchema } from "../../../models/Pricelist";
+import { useCreateProduct } from "../../../hooks/products/useMutationProduct";
 
 const CreateProductForm = () => {
   const config = {
@@ -120,6 +121,8 @@ const CreateProductForm = () => {
     endpoint: "products",
   } satisfies Config<CreateProduct>;
 
+  const mutation = useCreateProduct();
+
   return (
     <div className="pb-4 px-8">
       <header className="flex justify-between items-center sticky top-[65.6px] bg-gray-900 z-50 py-4 border-gray-800 border-b-2">
@@ -139,6 +142,7 @@ const CreateProductForm = () => {
         config={config}
         id="create-product-form"
         method={"POST"}
+        mutation={mutation}
       />
     </div>
   );

@@ -9,6 +9,14 @@ export const API_OPTIONS_GET = {
   },
 };
 
+export const API_OPTIONS_POST = {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    accept: "application/json",
+  },
+};
+
 export const queryEndpoint = (
   endpotin: string,
   version: string = API_DEFAULT_VERSION

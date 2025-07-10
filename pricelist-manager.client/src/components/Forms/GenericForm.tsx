@@ -24,6 +24,7 @@ import type { FetchData } from "../../types";
 import type { Company } from "../../models/Company";
 import type { Product } from "../../models/Product";
 import isEqual from "lodash.isequal";
+import type { UseMutationResult } from "@tanstack/react-query";
 
 type InferredZodSchema<T extends FieldValues> = z.ZodType<T, any, any>;
 
@@ -36,6 +37,7 @@ interface Props<T extends FieldValues> {
   id: string;
   isRow?: boolean;
   externalProvider?: boolean;
+  mutation?: UseMutationResult<any, Error, T, unknown>;
 }
 
 interface BaseInput<T extends FieldValues> {
@@ -222,6 +224,7 @@ function GenericActualForm<T extends FieldValues>({
   method = "POST",
   id,
   isRow = false,
+  mutation,
 }: Props<T>) {
   const errorDiv = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -232,15 +235,7 @@ function GenericActualForm<T extends FieldValues>({
       return;
     }
 
-    usePost({
-      endpoint: config.endpoint,
-      body: data,
-      method: method,
-      schema: schema,
-      fieldErrors: methods.formState.errors,
-      setError: methods.setError,
-      setIsLoading: setIsLoading,
-    });
+    mutation?.mutate(data);
   };
 
   useEffect(() => {

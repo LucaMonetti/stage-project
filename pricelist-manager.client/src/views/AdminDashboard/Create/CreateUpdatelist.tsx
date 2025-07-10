@@ -15,6 +15,8 @@ import GenericForm, {
 import GenericTableView from "../../../components/Dashboard/Tables/GenericTableView";
 import { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
+import { useCreateUpdateList } from "../../../hooks/updatelists/useMutationUpdateList";
+import { useAllProducts } from "../../../hooks/products/useQueryProducts";
 
 const CreateUpdatelistForm = () => {
   const config = {
@@ -43,6 +45,8 @@ const CreateUpdatelistForm = () => {
     endpoint: "updatelists",
   } satisfies Config<CreateUpdateList>;
 
+  const mutation = useCreateUpdateList();
+
   return (
     <div className="pb-4 px-8">
       <header className="flex justify-between items-center sticky top-[65.6px] bg-gray-900 z-50 py-4 border-gray-800 border-b-2">
@@ -68,6 +72,7 @@ const CreateUpdatelistForm = () => {
           id="create-updatelist-form"
           method={"POST"}
           externalProvider={true}
+          mutation={mutation}
         />
         <ProductTable />
       </GenericFormProvider>
@@ -76,14 +81,10 @@ const CreateUpdatelistForm = () => {
 };
 
 function ProductTable() {
-  const products = useGet({
-    endpoint: "products",
-    method: "GET",
-    schema: ProductArraySchema,
-  });
-
   const [selectedItem, setSelectedItem] = useState<Product[]>([]);
   const methods = useFormContext<CreateUpdateList>();
+
+  const { data, isPending, isError, error } = useAllProducts();
 
   useEffect(() => {
     methods.setValue(
@@ -94,11 +95,10 @@ function ProductTable() {
 
   return (
     <GenericTableView
-      data={useGet({
-        endpoint: "products",
-        method: "GET",
-        schema: ProductArraySchema,
-      })}
+      data={data || []}
+      isPending={isPending}
+      isError={isError}
+      error={error}
       keyField="id"
       config={{
         enableLink: false,
