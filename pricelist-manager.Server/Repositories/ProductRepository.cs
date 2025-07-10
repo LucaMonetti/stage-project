@@ -17,16 +17,16 @@ namespace pricelist_manager.Server.Repositories
         public ProductRepository(DataContext dataContext) : base(dataContext)
         { }
 
-        public async Task<bool> UpdateAsync(Product entity)
+        public async Task<Product> UpdateAsync(Product entity)
         {
             if (!CanConnect()) throw new StorageUnavailableException();
 
             if (!(await existsIdAsync(entity.Id))) throw new NotFoundException<Product>(entity.ProductCode);
 
             Context.Products.Update(entity);
-            var res = await Context.SaveChangesAsync();
+            await Context.SaveChangesAsync();
 
-            return res >= 1;
+            return entity;
         }
 
         public async Task<bool> ExistsIdAsync(string productId)
@@ -137,19 +137,19 @@ namespace pricelist_manager.Server.Repositories
             return await PagedList<Product>.ToPagedList(query, requestParams.Pagination.PageNumber, requestParams.Pagination.PageSize);
         }
 
-        public async Task<bool> CreateAsync(Product entity)
+        public async Task<Product> CreateAsync(Product entity)
         {
             if (!CanConnect()) throw new StorageUnavailableException();
 
             if (await existsIdAsync(entity.Id)) throw new AlreadyExistException<Product>(entity.Id);
 
             await Context.Products.AddAsync(entity);
-            var res = await Context.SaveChangesAsync();
+            await Context.SaveChangesAsync();
 
-            return res >= 1;
+            return entity;
         }
 
-        public async Task<bool> DeleteAsync(string productId)
+        public async Task<Product> DeleteAsync(string productId)
         {
             if (!CanConnect()) throw new StorageUnavailableException();
 
@@ -158,9 +158,9 @@ namespace pricelist_manager.Server.Repositories
             if (product == null) throw new NotFoundException<Product>(productId);
 
             Context.Products.Remove(product);
-            var res = await Context.SaveChangesAsync();
+            await Context.SaveChangesAsync();
 
-            return res >= 1;
+            return product;
         }
 
         public async Task<ProductStatistics> GetStatistics()

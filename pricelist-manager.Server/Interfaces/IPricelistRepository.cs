@@ -19,15 +19,15 @@ namespace pricelist_manager.Server.Interfaces
 
         /// <exception cref="StorageUnavailableException">The database is not available</exception>
         /// <exception cref="AlreadyExistsException">The Pricelist already exists.</exception>
-        Task<Boolean> CreateAsync(Pricelist entity);
+        Task<Pricelist> CreateAsync(Pricelist entity);
 
         /// <exception cref="StorageUnavailableException">The database is not available</exception>
         /// <exception cref="NotFoundException">The Pricelist doesn't exists.</exception>
-        Task<Boolean> UpdateAsync(Pricelist entity);
+        Task<Pricelist> UpdateAsync(Pricelist entity);
 
         /// <exception cref="StorageUnavailableException">The database is not available</exception>
         /// <exception cref="NotFoundException">The Pricelist doesn't exists.</exception>
-        Task<Boolean> DeleteAsync(Guid id);
+        Task<Pricelist> DeleteAsync(Guid id);
 
         /// <exception cref="StorageUnavailableException">The database is not available</exception>
         Task<Boolean> ExistsIdAsync(Guid id);

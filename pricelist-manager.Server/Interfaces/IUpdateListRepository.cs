@@ -15,12 +15,12 @@ namespace pricelist_manager.Server.Interfaces
         Task<UpdateList> GetByIdAsync(int id);
 
         Task<UpdateList> CreateAsync(UpdateList dto);
-        Task<Boolean> UpdateAsync(UpdateList dto);
-        Task<Boolean> UpdateProductStatusAsync(string productId, int editUpdateList, Status status);
+        Task<UpdateList> UpdateAsync(UpdateList dto);
+        Task<ProductToUpdateList> UpdateProductStatusAsync(string productId, int editUpdateList, Status status);
 
-        Task<Boolean> DeleteAsync(int id);
+        Task<UpdateList> DeleteAsync(int id);
 
-        Task<Boolean> AddProducts(ICollection<ProductToUpdateList> dto);
-        Task<Boolean> RemoveProducts(ICollection<ProductToUpdateList> dto);
+        Task<ICollection<ProductToUpdateList>> AddProducts(ICollection<ProductToUpdateList> dto);
+        Task<ICollection<ProductToUpdateList>> RemoveProducts(ICollection<ProductToUpdateList> dto);
     }
 }

@@ -16,15 +16,15 @@ namespace pricelist_manager.Server.Interfaces
 
         /// <exception cref="StorageUnavailableException">The database is not available</exception>
         /// <exception cref="AlreadyExistsException">The Company already exists.</exception>
-        Task<Boolean> CreateAsync(Company entity);
+        Task<Company> CreateAsync(Company entity);
 
         /// <exception cref="StorageUnavailableException">The database is not available</exception>
         /// <exception cref="NotFoundException">The Company doesn't exists.</exception>
-        Task<Boolean> UpdateAsync(Company entity);
+        Task<Company> UpdateAsync(Company entity);
 
         /// <exception cref="StorageUnavailableException">The database is not available</exception>
         /// <exception cref="NotFoundException">The Company doesn't exists.</exception>
-        Task<Boolean> DeleteAsync(string id);
+        Task<Company> DeleteAsync(string id);
 
         /// <exception cref="StorageUnavailableException">The database is not available</exception>
         Task<Boolean> ExistsIdAsync(string id);

@@ -103,7 +103,7 @@ namespace pricelist_manager.Server.Controllers.V1
             try
             {
                 var res = await PricelistRepository.CreateAsync(data);
-                return Ok(res);
+                return Ok(PricelistMapping.MapToDTO(res));
             }
             catch (AlreadyExistException<Pricelist> e)
             {
@@ -128,7 +128,7 @@ namespace pricelist_manager.Server.Controllers.V1
             try
             {
                 var res = await PricelistRepository.UpdateAsync(PricelistMapping.MapToPricelist(dto));
-                return Ok(res);
+                return Ok(PricelistMapping.MapToDTO(res));
             }
             catch (NotFoundException<Pricelist> e)
             {
@@ -147,7 +147,7 @@ namespace pricelist_manager.Server.Controllers.V1
             try
             {
                 var res = await PricelistRepository.DeleteAsync(id);
-                return Ok(res);
+                return Ok(PricelistMapping.MapToDTO(res));
             }
             catch (NotFoundException<Company> e)
             {

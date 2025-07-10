@@ -100,7 +100,7 @@ namespace pricelist_manager.Server.Controllers.V1
                 // Add Products To List
                 var res = await UpdateListRepository.AddProducts(ProductToUpdateListMappingService.MapToModels(item.Id, dto.Products ?? []));
 
-                return base.Ok(res);
+                return base.Ok(UpdateListMappingService.MapToDTO(item));
             }
             catch (Exceptions.AlreadyExistException<UpdateList> e)
             {
@@ -136,8 +136,8 @@ namespace pricelist_manager.Server.Controllers.V1
                     .Where(p => newProductIDs != null ? !newProductIDs.Contains(p.ProductId) : false)
                     .ToList();
 
-                var res = await UpdateListRepository.AddProducts(productsToAdd);
-                res &= await UpdateListRepository.RemoveProducts(productsToRemove);
+                await UpdateListRepository.AddProducts(productsToAdd);
+                await UpdateListRepository.RemoveProducts(productsToRemove);
 
                 // Update status of update list
                 var products = await UpdateListRepository.GetProductsByStatus(id, Status.Pending);
@@ -146,14 +146,14 @@ namespace pricelist_manager.Server.Controllers.V1
                 if (products.Count != 0 && updatelist.Status != Status.Pending)
                 {
                     updatelist.Status = Status.Pending;
-                    res &= await UpdateListRepository.UpdateAsync(updatelist);
+                    await UpdateListRepository.UpdateAsync(updatelist);
                 } else if (products.Count == 0 && updatelist.Status != Status.Edited)
                 {
                     updatelist.Status = Status.Edited;
-                    res &= await UpdateListRepository.UpdateAsync(updatelist);
+                    await UpdateListRepository.UpdateAsync(updatelist);
                 }
 
-                return base.Ok(res);
+                return base.Ok(UpdateListMappingService.MapToDTO(updatelist));
             }
             catch (Exceptions.AlreadyExistException<UpdateList> e)
             {
@@ -186,7 +186,7 @@ namespace pricelist_manager.Server.Controllers.V1
                 var model = UpdateListMappingService.MapToUpdateList(item, dto);
 
                 var res = await UpdateListRepository.UpdateAsync(model);
-                return Ok(res);
+                return Ok(item);
             }
             catch (NotFoundException<UpdateList> e)
             {
@@ -215,7 +215,7 @@ namespace pricelist_manager.Server.Controllers.V1
                 var model = UpdateListMappingService.MapToUpdateList(item, dto);
 
                 var res = await UpdateListRepository.UpdateAsync(model);
-                return Ok(res);
+                return Ok(UpdateListMappingService.MapToDTO(res));
             }
             catch (NotFoundException<UpdateList> e)
             {
@@ -233,8 +233,8 @@ namespace pricelist_manager.Server.Controllers.V1
 
             try
             {
-                var res = await UpdateListRepository.DeleteAsync(id);
-                return Ok(res);
+                var item = await UpdateListRepository.DeleteAsync(id);
+                return Ok(UpdateListMappingService.MapToDTO(item));
             }
             catch (NotFoundException<UpdateList> e)
             {

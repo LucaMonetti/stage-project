@@ -213,7 +213,7 @@ namespace pricelist_manager.Server.Controllers.V1
                 }
 
                 await transaction.CommitAsync();
-                return Ok(new { message = "Profile updated successfully!" });
+                return Ok(UserMapping.MapToDTO(user, await UserManager.GetRolesAsync(user)));
             }
             catch (Exception)
             {

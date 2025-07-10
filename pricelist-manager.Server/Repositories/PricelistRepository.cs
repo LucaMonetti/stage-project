@@ -15,19 +15,19 @@ namespace pricelist_manager.Server.Repositories
     {
         public PricelistRepository(DataContext dataContext) : base(dataContext) { }
 
-        public async Task<bool> CreateAsync(Pricelist entity)
+        public async Task<Pricelist> CreateAsync(Pricelist entity)
         {
             if (!CanConnect()) throw new StorageUnavailableException();
 
             if (await existsIdAsync(entity.Id)) throw new AlreadyExistException<Pricelist>(entity.Id);
 
             await Context.Pricelists.AddAsync(entity);
-            var res = await Context.SaveChangesAsync();
+            await Context.SaveChangesAsync();
 
-            return res >= 1;
+            return entity;
         }
 
-        public async Task<bool> DeleteAsync(Guid id)
+        public async Task<Pricelist> DeleteAsync(Guid id)
         {
             if (!CanConnect()) throw new StorageUnavailableException();
 
@@ -36,9 +36,9 @@ namespace pricelist_manager.Server.Repositories
             if (pricelist == null) throw new NotFoundException<Pricelist>(id);
 
             Context.Pricelists.Remove(pricelist);
-            var res = await Context.SaveChangesAsync();
+            await Context.SaveChangesAsync();
 
-            return res >= 1;
+            return pricelist;
         }
 
         public Task<bool> ExistsIdAsync(Guid id)
@@ -82,16 +82,16 @@ namespace pricelist_manager.Server.Repositories
             return pricelist;
         }
 
-        public async Task<bool> UpdateAsync(Pricelist entity)
+        public async Task<Pricelist> UpdateAsync(Pricelist entity)
         {
             if(!CanConnect()) throw new StorageUnavailableException();
 
             if (!(await existsIdAsync(entity.Id))) throw new NotFoundException<Pricelist>(entity.Id);
 
             Context.Pricelists.Update(entity);
-            var res = await Context.SaveChangesAsync();
+            await Context.SaveChangesAsync();
 
-            return res >= 1;
+            return entity;
         }
 
         public async Task<PricelistStatistics> GetStatistics()
