@@ -25,6 +25,7 @@ import CreateUpdatelistForm from "../views/AdminDashboard/Create/CreateUpdatelis
 import Sandbox from "../views/Sandbox";
 import EditUpdatelistForm from "../views/AdminDashboard/Edit/EditUpdatelist";
 import AddProductsForm from "../views/AdminDashboard/UpdateLists/AddProducts";
+import Login from "../views/Auth/Login";
 
 const router = createBrowserRouter([
   {
@@ -38,6 +39,10 @@ const router = createBrowserRouter([
       {
         path: "sandbox",
         Component: Sandbox,
+      },
+      {
+        path: "auth/login",
+        Component: Login,
       },
       {
         path: "admin-dashboard",

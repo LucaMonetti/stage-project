@@ -6,6 +6,7 @@ export const API_OPTIONS_GET = {
   method: "GET",
   headers: {
     accept: "application/json",
+    Authorization: `Bearer ${localStorage.getItem("jwtToken") || ""}`,
   },
 };
 
@@ -14,6 +15,7 @@ export const API_OPTIONS_POST = {
   headers: {
     "Content-Type": "application/json",
     accept: "application/json",
+    Authorization: `Bearer ${localStorage.getItem("jwtToken") || ""}`,
   },
 };
 export const API_OPTIONS_PUT = {
@@ -21,12 +23,14 @@ export const API_OPTIONS_PUT = {
   headers: {
     "Content-Type": "application/json",
     accept: "application/json",
+    Authorization: `Bearer ${localStorage.getItem("jwtToken") || ""}`,
   },
 };
 export const API_OPTIONS_DELETE = {
   method: "DELETE",
   headers: {
     accept: "application/json",
+    Authorization: `Bearer ${localStorage.getItem("jwtToken") || ""}`,
   },
 };
 

@@ -16,7 +16,7 @@ import {
 } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useGet, usePost } from "../../hooks/useGenericFetch";
-import { FaExclamation } from "react-icons/fa6";
+import { FaExclamation, FaPaperPlane } from "react-icons/fa6";
 import SearchSelect from "./SearchSelect";
 import { PricelistArraySchema, type Pricelist } from "../../models/Pricelist";
 import type { z, ZodType } from "zod/v4";
@@ -25,6 +25,9 @@ import type { Company } from "../../models/Company";
 import type { Product } from "../../models/Product";
 import isEqual from "lodash.isequal";
 import type { UseMutationResult } from "@tanstack/react-query";
+import FormButton from "../Buttons/FormButton";
+import SimpleIconButton from "../Buttons/SimpleButton";
+import ActionButton from "../Buttons/ActionButton";
 
 type InferredZodSchema<T extends FieldValues> = z.ZodType<T, any, any>;
 
@@ -37,7 +40,7 @@ interface Props<T extends FieldValues> {
   id: string;
   isRow?: boolean;
   externalProvider?: boolean;
-  mutation?: UseMutationResult<any, Error, T, unknown>;
+  mutation?: UseMutationResult<any, Error, any, unknown>;
 }
 
 interface BaseInput<T extends FieldValues> {
@@ -92,6 +95,12 @@ interface FieldSet<T extends FieldValues> {
 export interface Config<T extends FieldValues> {
   fieldset: FieldSet<T>[];
   endpoint: string;
+  submitButton:
+    | {
+        label: string;
+        isLoading: boolean;
+      }
+    | undefined;
 }
 
 function RenderInputField<T extends FieldValues>(
@@ -280,6 +289,16 @@ function GenericActualForm<T extends FieldValues>({
           })}
         </Fieldset>
       ))}
+
+      {config.submitButton && (
+        <button
+          type="submit"
+          className={`p-2 rounded flex gap-2 items-center bg-blue-600 hover:bg-blue-700 transition-colors`}
+        >
+          <FaPaperPlane className="text-white" />
+          Invia
+        </button>
+      )}
     </form>
   );
 }
