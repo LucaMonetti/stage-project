@@ -5,17 +5,15 @@ import InfoWidget from "../../../components/SinglePage/Widgets/InfoWidget";
 import DefinitionListWidget from "../../../components/SinglePage/Widgets/DefinitionListWidget";
 import { useGet } from "../../../hooks/useGenericFetch";
 import { UserSchema } from "../../../models/User";
+import { useAllUsers, useUser } from "../../../hooks/users/useQueryUsers";
 
 const SingleUserView = () => {
   const navigate = useNavigate();
   const { userId } = useParams();
-  const user = useGet({
-    method: "GET",
-    endpoint: `accounts/${userId}`,
-    schema: UserSchema,
-  });
 
-  if (user.isLoading) {
+  const { data, isPending, error, isError } = useUser(userId ?? "");
+
+  if (isPending) {
     return (
       <div className="px-8 py-4 flex justify-center align-center h-full">
         <BasicLoader />
@@ -23,16 +21,16 @@ const SingleUserView = () => {
     );
   }
 
-  if (user.errorMsg) {
+  if (isError) {
     navigate("/error/404");
   }
 
   return (
     <div className="px-8 py-8 grid grid-cols-4 gap-4">
       <InfoWidget
-        title={user.data?.username}
-        subtitle={`${user.data?.firstName} ${user.data?.lastName}`}
-        callout={`Ruolo: ${user.data?.roles.join(", ")}`}
+        title={data?.username}
+        subtitle={`${data?.firstName} ${data?.lastName}`}
+        callout={`Ruolo: ${data?.roles.join(", ")}`}
         CalloutIcon={FaUser}
         actions={[
           {
@@ -57,15 +55,15 @@ const SingleUserView = () => {
         values={[
           {
             title: "Nome",
-            value: `${user.data?.firstName} ${user.data?.lastName}`,
+            value: `${data?.firstName} ${data?.lastName}`,
           },
           {
             title: "Ruoli",
-            value: user.data?.roles.join(", "),
+            value: data?.roles.join(", "),
           },
           {
             title: "Azienda",
-            value: user.data?.company.id,
+            value: data?.company.id,
           },
         ]}
       />
@@ -75,15 +73,11 @@ const SingleUserView = () => {
         values={[
           {
             title: "Email",
-            value: (
-              <Link to={`mailto:${user.data?.email}`}>{user.data?.email}</Link>
-            ),
+            value: <Link to={`mailto:${data?.email}`}>{data?.email}</Link>,
           },
           {
             title: "Numero di telefono",
-            value: (
-              <Link to={`tel:${user.data?.phone}`}>{user.data?.phone}</Link>
-            ),
+            value: <Link to={`tel:${data?.phone}`}>{data?.phone}</Link>,
           },
         ]}
       />

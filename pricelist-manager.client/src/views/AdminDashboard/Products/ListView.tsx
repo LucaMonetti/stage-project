@@ -3,24 +3,17 @@ import ActionRenderer from "../../../components/Buttons/ActionRenderer";
 import GenericTableView, {
   type CustomColumnDef,
 } from "../../../components/Dashboard/Tables/GenericTableView";
-import { useFetch } from "../../../hooks/useFetch";
-import {
-  ProductArraySchema,
-  type Product,
-  type ProductFilter,
-} from "../../../models/Product";
+import { type Product, type ProductFilter } from "../../../models/Product";
 import { type Table } from "@tanstack/react-table";
 import type { Config } from "../../../components/Forms/GenericForm";
 import { CompanyArraySchema } from "../../../models/Company";
 import { useGet } from "../../../hooks/useGenericFetch";
 import { useState } from "react";
+import { useAllProducts } from "../../../hooks/products/useQueryProducts";
 
 const ProductsListView = () => {
-  const products = useGet({
-    method: "GET",
-    endpoint: "products",
-    schema: ProductArraySchema,
-  });
+  const { data, isPending, isError, error } = useAllProducts();
+
   const [table, setTable] = useState<Table<Product>>();
 
   const columns: CustomColumnDef<Product>[] = [
@@ -144,7 +137,10 @@ const ProductsListView = () => {
       </div>
 
       <GenericTableView
-        data={products}
+        data={data ?? []}
+        isPending={isPending}
+        isError={isError}
+        error={error}
         columns={columns}
         config={{
           baseUrl: "/admin-dashboard/products/:pid",

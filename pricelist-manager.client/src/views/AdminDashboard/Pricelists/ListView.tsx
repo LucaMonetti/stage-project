@@ -1,9 +1,7 @@
 import { FaPlus } from "react-icons/fa6";
 import ActionRenderer from "../../../components/Buttons/ActionRenderer";
 import GenericTableView from "../../../components/Dashboard/Tables/GenericTableView";
-import { useFetch } from "../../../hooks/useFetch";
 import {
-  PricelistArraySchema,
   type Pricelist,
   type PricelistFilter,
 } from "../../../models/Pricelist";
@@ -12,13 +10,11 @@ import { useState } from "react";
 import type { ColumnDef, Table } from "@tanstack/react-table";
 import { CompanyArraySchema } from "../../../models/Company";
 import type { Config } from "../../../components/Forms/GenericForm";
+import { useAllPricelists } from "../../../hooks/pricelists/useQueryPricelists";
 
 const PricelistListView = () => {
-  const pricelists = useGet({
-    method: "GET",
-    endpoint: "pricelists",
-    schema: PricelistArraySchema,
-  });
+  const { data, isPending, isError, error } = useAllPricelists();
+
   const [table, setTable] = useState<Table<Pricelist>>();
 
   const filterConfig = {
@@ -133,7 +129,10 @@ const PricelistListView = () => {
       </div>
 
       <GenericTableView
-        data={pricelists}
+        data={data ?? []}
+        isPending={isPending}
+        isError={isError}
+        error={error}
         columns={columns}
         onTableReady={setTable}
         filterConfig={filterConfig}

@@ -89,7 +89,7 @@ namespace pricelist_manager.Server.Controllers.V1
         }
 
         [HttpGet("{id}/products")]
-        public async Task<ActionResult<PagedList<ProductDTO>>> GetProductsByCompany(string id, ProductQueryParams requestParams)
+        public async Task<ActionResult<PagedList<ProductDTO>>> GetProductsByCompany(string id, [FromQuery] ProductQueryParams requestParams)
         {
             if (!ModelState.IsValid)
             {
@@ -131,7 +131,7 @@ namespace pricelist_manager.Server.Controllers.V1
             try
             {
                 var res = await CompanyRepository.CreateAsync(data);
-                return Ok(res);
+                return Ok(CompanyMapping.MapToDTO(res));
             }
             catch (AlreadyExistException<Company> e)
             {
@@ -156,7 +156,7 @@ namespace pricelist_manager.Server.Controllers.V1
             try
             {
                 var res = await CompanyRepository.UpdateAsync(dto);
-                return Ok(res);
+                return Ok(CompanyMapping.MapToDTO(res));
             }
             catch (NotFoundException<Company> e)
             {
@@ -175,7 +175,7 @@ namespace pricelist_manager.Server.Controllers.V1
             try
             {
                 var res = await CompanyRepository.DeleteAsync(id);
-                return Ok(res);
+                return Ok(CompanyMapping.MapToDTO(res));
             }
             catch (NotFoundException<Company> e)
             {

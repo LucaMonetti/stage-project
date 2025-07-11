@@ -1,10 +1,12 @@
 import { Link } from "react-router-dom";
-import type { FetchData } from "../../../types";
 import BasicLoader from "../../Loader/BasicLoader";
 
 type Props<T extends any[]> = {
   title: string;
-  fetch: FetchData<T>;
+  data: T;
+  isPending: boolean;
+  isError: boolean;
+  error: Error | null;
   color?: "blue" | "purple" | "yellow" | "green";
   Icon?: React.ComponentType<{ className?: string }>;
   getCallout?: (item: T[number]) => string;
@@ -29,7 +31,10 @@ const bodyVariant = {
 
 function ItemList<T extends any[]>({
   title,
-  fetch,
+  data,
+  isPending,
+  isError,
+  error,
   color = "blue",
   getline,
   getCallout,
@@ -48,12 +53,12 @@ function ItemList<T extends any[]>({
       </header>
       <main className="px-4 pb-4">
         <ul className="flex flex-col">
-          {fetch.isLoading ? (
+          {isPending ? (
             <BasicLoader color={color} />
-          ) : fetch.errorMsg != undefined ? (
-            <p className="text-red-500">{fetch.errorMsg}</p>
-          ) : fetch.data && fetch.data.length > 0 ? (
-            fetch.data.map((item: T[number]) => (
+          ) : isError ? (
+            <p className="text-red-500">{error?.message}</p>
+          ) : data && data.length > 0 ? (
+            data.map((item: T[number]) => (
               <li
                 key={getUniqueId(item)}
                 className="[&+li]:border-t-2 border-gray-700 py-2"

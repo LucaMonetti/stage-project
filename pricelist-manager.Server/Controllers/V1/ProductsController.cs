@@ -75,14 +75,13 @@ namespace pricelist_manager.Server.Controllers.V1
                 return BadRequest(ModelState);
             }
 
-
             try
             {
                 Pricelist pricelist = await PricelistRepository.GetByIdAsync(dto.PricelistId);
                 Product data = ProductMapping.MapToProduct(dto, pricelist.CompanyId);
                 
                 var res = await ProductRepository.CreateAsync(data);
-                return Ok(res);
+                return Ok(ProductMapping.MapToDTO(res));
             }
             catch (AlreadyExistException<Product> e)
             {
@@ -125,7 +124,7 @@ namespace pricelist_manager.Server.Controllers.V1
 
                 if (editUpdateList != null)
                 {
-                    res &= await UpdateListRepository.UpdateProductStatusAsync(productId, editUpdateList.Value, Status.Edited);
+                    await UpdateListRepository.UpdateProductStatusAsync(productId, editUpdateList.Value, Status.Edited);
                     
                     // Check if there are still products to edit
                     var products = await UpdateListRepository.GetProductsByStatus(editUpdateList.Value, Status.Pending);
@@ -135,11 +134,11 @@ namespace pricelist_manager.Server.Controllers.V1
 
                         item.Status = Status.Edited;
 
-                        res &= await UpdateListRepository.UpdateAsync(item);
+                        await UpdateListRepository.UpdateAsync(item);
                     }
                 }
 
-                return Ok(res);
+                return Ok(ProductMapping.MapToDTO(res));
             }
             catch (NotFoundException<Product> e)
             {
@@ -166,7 +165,7 @@ namespace pricelist_manager.Server.Controllers.V1
             try
             {
                 var res = await ProductRepository.DeleteAsync(productId);
-                return Ok(res);
+                return Ok(ProductMapping.MapToDTO(res));
             }
             catch (NotFoundException<Product> e)
             {

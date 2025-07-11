@@ -8,6 +8,7 @@ using pricelist_manager.Server.Helpers;
 using pricelist_manager.Server.Interfaces;
 using pricelist_manager.Server.Models;
 using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 
 namespace pricelist_manager.Server.Repositories
 {
@@ -17,40 +18,28 @@ namespace pricelist_manager.Server.Repositories
         public CompanyRepository(DataContext context) : base(context)
         { }
 
-        public async Task<bool> CreateAsync(Company entity)
+        public async Task<Company> CreateAsync(Company entity)
         {
             if (!CanConnect()) throw new StorageUnavailableException();
 
             if (ExistsId(entity.Id)) throw new AlreadyExistException<Company>(entity.Id);
 
-            try
-            {
-                await Context.AddAsync(entity);
-                await Context.SaveChangesAsync();
-            }
-            catch (Exception)
-            {
-                return false;
-            }
+            await Context.AddAsync(entity);
+            await Context.SaveChangesAsync();
 
-            return true;
+            return entity;
         }
 
-        public async Task<bool> DeleteAsync(string id)
+        public async Task<Company> DeleteAsync(string id)
         {
+            if (!CanConnect()) throw new StorageUnavailableException();
+
             var res = await GetByIdAsync(id);
 
-            try
-            {
-                Context.Remove(res);
-                await Context.SaveChangesAsync();
-            }
-            catch (Exception)
-            {
-                return false;
-            }
+            Context.Remove(res);
+            await Context.SaveChangesAsync();
 
-            return true;
+            return res;
         }
 
         public async Task<bool> ExistsIdAsync(string id)
@@ -92,22 +81,16 @@ namespace pricelist_manager.Server.Repositories
             return res;
         }
 
-        public async Task<bool> UpdateAsync(Company entity)
+        public async Task<Company> UpdateAsync(Company entity)
         {
             if (!CanConnect()) throw new StorageUnavailableException();
 
             if (!ExistsId(entity.Id)) throw new NotFoundException<Company>(entity.Id);
 
-            try
-            {
-                Context.Update(entity);
-                await Context.SaveChangesAsync();
-            } catch (Exception)
-            {
-                return false;
-            }
+            Context.Update(entity);
+            await Context.SaveChangesAsync();
 
-            return true;
+            return entity;
         }
 
         private bool ExistsId(string id)

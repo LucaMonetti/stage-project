@@ -4,16 +4,13 @@ import GenericForm, {
 } from "../../../components/Forms/GenericForm";
 
 import { FaPlus } from "react-icons/fa6";
-import {
-  CreateUserSchema,
-  EditUserSchema,
-  type CreateUser,
-  type EditUser,
-} from "../../../models/FormUser";
+import { EditUserSchema, type EditUser } from "../../../models/FormUser";
 import { useParams } from "react-router";
 import { useGet } from "../../../hooks/useGenericFetch";
 import { UserSchema } from "../../../models/User";
 import { CompanyArraySchema } from "../../../models/Company";
+import { useUser } from "../../../hooks/users/useQueryUsers";
+import { useEditUser } from "../../../hooks/users/useMutationUsers";
 
 const EditUserForm = () => {
   const config = {
@@ -114,11 +111,8 @@ const EditUserForm = () => {
   let data: EditUser | undefined = undefined;
 
   const { userId } = useParams();
-  const user = useGet({
-    endpoint: `accounts/${userId}`,
-    method: "GET",
-    schema: UserSchema,
-  });
+  const user = useUser(userId ?? "");
+  const mutation = useEditUser();
 
   if (user.data) {
     data = {
@@ -128,7 +122,7 @@ const EditUserForm = () => {
       firstName: user.data.firstName,
       lastName: user.data.lastName,
       phone: user.data.phone,
-      role: user.data.roles,
+      role: user.data.roles.join(", "),
       username: user.data.username,
       password: "",
     };
@@ -159,6 +153,7 @@ const EditUserForm = () => {
         config={{ ...config, endpoint: `accounts/${userId}` }}
         id="edit-user-form"
         method={"PUT"}
+        mutation={mutation}
       />
     </div>
   );

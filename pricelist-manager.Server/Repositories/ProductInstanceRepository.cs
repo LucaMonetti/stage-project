@@ -32,14 +32,14 @@ namespace pricelist_manager.Server.Repositories
             return productInstance;
         }
 
-        public async Task<bool> CreateAsync(ProductInstance productInstance)
+        public async Task<ProductInstance> CreateAsync(ProductInstance productInstance)
         {
             if (!CanConnect()) throw new StorageUnavailableException();
 
-            await Context.ProductInstances.AddAsync(productInstance);
+            var data = await Context.ProductInstances.AddAsync(productInstance);
             var res = await Context.SaveChangesAsync();
 
-            return res >= 1;
+            return data.Entity;
         }
 
     }

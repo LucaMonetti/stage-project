@@ -1,27 +1,27 @@
 import { FaPlus } from "react-icons/fa6";
 import ActionRenderer from "../../../components/Buttons/ActionRenderer";
 import GenericTableView, {
-  type Column,
   type CustomColumnDef,
 } from "../../../components/Dashboard/Tables/GenericTableView";
-import { useFetch } from "../../../hooks/useFetch";
-import {
-  UserArrraySchema,
-  type User,
-  type UserFilter,
-} from "../../../models/User";
+import { type User, type UserFilter } from "../../../models/User";
 import { useGet } from "../../../hooks/useGenericFetch";
 import { useState } from "react";
-import type { ColumnDef, Table } from "@tanstack/react-table";
+import type { Table } from "@tanstack/react-table";
 import type { Config } from "../../../components/Forms/GenericForm";
 import { CompanyArraySchema } from "../../../models/Company";
+import { useAllUsers } from "../../../hooks/users/useQueryUsers";
 
 const UsersListView = () => {
-  const users = useGet({
-    method: "GET",
-    endpoint: "accounts",
-    schema: UserArrraySchema,
-  });
+  const { data, isPending, isError, error } = useAllUsers();
+
+  // Add debugging
+  console.log("useAllUsers result:", { data, isPending, isError, error });
+  console.log("Data type:", typeof data);
+  console.log(
+    "Data length:",
+    Array.isArray(data) ? data.length : "Not an array"
+  );
+
   const [table, setTable] = useState<Table<User>>();
 
   const columns: CustomColumnDef<User>[] = [
@@ -116,7 +116,10 @@ const UsersListView = () => {
       </div>
 
       <GenericTableView
-        data={users}
+        data={data ?? []}
+        isPending={isPending}
+        isError={isError}
+        error={error}
         columns={columns}
         filterConfig={filterConfig}
         onTableReady={setTable}

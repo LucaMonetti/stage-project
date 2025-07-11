@@ -10,6 +10,7 @@ import {
 } from "../../../models/FormPricelist";
 import { useGet } from "../../../hooks/useGenericFetch";
 import { CompanyArraySchema } from "../../../models/Company";
+import { useCreatePricelist } from "../../../hooks/pricelists/useMutationPricelists";
 
 const CreatePricelistForm = () => {
   const config = {
@@ -53,6 +54,8 @@ const CreatePricelistForm = () => {
     endpoint: "pricelists",
   } satisfies Config<CreatePricelist>;
 
+  const mutation = useCreatePricelist();
+
   return (
     <div className="pb-4 px-8">
       <header className="flex justify-between items-center sticky top-[65.6px] bg-gray-900 z-50 py-4 border-gray-800 border-b-2">
@@ -76,6 +79,7 @@ const CreatePricelistForm = () => {
         config={config}
         id="create-pricelist-form"
         method={"POST"}
+        mutation={mutation}
       />
     </div>
   );

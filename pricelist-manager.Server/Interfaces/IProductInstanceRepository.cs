@@ -14,6 +14,6 @@ namespace pricelist_manager.Server.Interfaces
         
         /// <exception cref="StorageUnavailableException">The database is not available</exception>
         /// <exception cref="AlreadyExistsException">The Company already exists.</exception>
-        public Task<Boolean> CreateAsync(ProductInstance productInstance);
+        public Task<ProductInstance> CreateAsync(ProductInstance productInstance);
     }
 }

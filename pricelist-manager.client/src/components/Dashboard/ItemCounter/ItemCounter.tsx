@@ -7,7 +7,10 @@ import { FaPlus } from "react-icons/fa6";
 
 type Props<T> = {
   title: string;
-  fetch: FetchData<T>;
+  data: T;
+  isPending: boolean;
+  isError: boolean;
+  error: Error | null;
   description: string;
   color?: "blue" | "purple" | "yellow" | "green";
   Icon?: React.ComponentType<{ className?: string }>;
@@ -31,7 +34,10 @@ const bodyVariant = {
 
 function ItemCounter<T>({
   title,
-  fetch,
+  data,
+  isPending,
+  isError,
+  error,
   description,
   color = "blue",
   Icon = FaBoxesStacked,
@@ -53,13 +59,13 @@ function ItemCounter<T>({
         />
       </header>
       <main className="px-4 pb-4">
-        {fetch.isLoading ? (
+        {isPending ? (
           <BasicLoader color={color} />
-        ) : fetch.errorMsg != undefined ? (
-          <p className="text-red-500">{fetch.errorMsg}</p>
+        ) : isError ? (
+          <p className="text-red-500">{error?.message}</p>
         ) : (
           <p className={`text-4xl ${bodyVariant[color]} font-bold`}>
-            {getBodyText(fetch.data)}
+            {getBodyText(data)}
           </p>
         )}
         <p className="mt-2 text-gray-400">{description}</p>

@@ -1,24 +1,48 @@
-import { useFetch } from "../../../hooks/useFetch";
-import { CompanyStatisticsSchema } from "../../../models/CompanyStatistics";
-import { PricelistStatisticsSchema } from "../../../models/PricelistStatistics";
-import { ProductStatisticsSchema } from "../../../models/ProductStatistics";
-import { UserStatisticsSchema } from "../../../models/User";
+import {
+  useCompanyStatistics,
+  usePricelistStatistics,
+  useProductStatistics,
+  useUserStatistics,
+} from "../../../hooks/statistics/useQueryStatistics";
 import ItemCounter from "./ItemCounter";
 import { FaBuilding, FaListUl, FaUser } from "react-icons/fa6";
 
 function ItenCounterGroup() {
-  const products = useFetch("statistics/products", ProductStatisticsSchema);
-  const companies = useFetch("statistics/companies", CompanyStatisticsSchema);
-  const pricelists = useFetch(
-    "statistics/pricelists",
-    PricelistStatisticsSchema
-  );
-  const users = useFetch("statistics/accounts", UserStatisticsSchema);
+  const {
+    data: products,
+    isPending: isProductPending,
+    isError: isProductError,
+    error: productError,
+  } = useProductStatistics();
+
+  const {
+    data: pricelists,
+    isPending: isPricelistsPending,
+    isError: isPricelistsError,
+    error: pricelistsError,
+  } = usePricelistStatistics();
+
+  const {
+    data: companies,
+    isPending: isCompaniesPending,
+    isError: isCompaniesError,
+    error: companiesError,
+  } = useCompanyStatistics();
+
+  const {
+    data: users,
+    isPending: isUsersPending,
+    isError: isUsersError,
+    error: usersError,
+  } = useUserStatistics();
 
   return (
     <div className="flex flex-wrap gap-8 mt-8">
       <ItemCounter
-        fetch={companies}
+        data={companies}
+        isPending={isCompaniesPending}
+        isError={isCompaniesError}
+        error={companiesError}
         title={"Aziende"}
         color="purple"
         description={"Aziende registrate nel sistema"}
@@ -27,7 +51,10 @@ function ItenCounterGroup() {
         createLink="create/companies"
       />
       <ItemCounter
-        fetch={pricelists}
+        data={pricelists}
+        isPending={isPricelistsPending}
+        isError={isPricelistsError}
+        error={pricelistsError}
         title={"Listini"}
         color="green"
         description={"Totale listini creati"}
@@ -36,7 +63,10 @@ function ItenCounterGroup() {
         createLink="create/pricelists"
       />
       <ItemCounter
-        fetch={products}
+        data={products}
+        isPending={isProductPending}
+        isError={isProductError}
+        error={productError}
         title={"Prodotti"}
         color="blue"
         description={"Prodotti unici disponibili"}
@@ -44,7 +74,10 @@ function ItenCounterGroup() {
         createLink="create/products"
       />
       <ItemCounter
-        fetch={users}
+        data={users}
+        isPending={isUsersPending}
+        isError={isUsersError}
+        error={usersError}
         title={"Utenti"}
         Icon={FaUser}
         color="yellow"

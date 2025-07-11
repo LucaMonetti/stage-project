@@ -15,16 +15,16 @@ import { useState, useEffect, useRef } from "react";
 import { useFormContext } from "react-hook-form";
 import GenericTableView from "../../../components/Dashboard/Tables/GenericTableView";
 import { ProductArraySchema, type Product } from "../../../models/Product";
+import { useUpdateList } from "../../../hooks/updatelists/useQueryUpdatelists";
+import { useEditUpdateListProducts } from "../../../hooks/updatelists/useMutationUpdateList";
+import { useAllProducts } from "../../../hooks/products/useQueryProducts";
 
 const AddProductsForm = () => {
   let data: AddProductsUpdateList | undefined = undefined;
 
   const { updateListId } = useParams();
-  const updatelist = useGet({
-    endpoint: `updatelists/${updateListId}`,
-    method: "GET",
-    schema: UpdateListSchema,
-  });
+  const updatelist = useUpdateList(updateListId ?? "");
+  const mutation = useEditUpdateListProducts();
 
   const config = {
     fieldset: [
@@ -79,6 +79,7 @@ const AddProductsForm = () => {
           id="edit-updatelist-form"
           method={"POST"}
           externalProvider={true}
+          mutation={mutation}
         />
         <ProductTable />
       </GenericFormProvider>
@@ -87,11 +88,7 @@ const AddProductsForm = () => {
 };
 
 function ProductTable() {
-  const products = useGet({
-    endpoint: "products",
-    method: "GET",
-    schema: ProductArraySchema,
-  });
+  const products = useAllProducts();
 
   const [selectedItem, setSelectedItem] = useState<Product[]>([]);
   const isInitializedRef = useRef(false);
@@ -132,11 +129,10 @@ function ProductTable() {
 
   return (
     <GenericTableView
-      data={useGet({
-        endpoint: "products",
-        method: "GET",
-        schema: ProductArraySchema,
-      })}
+      data={products.data ?? []}
+      error={products.error}
+      isPending={products.isPending}
+      isError={products.isError}
       keyField="id"
       config={{
         enableLink: false,

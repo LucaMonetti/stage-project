@@ -7,23 +7,26 @@ import { useGet } from "../../../hooks/useGenericFetch";
 import { PricelistSchema } from "../../../models/Pricelist";
 import TableWidget from "../../../components/SinglePage/Widgets/TableWidget";
 import type { Column } from "../../../components/Dashboard/Tables/GenericTableView";
+import {
+  useAllPricelists,
+  usePricelist,
+} from "../../../hooks/pricelists/useQueryPricelists";
+import { useAllProductByPricelist } from "../../../hooks/products/useQueryProducts";
 
 const SinglePricelistView = () => {
   const navigate = useNavigate();
   const { pricelistId } = useParams();
-  const product = useGet({
-    method: "GET",
-    endpoint: `pricelists/${pricelistId}`,
-    schema: PricelistSchema,
-  });
 
-  const productsData = useGet({
-    method: "GET",
-    endpoint: `pricelists/${pricelistId}/products`,
-    schema: ProductArraySchema,
-  });
+  const { data, isPending, error, isError } = usePricelist(pricelistId ?? "");
 
-  if (product.isLoading) {
+  const {
+    data: productsData,
+    isPending: isProductsPending,
+    isError: isProductsError,
+    error: productsError,
+  } = useAllProductByPricelist(pricelistId ?? "");
+
+  if (isPending) {
     return (
       <div className="px-8 py-4 flex justify-center align-center h-full">
         <BasicLoader />
@@ -31,26 +34,28 @@ const SinglePricelistView = () => {
     );
   }
 
-  if (product.errorMsg) {
+  if (isError) {
     navigate("/error/404");
   }
 
   return (
     <div className="px-8 py-8 grid grid-cols-4 gap-4">
       <InfoWidget
-        title={product.data?.name}
-        subtitle={product.data?.description}
-        callout={`Totale Prodotti: ${product.data?.products?.length ?? 0}`}
+        title={data?.name}
+        subtitle={data?.description}
+        callout={`Totale Prodotti: ${data?.products?.length ?? 0}`}
         actions={[
           {
             color: "purple",
             Icon: FaPencil,
+            type: "link",
             route: `/admin-dashboard/edit/pricelists/${pricelistId}`,
             text: "Modifica",
           },
           {
             color: "blue",
             Icon: FaDownload,
+            type: "link",
             route: `/admin-dashboard/download/pricelists/${pricelistId}`,
             text: "Scarica",
           },
@@ -63,10 +68,14 @@ const SinglePricelistView = () => {
           {
             color: "blue",
             Icon: FaPlus,
+            type: "link",
             route: `/admin-dashboard/create/products?pricelistId=${pricelistId}`,
           },
         ]}
-        data={productsData}
+        data={productsData ?? []}
+        isPending={isProductsPending}
+        isError={isProductsError}
+        error={productsError}
         columns={[
           {
             accessorKey: "id",

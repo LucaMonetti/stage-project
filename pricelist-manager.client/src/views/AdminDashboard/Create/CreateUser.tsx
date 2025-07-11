@@ -7,6 +7,7 @@ import { FaPlus } from "react-icons/fa6";
 import { CreateUserSchema, type CreateUser } from "../../../models/FormUser";
 import { useGet } from "../../../hooks/useGenericFetch";
 import { CompanyArraySchema } from "../../../models/Company";
+import { useCreateUser } from "../../../hooks/users/useMutationUsers";
 
 const CreateUserForm = () => {
   const config = {
@@ -103,6 +104,8 @@ const CreateUserForm = () => {
     endpoint: "accounts/register",
   } satisfies Config<CreateUser>;
 
+  const mutation = useCreateUser();
+
   return (
     <div className="pb-4 px-8">
       <header className="flex justify-between items-center sticky top-[65.6px] bg-gray-900 z-50 py-4 border-gray-800 border-b-2">
@@ -122,6 +125,7 @@ const CreateUserForm = () => {
         config={config}
         id="create-user-form"
         method={"POST"}
+        mutation={mutation}
       />
     </div>
   );

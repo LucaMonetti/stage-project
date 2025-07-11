@@ -17,14 +17,20 @@ import {
   changeUpdateListStatus,
   deleteUpdateList,
 } from "../../../api/UpdateListAPI";
+import { useAllUpdateLists } from "../../../hooks/updatelists/useQueryUpdatelists";
+import {
+  useDeleteUpdateList,
+  useEditUpdateList,
+  useEditUpdateListStatus,
+} from "../../../hooks/updatelists/useMutationUpdateList";
 
 const UpdateListListView = () => {
-  const updatelists = useGet({
-    method: "GET",
-    endpoint: "updatelists",
-    schema: UpdateListArraySchema,
-  });
+  const { data, isPending, isError, error } = useAllUpdateLists();
+
   const [table, setTable] = useState<Table<UpdateList>>();
+
+  const deleteMutation = useDeleteUpdateList();
+  const editStateMutation = useEditUpdateListStatus();
 
   const columns: CustomColumnDef<UpdateList>[] = [
     {
@@ -81,11 +87,7 @@ const UpdateListListView = () => {
                 confirmColor: "blue",
               },
               handler: async () => {
-                var res = await changeUpdateListStatus(id, Status.Edited);
-
-                if (res == true) {
-                  updatelists.refetch();
-                }
+                editStateMutation.mutate({ id: id, status: Status.Edited });
               },
             });
           case Status.Edited:
@@ -98,11 +100,7 @@ const UpdateListListView = () => {
                 description: "Sei sicuro di voler eliminare questa lista?",
               },
               handler: async () => {
-                var res = await deleteUpdateList(id);
-
-                if (res == true) {
-                  updatelists.refetch();
-                }
+                deleteMutation.mutate(id);
               },
             });
             break;
@@ -151,7 +149,10 @@ const UpdateListListView = () => {
       </div>
 
       <GenericTableView
-        data={updatelists}
+        data={data ?? []}
+        isPending={isPending}
+        isError={isError}
+        error={error}
         columns={columns}
         onTableReady={setTable}
         config={{

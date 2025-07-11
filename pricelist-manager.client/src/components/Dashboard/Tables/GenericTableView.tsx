@@ -1,5 +1,4 @@
 import { useNavigate } from "react-router";
-import type { FetchData } from "../../../types";
 import BasicLoader from "../../Loader/BasicLoader";
 import { useEffect, useState } from "react";
 import type { FieldValues, Path } from "react-hook-form";
@@ -20,7 +19,10 @@ export type CustomColumnDef<T> = ColumnDef<T> & {
 };
 
 type Prods<T extends Record<string, any>, TFilter extends FieldValues> = {
-  data: FetchData<T[]>;
+  data: T[];
+  isPending: boolean;
+  isError: boolean;
+  error: Error | null;
   columns: CustomColumnDef<T>[];
   keyField: keyof T;
   className?: string;
@@ -55,6 +57,7 @@ function GenericTableView<
   TFilter extends FieldValues
 >({
   data,
+  isPending,
   columns,
   keyField,
   className,
@@ -74,7 +77,7 @@ function GenericTableView<
   const [columnFilters, setColumnFilters] = useState<ColumnFilter[]>([]);
 
   const table = useReactTable({
-    data: data.data ?? [],
+    data: data ?? [],
     columns,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
@@ -151,7 +154,7 @@ function GenericTableView<
   }, [table, onTableReady]);
 
   return (
-    <div>
+    <div className={className}>
       {filterConfig && <FilterRenderer config={filterConfig} />}
 
       {enableCheckbox && (
@@ -174,10 +177,10 @@ function GenericTableView<
                       type="checkbox"
                       className="rounded"
                       onChange={() => {
-                        if (!data.data) return;
+                        if (!data) return;
                         const allSelected =
                           selectedItems &&
-                          data.data.every((item) =>
+                          data.every((item) =>
                             selectedItems.some(
                               (selected) =>
                                 selected[keyField] === item[keyField]
@@ -185,14 +188,14 @@ function GenericTableView<
                           );
                         if (allSelected) {
                           // Deselect all
-                          data.data.forEach((item) => {
+                          data.forEach((item) => {
                             if (isRowSelected(item)) {
                               onRowSelect && onRowSelect(item);
                             }
                           });
                         } else {
                           // Select all
-                          data.data.forEach((item) => {
+                          data.forEach((item) => {
                             if (!isRowSelected(item)) {
                               onRowSelect && onRowSelect(item);
                             }
@@ -216,7 +219,7 @@ function GenericTableView<
               </tr>
             ))}
           </thead>
-          {data.isLoading ? (
+          {isPending ? (
             <tbody>
               <tr>
                 <td
@@ -227,10 +230,10 @@ function GenericTableView<
                 </td>
               </tr>
             </tbody>
-          ) : data.data && data.data.length > 0 ? (
+          ) : data && data.length > 0 ? (
             <tbody className="bg-gray-900 divide-y divide-gray-700">
               {table.getRowModel().rows.map((row, rowIndex) => {
-                const rowData = data.data ? data.data[rowIndex] : undefined;
+                const rowData = data ? data[rowIndex] : undefined;
                 return (
                   <tr
                     onClick={

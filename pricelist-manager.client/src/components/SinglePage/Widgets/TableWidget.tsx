@@ -1,15 +1,16 @@
-import type { FetchData } from "../../../types";
 import type { Action } from "../../Buttons/ActionRenderer";
 import ActionRenderer from "../../Buttons/ActionRenderer";
 import GenericTableView, {
-  type Column,
   type CustomColumnDef,
   type TableConfig,
 } from "../../Dashboard/Tables/GenericTableView";
 import WidgetBase from "./WidgetBase";
 
 type Props<T> = {
-  data: FetchData<T[]>;
+  data: T[];
+  isPending: boolean;
+  isError: boolean;
+  error: Error | null;
   columns: CustomColumnDef<T>[];
   config?: TableConfig<T>;
   keyField: keyof T;
@@ -19,6 +20,9 @@ type Props<T> = {
 
 function TableWidget<T extends Record<string, any>>({
   data,
+  isPending,
+  isError,
+  error,
   columns,
   config,
   keyField,
@@ -37,6 +41,9 @@ function TableWidget<T extends Record<string, any>>({
       </div>
       <GenericTableView
         data={data}
+        isPending={isPending}
+        isError={isError}
+        error={error}
         columns={columns}
         config={config}
         keyField={keyField}

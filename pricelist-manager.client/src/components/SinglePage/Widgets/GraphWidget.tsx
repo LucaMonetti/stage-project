@@ -82,7 +82,8 @@ function GraphWidget<T, DataType extends { y: any; x: any }>({
 
     const startDate = allValidDates[0];
     const endDate = allValidDates[allValidDates.length - 1];
-    endDate.setDate(endDate.getDate() + 1);
+    startDate.setDate(endDate.getDate() - 10);
+    endDate.setDate(endDate.getDate() + 10);
 
     // Generate complete date range
     const completeDateRange: DataType[] = [];
@@ -91,8 +92,6 @@ function GraphWidget<T, DataType extends { y: any; x: any }>({
     while (currentDate <= endDate) {
       const dayKey = currentDate.toISOString().split("T")[0];
       const existingData = lastPerDayMap.get(dayKey);
-
-      console.log("Checking date:", dayKey, "Existing data:", existingData);
 
       if (existingData) {
         completeDateRange.push(existingData);
@@ -132,12 +131,25 @@ function GraphWidget<T, DataType extends { y: any; x: any }>({
             stroke="#fff"
             tick={{ fill: "#fff" }}
             padding={{ left: 30, right: 30 }}
-            tickFormatter={(value) =>
-              new Intl.DateTimeFormat("it-IT", {
-                day: "2-digit",
-                month: "short",
-              }).format(new Date(value))
-            }
+            type="category"
+            scale="point"
+            tickFormatter={(value, index) => {
+              const currentDate = new Date(value);
+              const prevDate = index > 0 ? new Date(data[index - 1]?.y) : null;
+
+              // Show label only if it's the first day of the month or if the month changed
+              if (currentDate.getDate() == 1) {
+                return new Intl.DateTimeFormat("it-IT", {
+                  month: "long",
+                  year:
+                    currentDate.getFullYear() !== new Date().getFullYear()
+                      ? "numeric"
+                      : undefined,
+                }).format(currentDate);
+              }
+              return "";
+            }}
+            interval={0}
           />
           <YAxis stroke="#fff" tick={{ fill: "#fff" }} padding={{ top: 30 }} />
           <Tooltip
