@@ -16,5 +16,8 @@ namespace pricelist_manager.Server.Models
         public string CompanyId { get; set; } = string.Empty;
         public Company Company { get; set; } = null!;
 
+        public string? RefreshToken { get; set; }
+        public DateTime RefreshTokenExiryTime { get; set; }
+
     }
 }

@@ -83,5 +83,16 @@ namespace pricelist_manager.Server.Repositories
 
             return res;
         }
+
+        public async Task<User> UpdateAsync(User user)
+        {
+            if (!CanConnect())
+                throw new StorageUnavailableException();
+
+            var item = Context.Users.Update(user);
+            await Context.SaveChangesAsync();
+
+            return item.Entity;
+        }
     }
 }

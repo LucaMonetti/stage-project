@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using pricelist_manager.Server.Data;
+using pricelist_manager.Server.Helpers.Token;
 using pricelist_manager.Server.Interfaces;
 using pricelist_manager.Server.Mappers;
 using pricelist_manager.Server.Middlewares;
@@ -25,7 +26,6 @@ namespace pricelist_manager.Server
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-
             builder.Services.AddControllers();
 
             // Database
@@ -112,6 +112,8 @@ namespace pricelist_manager.Server
             builder.Services.AddScoped<IProductInstanceRepository, ProductInstanceRepository>();
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<IUpdateListRepository, UpdateListRepository>();
+
+            builder.Services.AddScoped<ITokenService, TokenService>();
 
             builder.Services.AddScoped<IProductMappingService, ProductMappingService>();
             builder.Services.AddScoped<IProductLiteMappingService, ProductLiteMappingService>();

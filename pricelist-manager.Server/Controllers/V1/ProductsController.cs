@@ -1,4 +1,5 @@
 ﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using pricelist_manager.Server.DTOs.V1;
@@ -7,13 +8,12 @@ using pricelist_manager.Server.Exceptions;
 using pricelist_manager.Server.Helpers;
 using pricelist_manager.Server.Interfaces;
 using pricelist_manager.Server.Models;
-using pricelist_manager.Server.Repositories;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace pricelist_manager.Server.Controllers.V1
 {
     [ApiController]
     [ApiVersion("1.0")]
+    [Authorize]
     [Route("api/v{version:apiVersion}/products")]
     public class ProductsController : ControllerBase
     {

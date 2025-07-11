@@ -10,6 +10,7 @@ namespace pricelist_manager.Server.Interfaces
         Task<(User user, ICollection<string> roles)> GetById(string userId);
         Task<ICollection<(User user, ICollection<string> roles)>> GetByCompany(string companyId);
 
+        Task<User> UpdateAsync(User user);
         Task<UserStatistics> GetStatistics();
     }
 }
