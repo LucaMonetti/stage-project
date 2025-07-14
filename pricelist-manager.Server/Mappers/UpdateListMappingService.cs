@@ -25,6 +25,7 @@ namespace pricelist_manager.Server.Mappers
                 Id = updateList.Id,
                 CreatedAt = DateTime.Now,
                 Description = updateList.Description,
+                CompanyId = updateList.CompanyId,
                 Status = updateList.Status,
                 Name = updateList.Name,
                 Products = ProductToUpdateListMappingService.MapToDTOs(updateList.ProductsToUpdateLists),
@@ -49,6 +50,7 @@ namespace pricelist_manager.Server.Mappers
             return new UpdateList
             {
                 Description = dto.Description,
+                CompanyId = dto.CompanyId,
                 Name = dto.Name,
             };
         }

@@ -70,3 +70,25 @@ export const useProductsByStatus = (updatelistId: string, status: Status) => {
     queryFn: () => fetchProductToUpdatelistByStatus(updatelistId, status),
   });
 };
+
+// Fetch all updatelists from the API
+const fetchAllUpdateListsByCompany = async (
+  companyId: string
+): Promise<UpdateList[]> => {
+  const response = await fetch(
+    queryEndpoint(`companies/${companyId}/updatelists`),
+    API_OPTIONS_GET
+  );
+  if (!response.ok) {
+    throw new Error("Failed to fetch updatelists");
+  }
+  const rawData = await response.json();
+  return UpdateListArraySchema.parse(rawData);
+};
+
+export const useAllUpdateListsByCompany = (companyId: string) => {
+  return useQuery<UpdateList[]>({
+    queryKey: ["companies", companyId, "updatelists"],
+    queryFn: () => fetchAllUpdateListsByCompany(companyId),
+  });
+};

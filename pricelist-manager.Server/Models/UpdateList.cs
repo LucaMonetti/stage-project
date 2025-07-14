@@ -12,6 +12,9 @@ namespace pricelist_manager.Server.Models
 
         [Length(1, 100)]
         public required string Name { get; set; } = string.Empty;
+
+        public required string CompanyId { get; set; }
+
         [Length(1, 200)]
         public required string Description { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; } = DateTime.Now;
@@ -20,5 +23,6 @@ namespace pricelist_manager.Server.Models
 
         // Navigation
         public virtual ICollection<ProductToUpdateList> ProductsToUpdateLists { get; set; } = [];
+        public virtual Company? Company { get; set; }
     }
 }

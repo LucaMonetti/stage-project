@@ -1,22 +1,6 @@
-import { useAllCompanies } from "../../../hooks/companies/useQueryCompanies";
-import {
-  useAllPricelists,
-  useAllPricelistsByCompany,
-} from "../../../hooks/pricelists/useQueryPricelists";
-import {
-  useAllProducts,
-  useAllProductsByCompany,
-} from "../../../hooks/products/useQueryProducts";
-import {
-  useAllUpdateLists,
-  useUpdateList,
-} from "../../../hooks/updatelists/useQueryUpdatelists";
-import { useFetch } from "../../../hooks/useFetch";
-import { useAllUsers } from "../../../hooks/users/useQueryUsers";
-import { CompanyArraySchema } from "../../../models/Company";
-import { PricelistArraySchema } from "../../../models/Pricelist";
-import { ProductArraySchema } from "../../../models/Product";
-import { UserArraySchema } from "../../../models/User";
+import { useAllPricelistsByCompany } from "../../../hooks/pricelists/useQueryPricelists";
+import { useAllProductsByCompany } from "../../../hooks/products/useQueryProducts";
+import { useAllUpdateListsByCompany } from "../../../hooks/updatelists/useQueryUpdatelists";
 import ItemList from "./ItemList";
 
 const ItemListGroupCompany = ({ companyId }: { companyId: string }) => {
@@ -39,7 +23,7 @@ const ItemListGroupCompany = ({ companyId }: { companyId: string }) => {
     isPending: isUpdateListsPending,
     isError: isUpdatelistsError,
     error: updatelistsError,
-  } = useAllUpdateLists();
+  } = useAllUpdateListsByCompany(companyId);
 
   return (
     <div className="flex flex-col flex-wrap gap-8 mt-8">

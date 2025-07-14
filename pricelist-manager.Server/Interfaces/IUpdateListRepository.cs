@@ -5,13 +5,14 @@ using pricelist_manager.Server.Models;
 
 namespace pricelist_manager.Server.Interfaces
 {
-    public interface IUpdateListRepository: IBaseRepository
+    public interface IUpdateListRepository : IBaseRepository
     {
         Task<PagedList<UpdateList>> GetAllAsync(UpdateListQueryParams requestParams);
         Task<ICollection<ProductToUpdateList>> GetProductsByList(int id, UpdateListQueryParams requestParams);
         Task<ICollection<ProductToUpdateList>> GetProductsByList(int id);
         Task<ICollection<ProductToUpdateList>> GetProductsByStatus(int updateListId, Status status);
-        
+        Task<PagedList<UpdateList>> GetByCompanyAsync(string companyId, UpdateListQueryParams requestParams);
+
         Task<UpdateList> GetByIdAsync(int id);
 
         Task<UpdateList> CreateAsync(UpdateList dto);

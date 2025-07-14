@@ -11,6 +11,7 @@ export const UpdateListSchema = z.object({
     (arg) => (typeof arg === "string" ? new Date(arg) : arg),
     z.date()
   ),
+  companyId: z.string(),
   status: z.enum(Status),
   totalProducts: z.number(),
   editedProducts: z.number(),

@@ -4,6 +4,7 @@ import { z } from "zod/v4";
 export const CreateUpdateListSchema = z.object({
   name: z.string(),
   description: z.string(),
+  companyId: z.string(),
   products: z.array(z.string()),
 });
 

@@ -9,14 +9,30 @@ import { useState } from "react";
 import type { Table } from "@tanstack/react-table";
 import { type UpdateList } from "../../../models/UpdateList";
 import { Status, StatusLabel } from "../../../types";
-import { useAllUpdateLists } from "../../../hooks/updatelists/useQueryUpdatelists";
+import {
+  useAllUpdateLists,
+  useAllUpdateListsByCompany,
+} from "../../../hooks/updatelists/useQueryUpdatelists";
 import {
   useDeleteUpdateList,
   useEditUpdateListStatus,
 } from "../../../hooks/updatelists/useMutationUpdateList";
+import type { UseQueryResult } from "@tanstack/react-query";
+import { useAuth } from "../../../components/Authentication/AuthenticationProvider";
 
 const UpdateListListView = () => {
-  const { data, isPending, isError, error } = useAllUpdateLists();
+  const { isAdmin, user } = useAuth();
+
+  let updatelists: UseQueryResult<UpdateList[]>;
+
+  if (isAdmin()) {
+    updatelists = useAllUpdateLists();
+  } else {
+    // If not admin, fetch only the update lists for the user's company
+    updatelists = useAllUpdateListsByCompany(user?.company.id ?? "");
+  }
+
+  const { data, isPending, isError, error } = updatelists;
 
   const [table, setTable] = useState<Table<UpdateList>>();
 
@@ -63,37 +79,44 @@ const UpdateListListView = () => {
       header: "Actions",
       cell: ({ row }) => {
         const { id, status } = row.original;
+
+        // Define actions outside the switch
+        const completeAction: Action = {
+          Icon: FaCheck,
+          type: "button",
+          color: "green",
+          modalConfig: {
+            title: "Segnare come completato?",
+            description:
+              "Sei sicuro di voler segnare questa lista come completata?",
+            confirmColor: "blue",
+          },
+          handler: async () => {
+            editStateMutation.mutate({ id: id, status: Status.Edited });
+          },
+        };
+
+        const deleteAction: Action = {
+          Icon: FaTrash,
+          type: "button",
+          color: "red",
+          modalConfig: {
+            title: "Eliminare la lista?",
+            description: "Sei sicuro di voler eliminare questa lista?",
+          },
+          handler: async () => {
+            deleteMutation.mutate(id);
+          },
+        };
+
         let actions: Action[] = [];
 
         switch (status) {
           case Status.Pending:
-            actions.push({
-              Icon: FaCheck,
-              type: "button",
-              color: "green",
-              modalConfig: {
-                title: "Segnare come completato?",
-                description:
-                  "Sei sicuro di voler segnare questa lista come completata?",
-                confirmColor: "blue",
-              },
-              handler: async () => {
-                editStateMutation.mutate({ id: id, status: Status.Edited });
-              },
-            });
+            actions = [completeAction, deleteAction];
+            break;
           case Status.Edited:
-            actions.push({
-              Icon: FaTrash,
-              type: "button",
-              color: "red",
-              modalConfig: {
-                title: "Eliminare la lista?",
-                description: "Sei sicuro di voler eliminare questa lista?",
-              },
-              handler: async () => {
-                deleteMutation.mutate(id);
-              },
-            });
+            actions = [deleteAction];
             break;
         }
 
@@ -104,18 +127,6 @@ const UpdateListListView = () => {
         );
       },
     },
-    // {
-    //   accessorKey: "products",
-    //   header: "Totale Prodotti",
-    //   cell: ({ getValue }) => {
-    //     const value = getValue() as any[];
-    //     return (
-    //       <span className="text-blue-400">
-    //         {value.length} {value.length === 1 ? "prodotto" : "prodotti"}
-    //       </span>
-    //     );
-    //   },
-    // },
   ];
 
   return (

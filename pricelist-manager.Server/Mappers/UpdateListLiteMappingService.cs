@@ -15,6 +15,7 @@ namespace pricelist_manager.Server.Mappers
                 Id = updateList.Id,
                 CreatedAt = DateTime.Now,
                 Description = updateList.Description,
+                CompanyId = updateList.CompanyId,
                 Status = updateList.Status,
                 Name = updateList.Name,
                 TotalProducts = updateList.ProductsToUpdateLists.Count,

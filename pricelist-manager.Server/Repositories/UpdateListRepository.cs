@@ -117,7 +117,7 @@ namespace pricelist_manager.Server.Repositories
             if (!CanConnect())
                 throw new StorageUnavailableException();
 
-            var res = await Context.ProductsToUpdateLists.Where(ptul => ptul.UpdateListId == id && 
+            var res = await Context.ProductsToUpdateLists.Where(ptul => ptul.UpdateListId == id &&
                 (requestParams.status.HasValue ? requestParams.status.Value == ptul.Status : true)).Include(ptul => ptul.Product).ThenInclude(p => p.Versions).ToListAsync();
 
             if (res == null)
@@ -152,7 +152,21 @@ namespace pricelist_manager.Server.Repositories
             return res;
         }
 
-        public  async Task<UpdateList> UpdateAsync(UpdateList dto)
+        public async Task<PagedList<UpdateList>> GetByCompanyAsync(string companyId, UpdateListQueryParams requestParams)
+        {
+            if (!CanConnect())
+                throw new StorageUnavailableException();
+
+            var query = Context.UpdateLists
+                .Where(ul => ul.CompanyId == companyId)
+                .Include(ul => ul.ProductsToUpdateLists)
+                .ThenInclude(ptul => ptul.Product)
+                .ThenInclude(p => p.Versions);
+
+            return await PagedList<UpdateList>.ToPagedList(query, requestParams.Pagination.PageNumber, requestParams.Pagination.PageSize);
+        }
+
+        public async Task<UpdateList> UpdateAsync(UpdateList dto)
         {
             if (!CanConnect())
                 throw new StorageUnavailableException();
@@ -177,7 +191,7 @@ namespace pricelist_manager.Server.Repositories
             var item = Context.ProductsToUpdateLists.First(ptul => ptul.UpdateListId == editUpdateList && ptul.ProductId == productId);
 
             item.Status = status;
-            
+
             var data = Context.ProductsToUpdateLists.Update(item);
             var res = await Context.SaveChangesAsync();
 

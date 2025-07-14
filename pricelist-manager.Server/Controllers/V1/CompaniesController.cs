@@ -23,14 +23,16 @@ namespace pricelist_manager.Server.Controllers.V1
         private readonly ICompanyRepository CompanyRepository;
         private readonly IProductRepository ProductRepository;
         private readonly IPricelistRepository PricelistRepository;
+        private readonly IUpdateListRepository UpdateListRepository;
         private readonly IUserRepository UserRepository;
         private readonly ICompanyMappingService CompanyMapping;
         private readonly IProductMappingService ProductMapping;
         private readonly IPricelistMappingService PricelistMapping;
         private readonly IUserMappingService UserMapping;
         private readonly IMetadataMappingService MetadataMapping;
+        private readonly IUpdateListMappingService UpdateListMapping;
 
-        public CompaniesController(ICompanyRepository companyRepository, IUserRepository userRepository, IProductRepository productRepository, IPricelistRepository pricelistRepository, ICompanyMappingService companyMapping, IProductMappingService productMapping, IPricelistMappingService pricelistMapping, IUserMappingService userMapping, IMetadataMappingService metadataMapping)
+        public CompaniesController(ICompanyRepository companyRepository, IUserRepository userRepository, IProductRepository productRepository, IPricelistRepository pricelistRepository, ICompanyMappingService companyMapping, IProductMappingService productMapping, IPricelistMappingService pricelistMapping, IUserMappingService userMapping, IMetadataMappingService metadataMapping, IUpdateListRepository updateListRepository, IUpdateListMappingService updateListMapping)
         {
             CompanyRepository = companyRepository;
             UserRepository = userRepository;
@@ -41,6 +43,8 @@ namespace pricelist_manager.Server.Controllers.V1
             PricelistMapping = pricelistMapping;
             UserMapping = userMapping;
             MetadataMapping = metadataMapping;
+            UpdateListRepository = updateListRepository;
+            UpdateListMapping = updateListMapping;
         }
 
         [HttpGet]
@@ -116,6 +120,21 @@ namespace pricelist_manager.Server.Controllers.V1
             Response.Headers["X-Pagination"] = JsonConvert.SerializeObject(MetadataMapping.MapToMetadata(data));
 
             return Ok(PricelistMapping.MapToDTOs(data));
+        }
+
+        [HttpGet("{id}/updatelists")]
+        public async Task<ActionResult<PagedList<UpdateList>>> GetUpdateListsByCompany(string id, [FromQuery] UpdateListQueryParams requestParams)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var data = await UpdateListRepository.GetByCompanyAsync(id, requestParams);
+
+            Response.Headers["X-Pagination"] = JsonConvert.SerializeObject(MetadataMapping.MapToMetadata(data));
+
+            return Ok(UpdateListMapping.MapToDTOs(data));
         }
 
         [HttpPost]

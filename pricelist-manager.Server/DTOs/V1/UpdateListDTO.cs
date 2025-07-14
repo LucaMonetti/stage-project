@@ -8,6 +8,8 @@ namespace pricelist_manager.Server.DTOs.V1
     {
         public required int Id { get; set; }
         public required string Name { get; set; } = string.Empty;
+        public required string CompanyId { get; set; }
+
         public required string Description { get; set; } = string.Empty;
         public required DateTime CreatedAt { get; set; } = DateTime.Now;
         public required Status Status { get; set; } = Status.Pending;

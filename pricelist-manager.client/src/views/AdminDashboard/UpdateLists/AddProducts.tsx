@@ -17,7 +17,10 @@ import GenericTableView from "../../../components/Dashboard/Tables/GenericTableV
 import { ProductArraySchema, type Product } from "../../../models/Product";
 import { useUpdateList } from "../../../hooks/updatelists/useQueryUpdatelists";
 import { useEditUpdateListProducts } from "../../../hooks/updatelists/useMutationUpdateList";
-import { useAllProducts } from "../../../hooks/products/useQueryProducts";
+import {
+  useAllProducts,
+  useAllProductsByCompany,
+} from "../../../hooks/products/useQueryProducts";
 
 const AddProductsForm = () => {
   let data: AddProductsUpdateList | undefined = undefined;
@@ -81,14 +84,16 @@ const AddProductsForm = () => {
           externalProvider={true}
           mutation={mutation}
         />
-        <ProductTable />
+        <ProductTable companyId={updatelist.data?.companyId ?? ""} />
       </GenericFormProvider>
     </div>
   );
 };
 
-function ProductTable() {
-  const products = useAllProducts();
+function ProductTable({ companyId }: { companyId: string }) {
+  const products = useAllProductsByCompany(companyId);
+
+  console.log("Products data:", products, companyId);
 
   const [selectedItem, setSelectedItem] = useState<Product[]>([]);
   const isInitializedRef = useRef(false);

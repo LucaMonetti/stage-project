@@ -13,13 +13,22 @@ import GenericForm, {
   type Config,
 } from "../../../components/Forms/GenericForm";
 import GenericTableView from "../../../components/Dashboard/Tables/GenericTableView";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState, useMemo } from "react";
 import { useFormContext } from "react-hook-form";
 import { useCreateUpdateList } from "../../../hooks/updatelists/useMutationUpdateList";
-import { useAllProducts } from "../../../hooks/products/useQueryProducts";
+import {
+  useAllProducts,
+  useAllProductsByCompany,
+} from "../../../hooks/products/useQueryProducts";
+import { useAuth } from "../../../components/Authentication/AuthenticationProvider";
+import type { UseQueryResult } from "@tanstack/react-query";
+import { useAllCompanies } from "../../../hooks/companies/useQueryCompanies";
 
 const CreateUpdatelistForm = () => {
-  const config = {
+  const { user, isAdmin } = useAuth();
+  const companies = useAllCompanies();
+
+  let config = {
     fieldset: [
       {
         title: "Informazioni Generali",
@@ -38,6 +47,22 @@ const CreateUpdatelistForm = () => {
             label: "Descrizione Lista",
             type: "textarea",
             placeholder: "Inserire la descrizione.",
+          },
+          {
+            id: "companyId",
+            label: "Azienda",
+            ...(isAdmin()
+              ? {
+                  type: "searchable",
+                  fetchData: companies,
+                  schema: "company",
+                  registerOptions: {
+                    required: "Necessario selezionare un'azienda!",
+                  },
+                }
+              : { type: "text" }),
+            placeholder: "Seleziona l'azienda",
+            isDisabled: !isAdmin(),
           },
         ],
       },
@@ -65,7 +90,7 @@ const CreateUpdatelistForm = () => {
       </header>
 
       <GenericFormProvider schema={CreateUpdateListSchema}>
-        <GenericForm
+        <GenericForm<CreateUpdateList>
           schema={CreateUpdateListSchema}
           className="mt-4"
           config={config}
@@ -73,18 +98,30 @@ const CreateUpdatelistForm = () => {
           method={"POST"}
           externalProvider={true}
           mutation={mutation}
+          values={{
+            name: "",
+            description: "",
+            companyId: user?.company.id ?? "",
+            products: [],
+          }}
         />
-        <ProductTable />
+        <ProductTable companyId={user?.company.id} />
       </GenericFormProvider>
     </div>
   );
 };
 
-function ProductTable() {
+function ProductTable({ companyId }: { companyId?: string }) {
   const [selectedItem, setSelectedItem] = useState<Product[]>([]);
   const methods = useFormContext<CreateUpdateList>();
 
-  const { data, isPending, isError, error } = useAllProducts();
+  let products: UseQueryResult<Product[], Error>;
+
+  if (companyId) {
+    products = useAllProductsByCompany(companyId);
+  } else {
+    products = useAllProducts();
+  }
 
   useEffect(() => {
     methods.setValue(
@@ -95,10 +132,10 @@ function ProductTable() {
 
   return (
     <GenericTableView
-      data={data || []}
-      isPending={isPending}
-      isError={isError}
-      error={error}
+      data={products.data || []}
+      isPending={products.isPending}
+      isError={products.isError}
+      error={products.error}
       keyField="id"
       config={{
         enableLink: false,
