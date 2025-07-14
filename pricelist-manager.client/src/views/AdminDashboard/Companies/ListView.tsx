@@ -8,8 +8,15 @@ import { useState } from "react";
 import type { Table } from "@tanstack/react-table";
 import type { Config } from "../../../components/Forms/GenericForm";
 import { useAllCompanies } from "../../../hooks/companies/useQueryCompanies";
+import { useAuth } from "../../../components/Authentication/AuthenticationProvider";
+import { useNavigate } from "react-router";
 
 const CompanyListView = () => {
+  const { isAdmin } = useAuth();
+  const navigate = useNavigate();
+
+  if (!isAdmin()) navigate("/auth/login");
+
   const { data: companies, isPending, isError, error } = useAllCompanies();
 
   const [table, setTable] = useState<Table<Company>>();

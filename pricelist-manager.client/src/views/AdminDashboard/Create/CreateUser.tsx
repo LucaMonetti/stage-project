@@ -8,8 +8,15 @@ import { CreateUserSchema, type CreateUser } from "../../../models/FormUser";
 import { useGet } from "../../../hooks/useGenericFetch";
 import { CompanyArraySchema } from "../../../models/Company";
 import { useCreateUser } from "../../../hooks/users/useMutationUsers";
+import { useAuth } from "../../../components/Authentication/AuthenticationProvider";
+import { useNavigate } from "react-router";
 
 const CreateUserForm = () => {
+  const { isAdmin } = useAuth();
+  const navigate = useNavigate();
+
+  if (!isAdmin()) navigate("/auth/login");
+
   const config = {
     fieldset: [
       {

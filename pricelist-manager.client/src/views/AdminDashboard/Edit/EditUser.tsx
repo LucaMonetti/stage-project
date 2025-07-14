@@ -5,14 +5,20 @@ import GenericForm, {
 
 import { FaPlus } from "react-icons/fa6";
 import { EditUserSchema, type EditUser } from "../../../models/FormUser";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { useGet } from "../../../hooks/useGenericFetch";
 import { UserSchema } from "../../../models/User";
 import { CompanyArraySchema } from "../../../models/Company";
 import { useUser } from "../../../hooks/users/useQueryUsers";
 import { useEditUser } from "../../../hooks/users/useMutationUsers";
+import { useAuth } from "../../../components/Authentication/AuthenticationProvider";
 
 const EditUserForm = () => {
+  const { isAdmin } = useAuth();
+  const navigate = useNavigate();
+
+  if (!isAdmin()) navigate("/auth/login");
+
   const config = {
     fieldset: [
       {

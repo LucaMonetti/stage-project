@@ -10,8 +10,15 @@ import type { Table } from "@tanstack/react-table";
 import type { Config } from "../../../components/Forms/GenericForm";
 import { CompanyArraySchema } from "../../../models/Company";
 import { useAllUsers } from "../../../hooks/users/useQueryUsers";
+import { useAuth } from "../../../components/Authentication/AuthenticationProvider";
+import { useNavigate } from "react-router";
 
 const UsersListView = () => {
+  const { isAdmin } = useAuth();
+  const navigate = useNavigate();
+
+  if (!isAdmin()) navigate("/auth/login");
+
   const { data, isPending, isError, error } = useAllUsers();
 
   // Add debugging

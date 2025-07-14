@@ -38,9 +38,10 @@ namespace pricelist_manager.Server.Controllers.V1
             string refreshToken = tokenApi.RefreshToken;
 
             var principal = TokenService.GetPrincipleFromExipiredToken(accessToken);
-            var username = principal.Identity.Name;
 
-            var user = await UserService.FindByNameAsync(username);
+            var email = principal.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Email)?.Value;
+
+            var user = await UserService.FindByEmailAsync(email ?? "");
 
             if (user is null || user.RefreshToken != refreshToken || user.RefreshTokenExiryTime <= DateTime.Now)
             {
@@ -55,7 +56,8 @@ namespace pricelist_manager.Server.Controllers.V1
             try
             {
                 await UserRepository.UpdateAsync(user);
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 return BadRequest(ex);
             }
@@ -71,8 +73,11 @@ namespace pricelist_manager.Server.Controllers.V1
         [Authorize]
         public async Task<IActionResult> Revoke()
         {
+            if (User.Identity == null)
+                return NoContent();
+
             var username = User.Identity.Name;
-            var user = await UserService.FindByNameAsync(username);
+            var user = await UserService.FindByNameAsync(username ?? "");
 
             if (user is null) return BadRequest();
 

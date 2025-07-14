@@ -36,9 +36,10 @@ const fetchUser = async (userId: string): Promise<User> => {
   return UserSchema.parse(rawData);
 };
 
-export const useUser = (userId: string) => {
+export const useUser = (userId: string, options?: { enabled?: boolean }) => {
   return useQuery<User>({
     queryKey: ["user", userId],
     queryFn: () => fetchUser(userId),
+    enabled: options?.enabled !== false && !!userId, // Only fetch if enabled and userId exists
   });
 };

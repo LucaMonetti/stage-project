@@ -10,7 +10,7 @@ function TopBar() {
         <nav>
           <ul className="flex gap-3">
             <MenuLink url="/" title="Home" />
-            <MenuLink url="/admin-dashboard" title="Admin" />
+            <MenuLink url="/dashboard" title="Dashboard" />
           </ul>
         </nav>
 
@@ -19,7 +19,7 @@ function TopBar() {
             <p>
               Ciao,{" "}
               <span className="text-blue-400 relative after:absolute after:bg-blue-400 after:w-0 after:h-0.5 after:-bottom-1 after:left-0 hover:after:w-full after:transition-all cursor-pointer ">
-                {user}
+                {user?.username}
               </span>
             </p>
             <span className="block bg-gray-400 border-2 border-gray-300 w-9 aspect-square rounded-full"></span>

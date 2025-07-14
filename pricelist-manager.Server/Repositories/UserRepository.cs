@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using System.Globalization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using pricelist_manager.Server.Data;
 using pricelist_manager.Server.DTOs.V1;
@@ -14,7 +15,7 @@ namespace pricelist_manager.Server.Repositories
     {
         private readonly UserManager<User> UserManager;
 
-        public UserRepository(DataContext dataContext, UserManager<User> userManage) : base(dataContext) 
+        public UserRepository(DataContext dataContext, UserManager<User> userManage) : base(dataContext)
         {
             UserManager = userManage;
         }
@@ -58,8 +59,23 @@ namespace pricelist_manager.Server.Repositories
 
             var data = await Context.Users.Include(u => u.Company).FirstOrDefaultAsync(u => u.Id == userId);
 
-            if (data == null) 
+            if (data == null)
                 throw new NotFoundException<User>(userId);
+
+            var userRoles = await UserManager.GetRolesAsync(data);
+
+            return (data, userRoles);
+        }
+        public async Task<(User user, ICollection<string> roles)> GetByEmail(string email)
+        {
+            if (!CanConnect()) throw new StorageUnavailableException();
+
+            var normalizedEmail = email.ToUpperInvariant();
+            var data = await Context.Users.Include(u => u.Company)
+                .FirstOrDefaultAsync(u => u.NormalizedEmail == normalizedEmail);
+
+            if (data == null)
+                throw new NotFoundException<User>(email, $"Not found user with email: {email}");
 
             var userRoles = await UserManager.GetRolesAsync(data);
 

@@ -1,8 +1,7 @@
 import { createBrowserRouter } from "react-router";
 import BaseLayout from "../views/BaseLayout";
 import HomeView from "../views/Index";
-import AdminDashboardLayout from "../views/AdminDashboard/BaseLayout";
-import AdminDashboardView from "../views/AdminDashboard/AdminDashboardView";
+import DashboardLayout from "../views/Dashboard/DashboardLayout";
 import CreateProductForm from "../views/AdminDashboard/Create/CreateProduct";
 import ProductsListView from "../views/AdminDashboard/Products/ListView";
 import SingleProductView from "../views/AdminDashboard/Products/SingleView";
@@ -26,6 +25,7 @@ import Sandbox from "../views/Sandbox";
 import EditUpdatelistForm from "../views/AdminDashboard/Edit/EditUpdatelist";
 import AddProductsForm from "../views/AdminDashboard/UpdateLists/AddProducts";
 import Login from "../views/Auth/Login";
+import DashboardView from "../views/Dashboard/Dashboard";
 
 const router = createBrowserRouter([
   {
@@ -45,12 +45,12 @@ const router = createBrowserRouter([
         Component: Login,
       },
       {
-        path: "admin-dashboard",
-        Component: AdminDashboardLayout,
+        path: "dashboard",
+        Component: DashboardLayout,
         children: [
           {
             index: true,
-            Component: AdminDashboardView,
+            Component: DashboardView,
           },
           {
             path: "create",

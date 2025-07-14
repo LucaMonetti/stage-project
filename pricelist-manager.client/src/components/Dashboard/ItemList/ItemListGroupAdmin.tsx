@@ -9,7 +9,7 @@ import { ProductArraySchema } from "../../../models/Product";
 import { UserArraySchema } from "../../../models/User";
 import ItemList from "./ItemList";
 
-const ItemListGroup = () => {
+const ItemListGroupAdmin = () => {
   const {
     data: products,
     isPending: isProductsPending,
@@ -89,4 +89,4 @@ const ItemListGroup = () => {
   );
 };
 
-export default ItemListGroup;
+export default ItemListGroupAdmin;

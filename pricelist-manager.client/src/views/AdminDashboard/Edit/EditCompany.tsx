@@ -8,9 +8,10 @@ import {
   EditCompanySchema,
   type EditCompany,
 } from "../../../models/FormCompany";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { useCompany } from "../../../hooks/companies/useQueryCompanies";
 import { useEditCompany } from "../../../hooks/companies/useMutationCompanies";
+import { useAuth } from "../../../components/Authentication/AuthenticationProvider";
 
 const config = {
   fieldset: [
@@ -99,6 +100,11 @@ const config = {
 } satisfies Config<EditCompany>;
 
 const EditCompanyForm = () => {
+  const { isAdmin } = useAuth();
+  const navigate = useNavigate();
+
+  if (!isAdmin()) navigate("/auth/login");
+
   let data: EditCompany | undefined = undefined;
 
   const { companyId } = useParams();

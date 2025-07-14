@@ -95,7 +95,7 @@ interface FieldSet<T extends FieldValues> {
 export interface Config<T extends FieldValues> {
   fieldset: FieldSet<T>[];
   endpoint: string;
-  submitButton:
+  submitButton?:
     | {
         label: string;
         isLoading: boolean;

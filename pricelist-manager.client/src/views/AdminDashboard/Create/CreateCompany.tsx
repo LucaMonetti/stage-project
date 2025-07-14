@@ -9,8 +9,15 @@ import {
   type CreateCompany,
 } from "../../../models/FormCompany";
 import { useCreateCompany } from "../../../hooks/companies/useMutationCompanies";
+import { useAuth } from "../../../components/Authentication/AuthenticationProvider";
+import { useNavigate } from "react-router";
 
 const CreateCompanyForm = () => {
+  const { isAdmin } = useAuth();
+  const navigate = useNavigate();
+
+  if (!isAdmin()) navigate("/auth/login");
+
   const config = {
     fieldset: [
       {

@@ -93,7 +93,7 @@ namespace pricelist_manager.Server.Controllers.V1
                 return BadRequest(ModelState);
             }
 
-            var user = await UserManager.FindByEmailAsync(dto.Email);
+            var (user, roles) = await UserRepository.GetByEmail(dto.Email);
 
             if (user == null)
                 return NotFound("User Not Found!");
@@ -105,14 +105,14 @@ namespace pricelist_manager.Server.Controllers.V1
                 return Unauthorized();
             }
 
-            var userRoles = await UserManager.GetRolesAsync(user);
             var authClaims = new List<Claim>
             {
-                new Claim(JwtRegisteredClaimNames.Sub, user.UserName!),
+                new Claim(JwtRegisteredClaimNames.Sub, user.Id),
+                new Claim(JwtRegisteredClaimNames.Email, user.Email ?? ""),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 
-            authClaims.AddRange(userRoles.Select(role => new Claim(ClaimTypes.Role, role)));
+            authClaims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
 
             var accessToken = TokenService.GenerateAccessToken(authClaims);
             var refreshToken = TokenService.GenerateRefreshToken();
@@ -129,7 +129,7 @@ namespace pricelist_manager.Server.Controllers.V1
                 return BadRequest(ex);
             }
 
-            return Ok(new AuthenticateResponse { Token = accessToken, RefreshToken = refreshToken});
+            return Ok(new AuthenticateResponse { Token = accessToken, RefreshToken = refreshToken });
         }
 
     }

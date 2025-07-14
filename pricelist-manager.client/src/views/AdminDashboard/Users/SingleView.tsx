@@ -3,15 +3,18 @@ import BasicLoader from "../../../components/Loader/BasicLoader";
 import { FaPencil, FaDownload, FaUser } from "react-icons/fa6";
 import InfoWidget from "../../../components/SinglePage/Widgets/InfoWidget";
 import DefinitionListWidget from "../../../components/SinglePage/Widgets/DefinitionListWidget";
-import { useGet } from "../../../hooks/useGenericFetch";
-import { UserSchema } from "../../../models/User";
-import { useAllUsers, useUser } from "../../../hooks/users/useQueryUsers";
+import { useUser } from "../../../hooks/users/useQueryUsers";
+import { useAuth } from "../../../components/Authentication/AuthenticationProvider";
 
 const SingleUserView = () => {
+  const { isAdmin } = useAuth();
   const navigate = useNavigate();
+
+  if (!isAdmin()) navigate("/auth/login");
+
   const { userId } = useParams();
 
-  const { data, isPending, error, isError } = useUser(userId ?? "");
+  const { data, isPending, isError } = useUser(userId ?? "");
 
   if (isPending) {
     return (

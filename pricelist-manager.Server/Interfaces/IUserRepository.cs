@@ -8,6 +8,7 @@ namespace pricelist_manager.Server.Interfaces
     {
         Task<ICollection<(User user, ICollection<string> roles)>> GetAll();
         Task<(User user, ICollection<string> roles)> GetById(string userId);
+        Task<(User user, ICollection<string> roles)> GetByEmail(string userId);
         Task<ICollection<(User user, ICollection<string> roles)>> GetByCompany(string companyId);
 
         Task<User> UpdateAsync(User user);

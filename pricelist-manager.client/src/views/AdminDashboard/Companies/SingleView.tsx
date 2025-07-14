@@ -7,9 +7,14 @@ import DefinitionListWidget from "../../../components/SinglePage/Widgets/Definit
 import { useCompany } from "../../../hooks/companies/useQueryCompanies";
 import { useAllProductsByCompany } from "../../../hooks/products/useQueryProducts";
 import { useAllPricelistsByCompany } from "../../../hooks/pricelists/useQueryPricelists";
+import { useAuth } from "../../../components/Authentication/AuthenticationProvider";
 
 const SingleCompanyView = () => {
+  const { isAdmin } = useAuth();
   const navigate = useNavigate();
+
+  if (!isAdmin()) navigate("/auth/login");
+
   const { companyId } = useParams();
 
   const {

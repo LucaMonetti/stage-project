@@ -1,20 +1,17 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { jwtDecode, type JwtPayload } from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
+import type { User } from "../../models/User";
+import { useUser } from "../../hooks/users/useQueryUsers";
 
 interface AuthContextType {
-  user: string | undefined;
+  user: User | undefined;
   isAuthenticated: boolean;
-  role: string | undefined;
   login: (token: string) => void;
   logout: () => void;
   isAdmin: () => boolean;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
-
-type CustomJwtPayload = JwtPayload & {
-  "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": string;
-};
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
@@ -29,49 +26,52 @@ const AuthenticationProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const [user, setUser] = useState<string>();
+  const [user, setUser] = useState<User>();
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [role, setRole] = useState<string>();
+  const [userId, setUserId] = useState<string>("");
+
+  // Always call the hook, but only when we have a userId
+  const userQuery = useUser(userId, { enabled: !!userId });
 
   useEffect(() => {
     const token = localStorage.getItem("jwtToken");
     if (token) {
       try {
-        const decodedToken = jwtDecode<CustomJwtPayload>(token);
+        const decodedToken = jwtDecode(token);
         if (!decodedToken.exp || decodedToken.exp * 1000 < Date.now()) {
           logout();
           return;
         }
 
-        setUser(decodedToken.sub);
-        setIsAuthenticated(true);
+        // Set the userId to trigger the user query
+        setUserId(decodedToken.sub ?? "");
 
-        setRole(
-          decodedToken[
-            "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"
-          ] ?? ""
-        );
+        setIsAuthenticated(true);
       } catch (error) {
-        console.error("Failed to decode JWT token:", error);
+        console.error(error);
         logout();
       }
     }
   }, []);
 
+  // Update user when userQuery data changes
+  useEffect(() => {
+    if (userQuery.data && userId) {
+      setUser(userQuery.data);
+      console.log("FROM USEEFFECT:", userQuery.data);
+    }
+  }, [userQuery.data, userId]);
+
   const login = (token: string) => {
     console.log("Login with token:", token);
 
     localStorage.setItem("jwtToken", token);
-    const decodedToken = jwtDecode<CustomJwtPayload>(token);
+    const decodedToken = jwtDecode(token);
 
-    const userRole =
-      decodedToken[
-        "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"
-      ] ?? "";
+    // Set the userId to trigger the user query
+    setUserId(decodedToken.sub ?? "");
 
-    setUser(decodedToken.sub);
     setIsAuthenticated(true);
-    setRole(userRole);
   };
 
   const logout = () => {
@@ -79,11 +79,10 @@ const AuthenticationProvider = ({
 
     setUser(undefined);
     setIsAuthenticated(false);
-    setRole(undefined);
   };
 
   const isAdmin = () => {
-    return role === "Admin";
+    return user?.roles.includes("Admin") ?? false;
   };
 
   return (
@@ -91,7 +90,6 @@ const AuthenticationProvider = ({
       value={{
         user,
         isAuthenticated,
-        role,
         login,
         logout,
         isAdmin,

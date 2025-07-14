@@ -7,7 +7,7 @@ import {
 import ItemCounter from "./ItemCounter";
 import { FaBuilding, FaListUl, FaUser } from "react-icons/fa6";
 
-function ItenCounterGroup() {
+function ItenCounterGroupAdmin() {
   const {
     data: products,
     isPending: isProductPending,
@@ -89,4 +89,4 @@ function ItenCounterGroup() {
   );
 }
 
-export default ItenCounterGroup;
+export default ItenCounterGroupAdmin;
