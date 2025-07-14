@@ -12,10 +12,13 @@ import {
   usePricelist,
 } from "../../../hooks/pricelists/useQueryPricelists";
 import { useAllProductByPricelist } from "../../../hooks/products/useQueryProducts";
+import { useAuth } from "../../../components/Authentication/AuthenticationProvider";
+import type { Action } from "../../../components/Buttons/ActionRenderer";
 
 const SinglePricelistView = () => {
   const navigate = useNavigate();
   const { pricelistId } = useParams();
+  const { isAdmin, user } = useAuth();
 
   const { data, isPending, error, isError } = usePricelist(pricelistId ?? "");
 
@@ -25,6 +28,26 @@ const SinglePricelistView = () => {
     isError: isProductsError,
     error: productsError,
   } = useAllProductByPricelist(pricelistId ?? "");
+
+  const actions: Action[] = [
+    {
+      color: "blue",
+      Icon: FaDownload,
+      type: "link",
+      route: `/dashboard/download/pricelists/${pricelistId}`,
+      text: "Scarica",
+    },
+  ];
+
+  if (isAdmin() || user?.company.id === data?.company.id) {
+    actions.unshift({
+      color: "purple",
+      Icon: FaPencil,
+      type: "link",
+      route: `/dashboard/edit/pricelists/${pricelistId}`,
+      text: "Modifica",
+    });
+  }
 
   if (isPending) {
     return (
@@ -44,22 +67,7 @@ const SinglePricelistView = () => {
         title={data?.name}
         subtitle={data?.description}
         callout={`Totale Prodotti: ${data?.products?.length ?? 0}`}
-        actions={[
-          {
-            color: "purple",
-            Icon: FaPencil,
-            type: "link",
-            route: `/admin-dashboard/edit/pricelists/${pricelistId}`,
-            text: "Modifica",
-          },
-          {
-            color: "blue",
-            Icon: FaDownload,
-            type: "link",
-            route: `/admin-dashboard/download/pricelists/${pricelistId}`,
-            text: "Scarica",
-          },
-        ]}
+        actions={actions}
       />
 
       <TableWidget
@@ -69,7 +77,7 @@ const SinglePricelistView = () => {
             color: "blue",
             Icon: FaPlus,
             type: "link",
-            route: `/admin-dashboard/create/products?pricelistId=${pricelistId}`,
+            route: `/dashboard/create/products?pricelistId=${pricelistId}`,
           },
         ]}
         data={productsData ?? []}
@@ -117,7 +125,7 @@ const SinglePricelistView = () => {
           },
         ]}
         config={{
-          baseUrl: "/admin-dashboard/products/:pid",
+          baseUrl: "/dashboard/products/:pid",
           enableLink: true,
           columnId: { ":pid": "id" },
         }}

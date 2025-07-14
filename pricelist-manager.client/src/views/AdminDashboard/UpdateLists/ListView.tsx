@@ -5,22 +5,13 @@ import ActionRenderer, {
 import GenericTableView, {
   type CustomColumnDef,
 } from "../../../components/Dashboard/Tables/GenericTableView";
-import { useGet, usePost } from "../../../hooks/useGenericFetch";
 import { useState } from "react";
-import type { ColumnDef, Table } from "@tanstack/react-table";
-import {
-  UpdateListArraySchema,
-  type UpdateList,
-} from "../../../models/UpdateList";
+import type { Table } from "@tanstack/react-table";
+import { type UpdateList } from "../../../models/UpdateList";
 import { Status, StatusLabel } from "../../../types";
-import {
-  changeUpdateListStatus,
-  deleteUpdateList,
-} from "../../../api/UpdateListAPI";
 import { useAllUpdateLists } from "../../../hooks/updatelists/useQueryUpdatelists";
 import {
   useDeleteUpdateList,
-  useEditUpdateList,
   useEditUpdateListStatus,
 } from "../../../hooks/updatelists/useMutationUpdateList";
 
@@ -141,7 +132,7 @@ const UpdateListListView = () => {
             {
               color: "blue",
               Icon: FaPlus,
-              route: `/admin-dashboard/create/updatelists`,
+              route: `/dashboard/create/updatelists`,
               type: "link",
             },
           ]}
@@ -156,7 +147,7 @@ const UpdateListListView = () => {
         columns={columns}
         onTableReady={setTable}
         config={{
-          baseUrl: "/admin-dashboard/updatelists/:pid",
+          baseUrl: "/dashboard/updatelists/:pid",
           enableLink: true,
           columnId: { ":pid": "id" },
         }}

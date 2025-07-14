@@ -23,14 +23,14 @@ namespace pricelist_manager.Server.Controllers.V1
         }
 
         [HttpGet("products")]
-        public async Task<IActionResult> GetProductsStats()
+        public async Task<IActionResult> GetProductsStats(string? companyId)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var data = await ProductsRepository.GetStatistics();
+            var data = await ProductsRepository.GetStatistics(companyId);
 
             return Ok(data);
         }
@@ -62,14 +62,14 @@ namespace pricelist_manager.Server.Controllers.V1
         }
 
         [HttpGet("pricelists")]
-        public async Task<IActionResult> GetPricelistsStats()
+        public async Task<IActionResult> GetPricelistsStats(string? companyId)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var data = await PricelistRepository.GetStatistics();
+            var data = await PricelistRepository.GetStatistics(companyId);
 
             return Ok(data);
         }

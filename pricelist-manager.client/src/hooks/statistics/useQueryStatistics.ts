@@ -34,10 +34,32 @@ export const useProductStatistics = () => {
   });
 };
 
+// Fetch the product statistics from the API
+const fetchProductStatisticsByCompany = async (
+  companyId: string
+): Promise<ProductStatistics> => {
+  const response = await fetch(
+    queryEndpoint("statistics/products?companyId=" + companyId),
+    API_OPTIONS_GET
+  );
+  if (!response.ok) {
+    throw new Error("Failed to fetch product statistics");
+  }
+  const rawData = await response.json();
+  return ProductStatisticsSchema.parse(rawData);
+};
+
+export const useProductStatisticsByCompany = (companyId: string) => {
+  return useQuery<ProductStatistics>({
+    queryKey: ["statistics", "products", companyId],
+    queryFn: () => fetchProductStatisticsByCompany(companyId),
+  });
+};
+
 // Fetch the pricelist statistics from the API
 const fetchPricelistStatistics = async (): Promise<PricelistStatistics> => {
   const response = await fetch(
-    queryEndpoint("statistics/products"),
+    queryEndpoint("statistics/pricelists"),
     API_OPTIONS_GET
   );
   if (!response.ok) {
@@ -51,6 +73,28 @@ export const usePricelistStatistics = () => {
   return useQuery<PricelistStatistics>({
     queryKey: ["statistics", "pricelists"],
     queryFn: fetchPricelistStatistics,
+  });
+};
+
+// Fetch the pricelist statistics from the API
+const fetchPricelistStatisticsByCompany = async (
+  companyId: string
+): Promise<PricelistStatistics> => {
+  const response = await fetch(
+    queryEndpoint("statistics/pricelists?companyId=" + companyId),
+    API_OPTIONS_GET
+  );
+  if (!response.ok) {
+    throw new Error("Failed to fetch pricelists statistics");
+  }
+  const rawData = await response.json();
+  return PricelistStatisticsSchema.parse(rawData);
+};
+
+export const usePricelistStatisticsByCompany = (companyId: string) => {
+  return useQuery<PricelistStatistics>({
+    queryKey: ["statistics", "pricelists", companyId],
+    queryFn: () => fetchPricelistStatisticsByCompany(companyId),
   });
 };
 

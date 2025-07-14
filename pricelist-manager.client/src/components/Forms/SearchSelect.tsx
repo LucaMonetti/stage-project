@@ -14,6 +14,7 @@ import {
   useState,
   type ChangeEventHandler,
 } from "react";
+import type { UseQueryResult } from "@tanstack/react-query";
 
 const customStyles = (hasError: boolean) => ({
   control: (base: any) => ({
@@ -87,7 +88,7 @@ type Props<T extends FieldValues, OptionItem> = {
   isDisabled?: boolean;
   label: string;
   placeholder?: string;
-  fetchData: FetchData<OptionItem[]>;
+  fetchData: UseQueryResult<OptionItem[]>;
   getLabel: (item: OptionItem) => string;
   getValue: (item: OptionItem) => string;
   groupBy?: (item: OptionItem) => { id: string; name: string };

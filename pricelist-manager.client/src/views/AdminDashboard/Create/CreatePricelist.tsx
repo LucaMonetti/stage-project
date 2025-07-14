@@ -9,10 +9,25 @@ import {
   type CreatePricelist,
 } from "../../../models/FormPricelist";
 import { useGet } from "../../../hooks/useGenericFetch";
-import { CompanyArraySchema } from "../../../models/Company";
+import { CompanyArraySchema, type Company } from "../../../models/Company";
 import { useCreatePricelist } from "../../../hooks/pricelists/useMutationPricelists";
+import { useAuth } from "../../../components/Authentication/AuthenticationProvider";
+import type { UseQueryResult } from "@tanstack/react-query";
+import {
+  useAllCompanies,
+  useCompany,
+} from "../../../hooks/companies/useQueryCompanies";
 
 const CreatePricelistForm = () => {
+  const { user, isAdmin } = useAuth();
+  let companies: UseQueryResult<Company[] | Company, Error>;
+
+  if (isAdmin()) {
+    companies = useAllCompanies();
+  } else {
+    companies = useCompany(user?.company.id ?? "");
+  }
+
   const config = {
     fieldset: [
       {
@@ -30,17 +45,8 @@ const CreatePricelistForm = () => {
           {
             id: "companyId",
             label: "Codice Azienda",
-            type: "searchable",
-            fetchData: useGet({
-              endpoint: "companies",
-              method: "GET",
-              schema: CompanyArraySchema,
-            }),
-            schema: "company",
-            placeholder: "Inserire il codice dell'azienda",
-            registerOptions: {
-              required: "Necessario inserire il codice dell'Azienda.",
-            },
+            type: "text",
+            isDisabled: !isAdmin(),
           },
           {
             id: "description",
@@ -73,13 +79,22 @@ const CreatePricelistForm = () => {
         />
       </header>
 
-      <GenericForm
+      <GenericForm<CreatePricelist>
         schema={CreatePricelistSchema}
         className="mt-4"
         config={config}
         id="create-pricelist-form"
         method={"POST"}
         mutation={mutation}
+        {...(!isAdmin()
+          ? {
+              values: {
+                name: "",
+                description: "",
+                companyId: user?.company.id ?? "",
+              },
+            }
+          : {})}
       />
     </div>
   );

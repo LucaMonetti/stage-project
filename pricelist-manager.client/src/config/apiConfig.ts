@@ -35,8 +35,8 @@ export const API_OPTIONS_DELETE = {
 };
 
 export const queryEndpoint = (
-  endpotin: string,
+  endpoint: string,
   version: string = API_DEFAULT_VERSION
 ): string => {
-  return `${API_BASE_URL}/${version}/${endpotin}`;
+  return `${API_BASE_URL}/${version}/${endpoint}`;
 };

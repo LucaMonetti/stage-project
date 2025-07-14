@@ -129,7 +129,7 @@ const ProductsListView = () => {
             {
               color: "blue",
               Icon: FaPlus,
-              route: `/admin-dashboard/create/products`,
+              route: `/dashboard/create/products`,
               type: "link",
             },
           ]}
@@ -143,13 +143,13 @@ const ProductsListView = () => {
         error={error}
         columns={columns}
         config={{
-          baseUrl: "/admin-dashboard/products/:pid",
+          baseUrl: "/dashboard/products/:pid",
           enableLink: true,
           columnId: { ":pid": "id" },
         }}
         onTableReady={setTable}
         filterConfig={filterConfig}
-        keyField="productCode"
+        keyField="id"
       />
     </div>
   );

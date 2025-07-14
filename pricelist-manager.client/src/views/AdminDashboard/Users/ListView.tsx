@@ -115,7 +115,7 @@ const UsersListView = () => {
             {
               color: "blue",
               Icon: FaPlus,
-              route: `/admin-dashboard/create/users`,
+              route: `/dashboard/create/users`,
               type: "link",
             },
           ]}
@@ -131,7 +131,7 @@ const UsersListView = () => {
         filterConfig={filterConfig}
         onTableReady={setTable}
         config={{
-          baseUrl: "/admin-dashboard/users/:uid",
+          baseUrl: "/dashboard/users/:uid",
           enableLink: true,
           columnId: { ":uid": "id" },
         }}

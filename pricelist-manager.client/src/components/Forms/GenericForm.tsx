@@ -24,7 +24,7 @@ import type { FetchData } from "../../types";
 import type { Company } from "../../models/Company";
 import type { Product } from "../../models/Product";
 import isEqual from "lodash.isequal";
-import type { UseMutationResult } from "@tanstack/react-query";
+import type { UseMutationResult, UseQueryResult } from "@tanstack/react-query";
 import FormButton from "../Buttons/FormButton";
 import SimpleIconButton from "../Buttons/SimpleButton";
 import ActionButton from "../Buttons/ActionButton";
@@ -77,7 +77,7 @@ interface SearchableInput<T extends FieldValues> extends BaseInput<T> {
   type: "searchable";
   maxLength?: number;
   schema: "pricelist" | "product" | "company";
-  fetchData: FetchData<Pricelist[] | Product[] | Company[]>;
+  fetchData: UseQueryResult<Pricelist[] | Product[] | Company[], Error>;
   onChange?: (value: string) => void;
 }
 
@@ -167,7 +167,7 @@ function RenderInputField<T extends FieldValues>(
               isDisabled={input.isDisabled}
               {...commonProps}
               control={control}
-              fetchData={input.fetchData as FetchData<Pricelist[]>}
+              fetchData={input.fetchData as UseQueryResult<Pricelist[]>}
               onChange={input.onChange ?? undefined}
               getLabel={(p) => `${p.company.id} - ${p.name}`}
               getValue={(p) => p.id}
@@ -182,7 +182,7 @@ function RenderInputField<T extends FieldValues>(
               isDisabled={input.isDisabled}
               {...commonProps}
               control={control}
-              fetchData={input.fetchData as FetchData<Company[]>}
+              fetchData={input.fetchData as UseQueryResult<Company[]>}
               onChange={input.onChange ?? undefined}
               getLabel={(p) => `${p.name} (${p.id})`}
               getValue={(p) => p.id}
@@ -196,7 +196,7 @@ function RenderInputField<T extends FieldValues>(
               isDisabled={input.isDisabled}
               {...commonProps}
               control={control}
-              fetchData={input.fetchData as FetchData<Product[]>}
+              fetchData={input.fetchData as UseQueryResult<Product[]>}
               onChange={input.onChange ?? undefined}
               getLabel={(p) => `${p.id} - ${p.currentInstance.name}`}
               getValue={(p) => p.id}
@@ -311,7 +311,7 @@ export function GenericFormProvider<T extends FieldValues>({
   children: React.ReactNode;
 }) {
   const methods = useForm<T>({
-    mode: "all",
+    mode: "onChange",
     resolver: zodResolver(schema),
   });
 

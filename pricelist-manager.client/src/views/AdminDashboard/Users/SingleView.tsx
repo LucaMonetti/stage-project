@@ -40,14 +40,14 @@ const SingleUserView = () => {
             color: "purple",
             type: "link",
             Icon: FaPencil,
-            route: `/admin-dashboard/edit/users/${userId}`,
+            route: `/dashboard/edit/users/${userId}`,
             text: "Modifica",
           },
           {
             color: "blue",
             type: "link",
             Icon: FaDownload,
-            route: `/admin-dashboard/download/users/${userId}`,
+            route: `/dashboard/download/users/${userId}`,
             text: "Scarica",
           },
         ]}

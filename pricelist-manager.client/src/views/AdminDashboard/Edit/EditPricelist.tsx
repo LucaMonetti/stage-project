@@ -29,18 +29,8 @@ const EditPricelistForm = () => {
           {
             id: "companyId",
             label: "Codice Azienda",
-            type: "searchable",
+            type: "text",
             isDisabled: true,
-            schema: "company",
-            fetchData: useGet({
-              endpoint: `companies`,
-              method: "GET",
-              schema: CompanyArraySchema,
-            }),
-            placeholder: "Inserire il codice dell'azienda",
-            registerOptions: {
-              required: "Necessario inserire il codice dell'Azienda.",
-            },
           },
           {
             id: "name",

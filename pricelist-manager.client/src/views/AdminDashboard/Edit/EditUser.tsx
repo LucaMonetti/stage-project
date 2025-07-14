@@ -27,18 +27,9 @@ const EditUserForm = () => {
           {
             id: "companyId",
             label: "Codice Azienda",
-            type: "searchable",
+            type: "text",
             isDisabled: true,
-            schema: "company",
-            fetchData: useGet({
-              endpoint: `companies`,
-              method: "GET",
-              schema: CompanyArraySchema,
-            }),
             placeholder: "Inserire il dell'Azienda per cui lavora l'utente.",
-            registerOptions: {
-              required: "Necessario inserire il codice dell'Azienda",
-            },
           },
           {
             id: "firstName",

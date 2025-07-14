@@ -1,12 +1,27 @@
 import { Outlet, useNavigate } from "react-router";
 import Sidebar, { type LinkProps } from "../../components/Sidebar/Sidebar";
 import { useAuth } from "../../components/Authentication/AuthenticationProvider";
+import { useEffect } from "react";
+import BasicLoader from "../../components/Loader/BasicLoader";
 
 const DashboardLayout = () => {
   const navigate = useNavigate();
   const { isAdmin, isAuthenticated } = useAuth();
 
-  if (!isAuthenticated) navigate("/auth/login");
+  useEffect(() => {
+    if (isAuthenticated === false) {
+      navigate("/auth/login");
+    }
+  }, [isAuthenticated, navigate]);
+
+  // Show loading state while authentication status is being determined
+  if (isAuthenticated !== true) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <BasicLoader />
+      </div>
+    );
+  }
 
   let topLinks: LinkProps[], bottomLinks: LinkProps[];
 
@@ -59,7 +74,7 @@ const DashboardLayout = () => {
         label: "Prodotti",
       },
       {
-        url: "update-lists",
+        url: "updatelists",
         label: "Liste di aggiornamento",
       },
     ];

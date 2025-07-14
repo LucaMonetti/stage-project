@@ -102,7 +102,7 @@ function ProductTable() {
       keyField="id"
       config={{
         enableLink: false,
-        baseUrl: "/admin-dashboard/products",
+        baseUrl: "/dashboard/products",
         columnId: {},
       }}
       columns={[

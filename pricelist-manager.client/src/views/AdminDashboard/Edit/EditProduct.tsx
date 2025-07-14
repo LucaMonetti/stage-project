@@ -2,19 +2,12 @@ import { useParams, useSearchParams } from "react-router";
 import FormButton from "../../../components/Buttons/FormButton";
 
 import { FaPlus } from "react-icons/fa6";
-import { useGet } from "../../../hooks/useGenericFetch";
-import { ProductSchema } from "../../../models/Product";
 import type { Config } from "../../../components/Forms/GenericForm";
 import {
   EditProductSchema,
-  type CreateProduct,
   type EditProduct,
 } from "../../../models/FormProduct";
 import GenericForm from "../../../components/Forms/GenericForm";
-import {
-  PricelistArraySchema,
-  PricelistSchema,
-} from "../../../models/Pricelist";
 import { useProduct } from "../../../hooks/products/useQueryProducts";
 import { useEditProduct } from "../../../hooks/products/useMutationProduct";
 
@@ -37,18 +30,8 @@ const EditProductForm = () => {
           {
             id: "pricelistId",
             label: "Listino",
-            type: "searchable",
+            type: "text",
             isDisabled: true,
-            schema: "pricelist",
-            fetchData: useGet({
-              endpoint: `pricelists`,
-              method: "GET",
-              schema: PricelistArraySchema,
-            }),
-            placeholder: "Seleziona il listino prezzi",
-            registerOptions: {
-              required: "Necessario selezionare un listino!",
-            },
           },
           {
             id: "productCode",
@@ -56,9 +39,6 @@ const EditProductForm = () => {
             type: "text",
             isDisabled: true,
             placeholder: "Inserire il codice del prodotto",
-            registerOptions: {
-              required: "Necessario inserire un codice Prodotto!",
-            },
           },
         ],
       },

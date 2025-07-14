@@ -1,24 +1,29 @@
 import {
   usePricelistStatistics,
+  usePricelistStatisticsByCompany,
   useProductStatistics,
+  useProductStatisticsByCompany,
 } from "../../../hooks/statistics/useQueryStatistics";
+import { useAuth } from "../../Authentication/AuthenticationProvider";
 import ItemCounter from "./ItemCounter";
 import { FaListUl } from "react-icons/fa6";
 
 function ItenCounterGroupCompany() {
+  const { user } = useAuth();
+
   const {
     data: products,
     isPending: isProductPending,
     isError: isProductError,
     error: productError,
-  } = useProductStatistics();
+  } = useProductStatisticsByCompany(user?.company.id || "");
 
   const {
     data: pricelists,
     isPending: isPricelistsPending,
     isError: isPricelistsError,
     error: pricelistsError,
-  } = usePricelistStatistics();
+  } = usePricelistStatisticsByCompany(user?.company.id || "");
 
   return (
     <div className="flex flex-wrap gap-8 mt-8">

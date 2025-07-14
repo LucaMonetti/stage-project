@@ -1,8 +1,15 @@
+import { useNavigate } from "react-router";
 import { useAuth } from "../Authentication/AuthenticationProvider";
 import MenuLink from "./MenuLink";
 
 function TopBar() {
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/auth/login");
+  };
 
   return (
     <header className="sticky top-0 left-0 border-b-2 border-gray-800 bg-gray-900 z-50">
@@ -18,7 +25,10 @@ function TopBar() {
           <div className="flex gap-4 items-center">
             <p>
               Ciao,{" "}
-              <span className="text-blue-400 relative after:absolute after:bg-blue-400 after:w-0 after:h-0.5 after:-bottom-1 after:left-0 hover:after:w-full after:transition-all cursor-pointer ">
+              <span
+                onClick={handleLogout}
+                className="text-blue-400 relative after:absolute after:bg-blue-400 after:w-0 after:h-0.5 after:-bottom-1 after:left-0 hover:after:w-full after:transition-all cursor-pointer "
+              >
                 {user?.username}
               </span>
             </p>

@@ -1,15 +1,12 @@
 import FormButton from "../../../components/Buttons/FormButton";
 import { FaPlus } from "react-icons/fa6";
-import { useGet } from "../../../hooks/useGenericFetch";
 import {
-  CreateUpdateListSchema,
   EditUpdateListSchema,
   type EditUpdateList,
 } from "../../../models/FormUpdateList";
 import GenericForm, {
   type Config,
 } from "../../../components/Forms/GenericForm";
-import { UpdateListSchema } from "../../../models/UpdateList";
 import { useParams } from "react-router";
 import { useUpdateList } from "../../../hooks/updatelists/useQueryUpdatelists";
 import { useEditUpdateList } from "../../../hooks/updatelists/useMutationUpdateList";
@@ -66,7 +63,7 @@ const EditUpdatelistForm = () => {
       <header className="flex justify-between items-center sticky top-[65.6px] bg-gray-900 z-50 py-4 border-gray-800 border-b-2">
         <div>
           <h1 className="text-3xl text-medium">
-            Crea una nuova lista di aggiornamento
+            Modifica la lista di aggiornamento
           </h1>
           <p className="text-gray-400">Inserisci i dettagli della lista</p>
         </div>

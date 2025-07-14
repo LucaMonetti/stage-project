@@ -101,7 +101,7 @@ const CompanyListView = () => {
             {
               color: "blue",
               Icon: FaPlus,
-              route: `/admin-dashboard/create/companies`,
+              route: `/dashboard/create/companies`,
               type: "link",
             },
           ]}
@@ -116,7 +116,7 @@ const CompanyListView = () => {
         onTableReady={setTable}
         filterConfig={filterConfig}
         config={{
-          baseUrl: "/admin-dashboard/companies/:pid",
+          baseUrl: "/dashboard/companies/:pid",
           enableLink: true,
           columnId: { ":pid": "id" },
         }}

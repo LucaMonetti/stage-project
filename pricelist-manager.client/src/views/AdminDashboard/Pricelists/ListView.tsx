@@ -13,7 +13,7 @@ import type { Config } from "../../../components/Forms/GenericForm";
 import { useAllPricelists } from "../../../hooks/pricelists/useQueryPricelists";
 
 const PricelistListView = () => {
-  const { data, isPending, isError, error } = useAllPricelists();
+  let pricelists = useAllPricelists();
 
   const [table, setTable] = useState<Table<Pricelist>>();
 
@@ -121,7 +121,7 @@ const PricelistListView = () => {
             {
               color: "blue",
               Icon: FaPlus,
-              route: `/admin-dashboard/create/pricelists`,
+              route: `/dashboard/create/pricelists`,
               type: "link",
             },
           ]}
@@ -129,15 +129,15 @@ const PricelistListView = () => {
       </div>
 
       <GenericTableView
-        data={data ?? []}
-        isPending={isPending}
-        isError={isError}
-        error={error}
+        data={pricelists.data ?? []}
+        isPending={pricelists.isPending}
+        isError={pricelists.isError}
+        error={pricelists.error}
         columns={columns}
         onTableReady={setTable}
         filterConfig={filterConfig}
         config={{
-          baseUrl: "/admin-dashboard/pricelists/:pid",
+          baseUrl: "/dashboard/pricelists/:pid",
           enableLink: true,
           columnId: { ":pid": "id" },
         }}

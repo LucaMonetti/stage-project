@@ -163,12 +163,30 @@ namespace pricelist_manager.Server.Repositories
             return product;
         }
 
-        public async Task<ProductStatistics> GetStatistics()
+        public async Task<ProductStatistics> GetStatistics(string? companyId = null)
         {
             if (!CanConnect()) throw new StorageUnavailableException();
 
-            var uniqueProdCount = await Context.Products.Select(p => p.ProductCode).Distinct().CountAsync();
-            var prodInstanceCount = await Context.Products.CountAsync();
+            int uniqueProdCount;
+            int prodInstanceCount;
+
+            if (companyId != null)
+            {
+                uniqueProdCount = await Context.Products
+                    .Where(p => p.CompanyId == companyId)
+                    .Select(p => p.ProductCode)
+                    .Distinct()
+                    .CountAsync();
+
+                prodInstanceCount = await Context.Products
+                    .Where(p => p.CompanyId == companyId)
+                    .CountAsync();
+            }
+            else
+            {
+                uniqueProdCount = await Context.Products.Select(p => p.ProductCode).Distinct().CountAsync();
+                prodInstanceCount = await Context.Products.CountAsync();
+            }
 
             var data = new ProductStatistics
             {

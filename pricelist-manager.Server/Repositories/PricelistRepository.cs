@@ -84,7 +84,7 @@ namespace pricelist_manager.Server.Repositories
 
         public async Task<Pricelist> UpdateAsync(Pricelist entity)
         {
-            if(!CanConnect()) throw new StorageUnavailableException();
+            if (!CanConnect()) throw new StorageUnavailableException();
 
             if (!(await existsIdAsync(entity.Id))) throw new NotFoundException<Pricelist>(entity.Id);
 
@@ -94,11 +94,20 @@ namespace pricelist_manager.Server.Repositories
             return entity;
         }
 
-        public async Task<PricelistStatistics> GetStatistics()
+        public async Task<PricelistStatistics> GetStatistics(string? companyId = null)
         {
             if (!CanConnect()) throw new StorageUnavailableException();
 
-            var companyCount = await Context.Pricelists.CountAsync();
+            int companyCount;
+
+            if (companyId != null)
+            {
+                companyCount = await Context.Pricelists.CountAsync(p => p.CompanyId == companyId);
+            }
+            else
+            {
+                companyCount = await Context.Pricelists.CountAsync();
+            }
 
             var res = new PricelistStatistics
             {

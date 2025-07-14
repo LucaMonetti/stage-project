@@ -5,7 +5,7 @@ import { useUser } from "../../hooks/users/useQueryUsers";
 
 interface AuthContextType {
   user: User | undefined;
-  isAuthenticated: boolean;
+  isAuthenticated: boolean | undefined;
   login: (token: string) => void;
   logout: () => void;
   isAdmin: () => boolean;
@@ -27,11 +27,15 @@ const AuthenticationProvider = ({
   children: React.ReactNode;
 }) => {
   const [user, setUser] = useState<User>();
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | undefined>(
+    undefined
+  );
   const [userId, setUserId] = useState<string>("");
 
-  // Always call the hook, but only when we have a userId
-  const userQuery = useUser(userId, { enabled: !!userId });
+  // Only call the hook when user is authenticated and we have a userId
+  const userQuery = useUser(userId, {
+    enabled: !!userId && isAuthenticated === true,
+  });
 
   useEffect(() => {
     const token = localStorage.getItem("jwtToken");
@@ -51,6 +55,9 @@ const AuthenticationProvider = ({
         console.error(error);
         logout();
       }
+    } else {
+      // No token found, user is not authenticated
+      setIsAuthenticated(false);
     }
   }, []);
 

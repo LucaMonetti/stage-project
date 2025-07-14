@@ -88,14 +88,14 @@ const UpdateListSingleView = () => {
             color: "purple",
             type: "link",
             Icon: FaPencil,
-            route: `/admin-dashboard/edit/updatelists/${updateListId}`,
+            route: `/dashboard/edit/updatelists/${updateListId}`,
             text: "Modifica",
           },
           {
             color: "blue",
             type: "link",
             Icon: FaDownload,
-            route: `/admin-dashboard/download/updatelists/${updateListId}`,
+            route: `/dashboard/download/updatelists/${updateListId}`,
             text: "Scarica",
           },
         ]}
@@ -108,7 +108,7 @@ const UpdateListSingleView = () => {
             color: "blue",
             type: "link",
             Icon: FaPlus,
-            route: `/admin-dashboard/updatelists/${updateListId}/products`,
+            route: `/dashboard/updatelists/${updateListId}/products`,
           },
         ]}
         data={toUpdateProducts ?? []}
@@ -117,7 +117,7 @@ const UpdateListSingleView = () => {
         error={toUpdateProductsError}
         columns={productCols}
         config={{
-          baseUrl: `/admin-dashboard/edit/products/:pid?editUpdateList=${updateListId}`,
+          baseUrl: `/dashboard/edit/products/:pid?editUpdateList=${updateListId}`,
           enableLink: true,
           columnId: { ":pid": "id" },
         }}
@@ -132,7 +132,7 @@ const UpdateListSingleView = () => {
         error={updatedProductsError}
         columns={productCols}
         config={{
-          baseUrl: "/admin-dashboard/products/:pid",
+          baseUrl: "/dashboard/products/:pid",
           enableLink: true,
           columnId: { ":pid": "id" },
         }}

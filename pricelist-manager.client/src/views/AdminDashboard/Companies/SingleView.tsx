@@ -56,14 +56,14 @@ const SingleCompanyView = () => {
             color: "purple",
             type: "link",
             Icon: FaPencil,
-            route: `/admin-dashboard/edit/companies/${companyId}`,
+            route: `/dashboard/edit/companies/${companyId}`,
             text: "Modifica",
           },
           {
             color: "blue",
             type: "link",
             Icon: FaDownload,
-            route: `/admin-dashboard/download/companies/${companyId}`,
+            route: `/dashboard/download/companies/${companyId}`,
             text: "Scarica",
           },
         ]}
@@ -102,7 +102,7 @@ const SingleCompanyView = () => {
             color: "blue",
             type: "link",
             Icon: FaPlus,
-            route: `/admin-dashboard/create/pricelists?companyId=${companyId}`,
+            route: `/dashboard/create/pricelists?companyId=${companyId}`,
           },
         ]}
         data={pricelists}
@@ -140,7 +140,7 @@ const SingleCompanyView = () => {
           },
         ]}
         config={{
-          baseUrl: "/admin-dashboard/pricelists/:pid",
+          baseUrl: "/dashboard/pricelists/:pid",
           enableLink: true,
           columnId: { ":pid": "id" },
         }}
@@ -154,7 +154,7 @@ const SingleCompanyView = () => {
             color: "blue",
             type: "link",
             Icon: FaPlus,
-            route: `/admin-dashboard/create/products?companyId=${companyId}`,
+            route: `/dashboard/create/products?companyId=${companyId}`,
           },
         ]}
         data={products ?? []}
@@ -202,7 +202,7 @@ const SingleCompanyView = () => {
           },
         ]}
         config={{
-          baseUrl: "/admin-dashboard/products/:pid",
+          baseUrl: "/dashboard/products/:pid",
           enableLink: true,
           columnId: { ":pid": "id" },
         }}

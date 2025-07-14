@@ -7,10 +7,13 @@ import MoneyWidget from "../../../components/SinglePage/Widgets/MoneyWidget";
 import VersionWidget from "../../../components/SinglePage/Widgets/VersionWidget";
 import GraphWidget from "../../../components/SinglePage/Widgets/GraphWidget";
 import { useProduct } from "../../../hooks/products/useQueryProducts";
+import type { Action } from "../../../components/Buttons/ActionRenderer";
+import { useAuth } from "../../../components/Authentication/AuthenticationProvider";
 
 const SingleProductView = () => {
   const navigate = useNavigate();
   const { productId } = useParams();
+  const { isAdmin, user } = useAuth();
 
   const { data, isPending, error, isError } = useProduct(productId ?? "");
 
@@ -20,6 +23,26 @@ const SingleProductView = () => {
         <BasicLoader />
       </div>
     );
+  }
+
+  const actions: Action[] = [
+    {
+      color: "blue",
+      type: "link",
+      Icon: FaDownload,
+      route: `/dashboard/download/products/${productId}`,
+      text: "Scarica",
+    },
+  ];
+
+  if (isAdmin() || user?.company.id === data?.company.id) {
+    actions.unshift({
+      color: "purple",
+      Icon: FaPencil,
+      type: "link",
+      route: `/dashboard/edit/products/${productId}`,
+      text: "Modifica",
+    });
   }
 
   if (isError) {
@@ -32,22 +55,7 @@ const SingleProductView = () => {
         title={data?.currentInstance.name}
         subtitle={data?.currentInstance.description}
         callout={`Versione ${data?.latestVersion}`}
-        actions={[
-          {
-            color: "purple",
-            Icon: FaPencil,
-            type: "link",
-            route: `/admin-dashboard/edit/products/${productId}`,
-            text: "Modifica",
-          },
-          {
-            color: "blue",
-            type: "link",
-            Icon: FaDownload,
-            route: `/admin-dashboard/download/products/${productId}`,
-            text: "Scarica",
-          },
-        ]}
+        actions={actions}
       />
       <MoneyWidget
         title="Prezzo corrente"
@@ -137,3 +145,6 @@ const SingleProductView = () => {
 };
 
 export default SingleProductView;
+function isAdmin() {
+  throw new Error("Function not implemented.");
+}

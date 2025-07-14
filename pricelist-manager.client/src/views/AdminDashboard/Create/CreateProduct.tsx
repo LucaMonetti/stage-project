@@ -9,10 +9,28 @@ import {
   type CreateProduct,
 } from "../../../models/FormProduct";
 import { useGet } from "../../../hooks/useGenericFetch";
-import { PricelistArraySchema } from "../../../models/Pricelist";
+import {
+  PricelistArraySchema,
+  type Pricelist,
+} from "../../../models/Pricelist";
 import { useCreateProduct } from "../../../hooks/products/useMutationProduct";
+import {
+  useAllPricelists,
+  useAllPricelistsByCompany,
+} from "../../../hooks/pricelists/useQueryPricelists";
+import type { UseQueryResult } from "@tanstack/react-query";
+import { useAuth } from "../../../components/Authentication/AuthenticationProvider";
 
 const CreateProductForm = () => {
+  const { user, isAdmin } = useAuth();
+  let pricelists: UseQueryResult<Pricelist[], Error>;
+
+  if (isAdmin()) {
+    pricelists = useAllPricelists();
+  } else {
+    pricelists = useAllPricelistsByCompany(user?.company.id ?? "");
+  }
+
   const config = {
     fieldset: [
       {
@@ -23,11 +41,7 @@ const CreateProductForm = () => {
             label: "Listino",
             type: "searchable",
             placeholder: "Seleziona il listino prezzi",
-            fetchData: useGet({
-              endpoint: "pricelists",
-              method: "GET",
-              schema: PricelistArraySchema,
-            }),
+            fetchData: pricelists,
             schema: "pricelist",
             registerOptions: {
               required: "Necessario selezionare un listino!",

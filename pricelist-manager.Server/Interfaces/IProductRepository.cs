@@ -5,7 +5,7 @@ using pricelist_manager.Server.Models;
 
 namespace pricelist_manager.Server.Interfaces
 {
-    public interface IProductRepository: IBaseRepository
+    public interface IProductRepository : IBaseRepository
     {
         /// <exception cref="StorageUnavailableException">The database is not available</exception>
         Task<PagedList<Product>> GetAllAsync(ProductQueryParams requestParams);
@@ -51,6 +51,6 @@ namespace pricelist_manager.Server.Interfaces
         /// <exception cref="StorageUnavailableException">The database is not available</exception>
         Task<Boolean> ExistsIdAsync(string productId);
 
-        Task<ProductStatistics> GetStatistics();
+        Task<ProductStatistics> GetStatistics(string? companyId = null);
     }
 }
