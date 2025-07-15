@@ -42,7 +42,7 @@ namespace pricelist_manager.Server.Mappers
 
             return new Company
             {
-                Id = dto.Id,
+                Id = dto.Id.ToUpper(),
                 Name = dto.Name,
                 Address = dto.Address,
                 InterfaceColor = dto.InterfaceColor,

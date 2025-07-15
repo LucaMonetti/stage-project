@@ -47,7 +47,7 @@ namespace pricelist_manager.Server.Mappers
                 Id = pricelist.Id,
                 Name = pricelist.Name,
                 Description = pricelist.Description,
-                CompanyId = pricelist.CompanyId
+                CompanyId = pricelist.CompanyId.ToUpper()
             };
         }
 
@@ -60,7 +60,7 @@ namespace pricelist_manager.Server.Mappers
                 Id = pricelist.Id,
                 Name = pricelist.Name,
                 Description = pricelist.Description,
-                CompanyId = pricelist.CompanyId
+                CompanyId = pricelist.CompanyId.ToUpper()
             };
         }
     }

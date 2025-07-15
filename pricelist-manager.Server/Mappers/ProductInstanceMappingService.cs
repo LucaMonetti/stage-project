@@ -13,7 +13,7 @@ namespace pricelist_manager.Server.Mappers
 
             return new ProductInstance
             {
-                ProductId = $"{companyId}-{dto.ProductCode}",
+                ProductId = $"{companyId.ToUpper()}-{dto.ProductCode.ToUpper()}",
                 Name = dto.Name,
                 Description = dto.Description,
                 Price = dto.Price,
@@ -32,7 +32,7 @@ namespace pricelist_manager.Server.Mappers
 
             return new ProductInstance
             {
-                ProductId = dto.ProductId,
+                ProductId = dto.ProductId.ToUpper(),
                 Description = dto.Description,
                 Name = dto.Name,
                 Price = dto.Price,
@@ -51,7 +51,7 @@ namespace pricelist_manager.Server.Mappers
 
             return new ProductInstance
             {
-                ProductId = dto.ProductId,
+                ProductId = dto.ProductId.ToUpper(),
                 Version = dto.Version,
                 Name = dto.Name,
                 Description = dto.Description,

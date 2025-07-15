@@ -35,7 +35,7 @@ namespace pricelist_manager.Server.Mappers
 
             return new User
             {
-                CompanyId = dto.Company.Id,
+                CompanyId = dto.Company.Id.ToUpper(),
                 FirstName = dto.FirstName,
                 LastName = dto.LastName,
                 Email = dto.Email,

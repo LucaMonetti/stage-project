@@ -37,7 +37,7 @@ namespace pricelist_manager.Server.Mappers
         {
             return new ProductToUpdateList
             {
-                ProductId = productId,
+                ProductId = productId.ToUpper(),
                 UpdateListId = updateListId,
             };
         }
@@ -51,7 +51,7 @@ namespace pricelist_manager.Server.Mappers
         {
             ArgumentNullException.ThrowIfNull(dto);
 
-            if (dto.ProductIds is null) 
+            if (dto.ProductIds is null)
                 return [];
 
             return [.. dto.ProductIds.Select(ul => MapToModel(dto.Id, ul))];

@@ -64,10 +64,10 @@ namespace pricelist_manager.Server.Mappers
 
             return new Product
             {
-                Id = $"{companyId}-{dto.ProductCode}",
+                Id = $"{companyId.ToUpper()}-{dto.ProductCode.ToUpper()}",
                 PricelistId = dto.PricelistId,
-                ProductCode = dto.ProductCode,
-                CompanyId = companyId,
+                ProductCode = dto.ProductCode.ToUpper(),
+                CompanyId = companyId.ToUpper(),
                 LatestVersion = 0,
                 Versions = [ProductInstanceMapping.MapToProductInstance(dto, companyId)]
             };

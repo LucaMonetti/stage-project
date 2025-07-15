@@ -50,7 +50,7 @@ namespace pricelist_manager.Server.Mappers
             return new UpdateList
             {
                 Description = dto.Description,
-                CompanyId = dto.CompanyId,
+                CompanyId = dto.CompanyId.ToUpper(),
                 Name = dto.Name,
             };
         }
