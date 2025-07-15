@@ -1,4 +1,5 @@
 import { Link } from "react-router";
+import BasicLoader from "../Loader/BasicLoader";
 
 type Props = {
   formId: string;
@@ -7,6 +8,7 @@ type Props = {
   text?: string;
   className?: string;
   disabled?: boolean;
+  isPending?: boolean;
 };
 
 const bgColor = {
@@ -23,6 +25,7 @@ const FormButton = ({
   className = "",
   disabled,
   text = "Aggiungi",
+  isPending = false,
 }: Props) => {
   return (
     <button
@@ -31,8 +34,14 @@ const FormButton = ({
       className={`p-2 rounded flex gap-2 items-center ${bgColor[color]} ${className}`}
       {...(disabled ? { disabled: true } : "")}
     >
-      {Icon && <Icon className="text-white" />}
-      {text}
+      {isPending ? (
+        <BasicLoader />
+      ) : (
+        <>
+          {Icon && <Icon className="text-white" />}
+          {text}
+        </>
+      )}
     </button>
   );
 };

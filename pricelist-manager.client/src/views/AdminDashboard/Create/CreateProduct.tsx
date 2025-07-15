@@ -20,9 +20,11 @@ import {
 } from "../../../hooks/pricelists/useQueryPricelists";
 import type { UseQueryResult } from "@tanstack/react-query";
 import { useAuth } from "../../../components/Authentication/AuthenticationProvider";
+import { useNavigate } from "react-router";
 
 const CreateProductForm = () => {
   const { user, isAdmin } = useAuth();
+  const navigate = useNavigate();
   let pricelists: UseQueryResult<Pricelist[], Error>;
 
   if (isAdmin()) {
@@ -147,7 +149,12 @@ const CreateProductForm = () => {
           </p>
         </div>
 
-        <FormButton formId="create-product-form" color="purple" Icon={FaPlus} />
+        <FormButton
+          isPending={mutation.isPending}
+          formId="create-product-form"
+          color="purple"
+          Icon={FaPlus}
+        />
       </header>
 
       <GenericForm
@@ -157,6 +164,9 @@ const CreateProductForm = () => {
         id="create-product-form"
         method={"POST"}
         mutation={mutation}
+        onSuccess={() => {
+          navigate("/dashboard/products");
+        }}
       />
     </div>
   );

@@ -151,6 +151,9 @@ const EditUserForm = () => {
         id="edit-user-form"
         method={"PUT"}
         mutation={mutation}
+        onSuccess={() => {
+          navigate("/dashboard/users/" + userId);
+        }}
       />
     </div>
   );

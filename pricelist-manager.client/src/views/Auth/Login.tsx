@@ -1,8 +1,23 @@
+import { useNavigate, useLocation } from "react-router";
+import { useAuth } from "../../components/Authentication/AuthenticationProvider";
 import GenericForm from "../../components/Forms/GenericForm";
 import { useLogin } from "../../hooks/auth/useAuthQuery";
 import { UserLoginSchema } from "../../models/UserLogin";
+import { useEffect } from "react";
 
 const Login = () => {
+  const navigation = useNavigate();
+  const location = useLocation();
+  const { user, isAuthenticated } = useAuth();
+
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      // Redirect to the previous page or home if no previous page exists
+      const from = (location.state as any)?.from?.pathname || "/dashboard";
+      navigation(from, { replace: true });
+    }
+  }, [user]);
+
   const mutation = useLogin();
 
   return (

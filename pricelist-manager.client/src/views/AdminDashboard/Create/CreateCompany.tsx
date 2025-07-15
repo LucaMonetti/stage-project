@@ -127,6 +127,9 @@ const CreateCompanyForm = () => {
         id="create-company-form"
         method={"POST"}
         mutation={mutation}
+        onSuccess={() => {
+          navigate("/dashboard/companies");
+        }}
       />
     </div>
   );

@@ -143,6 +143,9 @@ const EditCompanyForm = () => {
         id="edit-company-form"
         method={"PUT"}
         mutation={mutation}
+        onSuccess={() => {
+          navigate("/dashboard/companies/" + companyId);
+        }}
       />
     </div>
   );

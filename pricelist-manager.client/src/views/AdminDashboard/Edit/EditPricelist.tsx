@@ -8,13 +8,15 @@ import {
   EditPricelistSchema,
   type EditPricelist,
 } from "../../../models/FormPricelist";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { useGet } from "../../../hooks/useGenericFetch";
 import { CompanyArraySchema } from "../../../models/Company";
 import { usePricelist } from "../../../hooks/pricelists/useQueryPricelists";
 import { useEditPricelist } from "../../../hooks/pricelists/useMutationPricelists";
 
 const EditPricelistForm = () => {
+  const navigate = useNavigate();
+
   const config = {
     fieldset: [
       {
@@ -92,6 +94,9 @@ const EditPricelistForm = () => {
         id="create-pricelist-form"
         method={"PUT"}
         mutation={mutation}
+        onSuccess={() => {
+          navigate("/dashboard/pricelists/" + pricelistId);
+        }}
       />
     </div>
   );

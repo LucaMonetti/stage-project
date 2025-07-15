@@ -23,9 +23,11 @@ import {
 import { useAuth } from "../../../components/Authentication/AuthenticationProvider";
 import type { UseQueryResult } from "@tanstack/react-query";
 import { useAllCompanies } from "../../../hooks/companies/useQueryCompanies";
+import { useNavigate } from "react-router";
 
 const CreateUpdatelistForm = () => {
   const { user, isAdmin } = useAuth();
+  const navigate = useNavigate();
   const companies = useAllCompanies();
 
   let config = {
@@ -103,6 +105,9 @@ const CreateUpdatelistForm = () => {
             description: "",
             companyId: user?.company.id ?? "",
             products: [],
+          }}
+          onSuccess={() => {
+            navigate("/dashboard/pricelists");
           }}
         />
         <ProductTable companyId={user?.company.id} />

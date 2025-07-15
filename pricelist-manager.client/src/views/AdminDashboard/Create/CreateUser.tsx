@@ -10,10 +10,13 @@ import { CompanyArraySchema } from "../../../models/Company";
 import { useCreateUser } from "../../../hooks/users/useMutationUsers";
 import { useAuth } from "../../../components/Authentication/AuthenticationProvider";
 import { useNavigate } from "react-router";
+import { useAllCompanies } from "../../../hooks/companies/useQueryCompanies";
 
 const CreateUserForm = () => {
   const { isAdmin } = useAuth();
   const navigate = useNavigate();
+
+  const companies = useAllCompanies();
 
   if (!isAdmin()) navigate("/auth/login");
 
@@ -44,11 +47,7 @@ const CreateUserForm = () => {
             id: "companyId",
             label: "Codice Azienda",
             type: "searchable",
-            fetchData: useGet({
-              endpoint: "companies",
-              method: "GET",
-              schema: CompanyArraySchema,
-            }),
+            fetchData: companies,
             schema: "company",
             placeholder: "Inserire il codice dell'azienda",
             registerOptions: {
@@ -133,6 +132,9 @@ const CreateUserForm = () => {
         id="create-user-form"
         method={"POST"}
         mutation={mutation}
+        onSuccess={() => {
+          navigate("/dashboard/pricelists");
+        }}
       />
     </div>
   );

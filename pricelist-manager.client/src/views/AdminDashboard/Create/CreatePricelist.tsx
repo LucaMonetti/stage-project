@@ -17,9 +17,11 @@ import {
   useAllCompanies,
   useCompany,
 } from "../../../hooks/companies/useQueryCompanies";
+import { useNavigate } from "react-router";
 
 const CreatePricelistForm = () => {
   const { user, isAdmin } = useAuth();
+  const navigate = useNavigate();
   let companies: UseQueryResult<Company[] | Company, Error>;
 
   if (isAdmin()) {
@@ -95,6 +97,9 @@ const CreatePricelistForm = () => {
               },
             }
           : {})}
+        onSuccess={() => {
+          navigate("/dashboard/pricelists");
+        }}
       />
     </div>
   );

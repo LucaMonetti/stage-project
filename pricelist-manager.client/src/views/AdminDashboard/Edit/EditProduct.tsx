@@ -1,4 +1,4 @@
-import { useParams, useSearchParams } from "react-router";
+import { useNavigate, useParams, useSearchParams } from "react-router";
 import FormButton from "../../../components/Buttons/FormButton";
 
 import { FaPlus } from "react-icons/fa6";
@@ -14,6 +14,7 @@ import { useEditProduct } from "../../../hooks/products/useMutationProduct";
 const EditProductForm = () => {
   let data: EditProduct | undefined = undefined;
 
+  const navigate = useNavigate();
   const { productId } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -168,6 +169,9 @@ const EditProductForm = () => {
         values={data}
         method="PUT"
         mutation={mutation}
+        onSuccess={() => {
+          navigate("/dashboard/products/" + productId);
+        }}
       />
     </div>
   );

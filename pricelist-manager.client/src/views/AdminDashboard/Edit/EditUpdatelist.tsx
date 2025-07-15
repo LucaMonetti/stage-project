@@ -7,12 +7,14 @@ import {
 import GenericForm, {
   type Config,
 } from "../../../components/Forms/GenericForm";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { useUpdateList } from "../../../hooks/updatelists/useQueryUpdatelists";
 import { useEditUpdateList } from "../../../hooks/updatelists/useMutationUpdateList";
 
 const EditUpdatelistForm = () => {
   let data: EditUpdateList | undefined = undefined;
+
+  const navigate = useNavigate();
 
   const { updateListId } = useParams();
   const updatelist = useUpdateList(updateListId ?? "");
@@ -85,6 +87,9 @@ const EditUpdatelistForm = () => {
         id="edit-updatelist-form"
         method={"PUT"}
         mutation={mutation}
+        onSuccess={() => {
+          navigate("/dashboard/updatelists/" + updateListId);
+        }}
       />
     </div>
   );

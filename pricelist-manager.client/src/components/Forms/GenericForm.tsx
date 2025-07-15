@@ -36,11 +36,14 @@ interface Props<T extends FieldValues> {
   schema: InferredZodSchema<T>;
   config: Config<T>;
   values?: T;
+  resetValues?: T;
   method?: "POST" | "PUT" | "DELETE";
   id: string;
   isRow?: boolean;
   externalProvider?: boolean;
   mutation?: UseMutationResult<any, Error, any, unknown>;
+  onSuccess?: (data: any) => void;
+  clearOnSubmit?: boolean;
 }
 
 interface BaseInput<T extends FieldValues> {
@@ -227,13 +230,15 @@ function GenericForm<T extends FieldValues>(prop: Props<T>) {
 
 function GenericActualForm<T extends FieldValues>({
   className,
-  schema,
   config,
   values,
   method = "POST",
   id,
   isRow = false,
   mutation,
+  onSuccess,
+  clearOnSubmit = false,
+  resetValues = {} as T,
 }: Props<T>) {
   const errorDiv = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -244,7 +249,13 @@ function GenericActualForm<T extends FieldValues>({
       return;
     }
 
-    mutation?.mutate(data);
+    mutation?.mutate(data, {
+      onSuccess: (responseData) => {
+        if (onSuccess) {
+          onSuccess(responseData);
+        }
+      },
+    });
   };
 
   useEffect(() => {
@@ -296,7 +307,7 @@ function GenericActualForm<T extends FieldValues>({
           className={`p-2 rounded flex gap-2 items-center bg-blue-600 hover:bg-blue-700 transition-colors`}
         >
           <FaPaperPlane className="text-white" />
-          Invia
+          Login
         </button>
       )}
     </form>
@@ -311,7 +322,7 @@ export function GenericFormProvider<T extends FieldValues>({
   children: React.ReactNode;
 }) {
   const methods = useForm<T>({
-    mode: "onChange",
+    mode: "onSubmit",
     resolver: zodResolver(schema),
   });
 
