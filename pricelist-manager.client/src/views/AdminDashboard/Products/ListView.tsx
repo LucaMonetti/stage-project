@@ -6,13 +6,69 @@ import GenericTableView, {
 import { type Product, type ProductFilter } from "../../../models/Product";
 import { type Table } from "@tanstack/react-table";
 import type { Config } from "../../../components/Forms/GenericForm";
-import { CompanyArraySchema } from "../../../models/Company";
-import { useGet } from "../../../hooks/useGenericFetch";
-import { useState } from "react";
-import { useAllProducts } from "../../../hooks/products/useQueryProducts";
+import { useEffect, useState } from "react";
+import {
+  useAllProducts,
+  type ProductFilters,
+} from "../../../hooks/products/useQueryProducts";
+import { useAllCompanies } from "../../../hooks/companies/useQueryCompanies";
+
+const useDebounce = (value: string, delay: number) => {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+};
 
 const ProductsListView = () => {
-  const { data, isPending, isError, error } = useAllProducts();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [filters, setFilters] = useState<ProductFilters>({});
+  const [productCodeInput, setProductCodeInput] = useState("");
+
+  const debouncedProductCode = useDebounce(productCodeInput, 800);
+
+  // Add this useEffect to update filters when debouncedProductCode changes
+  useEffect(() => {
+    setFilters((prev) => ({
+      ...prev,
+      productCode: debouncedProductCode || undefined,
+    }));
+    setCurrentPage(1);
+  }, [debouncedProductCode]);
+
+  const { data, isPending, isError, error } = useAllProducts(
+    {
+      CurrentPage: currentPage,
+      PageSize: pageSize,
+    },
+    filters
+  );
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handlePageSizeChange = (newPageSize: number) => {
+    setPageSize(newPageSize);
+    setCurrentPage(1); // Reset to first page when changing page size
+  };
+
+  const handleFilterChange = (newFilters: Partial<ProductFilters>) => {
+    setFilters((prev) => ({ ...prev, ...newFilters }));
+    setCurrentPage(1); // Reset to first page when filters change
+  };
+
+  const companies = useAllCompanies();
 
   const [table, setTable] = useState<Table<Product>>();
 
@@ -90,7 +146,7 @@ const ProductsListView = () => {
             autocomplete: false,
             outerClass: "flex-1",
             onChange: (e) => {
-              table?.getColumn("productCode")?.setFilterValue(e.target.value);
+              setProductCodeInput(e.target.value);
             },
           },
           {
@@ -98,14 +154,10 @@ const ProductsListView = () => {
             label: "Codice Azienda",
             type: "searchable",
             placeholder: "Selezionare codice azienda...",
-            fetchData: useGet({
-              endpoint: "companies",
-              method: "GET",
-              schema: CompanyArraySchema,
-            }),
+            fetchData: companies,
             schema: "company",
             onChange: (value) => {
-              table?.getColumn("companyId")?.setFilterValue(value);
+              handleFilterChange({ companyId: value || undefined });
             },
           },
         ],
@@ -137,7 +189,7 @@ const ProductsListView = () => {
       </div>
 
       <GenericTableView
-        data={data ?? []}
+        data={data?.items ?? []}
         isPending={isPending}
         isError={isError}
         error={error}
@@ -150,6 +202,9 @@ const ProductsListView = () => {
         onTableReady={setTable}
         filterConfig={filterConfig}
         keyField="id"
+        pagination={data?.pagination}
+        onPageChange={handlePageChange}
+        onPageSizeChange={handlePageSizeChange}
       />
     </div>
   );
