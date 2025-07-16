@@ -18,7 +18,7 @@ import { ProductArraySchema, type Product } from "../../../models/Product";
 import { useUpdateList } from "../../../hooks/updatelists/useQueryUpdatelists";
 import { useEditUpdateListProducts } from "../../../hooks/updatelists/useMutationUpdateList";
 import {
-  useAllProducts,
+  useAllProductsPaginated,
   useAllProductsByCompany,
 } from "../../../hooks/products/useQueryProducts";
 

@@ -17,7 +17,7 @@ import { use, useEffect, useState, useMemo } from "react";
 import { useFormContext } from "react-hook-form";
 import { useCreateUpdateList } from "../../../hooks/updatelists/useMutationUpdateList";
 import {
-  useAllProducts,
+  useAllProductsPaginated,
   useAllProductsByCompany,
 } from "../../../hooks/products/useQueryProducts";
 import { useAuth } from "../../../components/Authentication/AuthenticationProvider";
@@ -125,7 +125,7 @@ function ProductTable({ companyId }: { companyId?: string }) {
   if (companyId) {
     products = useAllProductsByCompany(companyId);
   } else {
-    products = useAllProducts();
+    products = useAllProductsPaginated();
   }
 
   useEffect(() => {

@@ -3,58 +3,39 @@ import {
   ProductArraySchema,
   ProductSchema,
   type Product,
+  type ProductFilter,
 } from "../../models/Product";
 import { API_OPTIONS_GET, queryEndpoint } from "../../config/apiConfig";
+import type {
+  PaginatedResponse,
+  PaginationParams,
+} from "../../models/Pagination";
+import {
+  ParsePaginationHeader,
+  ParsePaginationSearchParams,
+} from "../../helpers/Pagination";
+import {
+  ParseFiltersSearchParams,
+  type FilterConfig,
+} from "../../helpers/Filters";
 
-export interface PaginationInfo {
-  currentPage: number;
-  totalPages: number;
-  totalCount: number;
-  pageSize: number;
-  hasPrevious: boolean;
-  hasNext: boolean;
-}
-
-export interface PaginatedResponse<T> {
-  items: T[];
-  pagination: PaginationInfo;
-}
-
-export interface PaginationParams {
-  CurrentPage?: number;
-  TotalPages?: number;
-  PageSize?: number;
-  TotalCount?: number;
-  HasPrevious?: boolean;
-  HasNext?: boolean;
-}
-
-export interface ProductFilters {
-  productCode?: string;
-  companyId?: string;
-}
+const ProductFilterConfig: FilterConfig<ProductFilter> = {
+  productCode: {
+    paramName: "Filters.ProductCode",
+  },
+  companyId: {
+    paramName: "Filters.CompanyId",
+  },
+};
 
 // Fetch all products from the API
-const fetchAllProducts = async (
+const fetchAllProductsPaginated = async (
   params: PaginationParams,
-  filters?: ProductFilters
+  filters?: ProductFilter
 ): Promise<PaginatedResponse<Product>> => {
   const searchParams = new URLSearchParams();
-  if (params.CurrentPage) {
-    searchParams.append("Pagination.PageNumber", params.CurrentPage.toString());
-  }
-  if (params.PageSize) {
-    searchParams.append("Pagination.PageSize", params.PageSize.toString());
-  }
-
-  if (filters) {
-    if (filters.productCode) {
-      searchParams.append("Filters.ProductCode", filters.productCode);
-    }
-    if (filters.companyId) {
-      searchParams.append("Filters.CompanyId", filters.companyId);
-    }
-  }
+  ParsePaginationSearchParams(params, searchParams);
+  ParseFiltersSearchParams(filters, searchParams, ProductFilterConfig);
 
   const response = await fetch(
     queryEndpoint(
@@ -67,32 +48,7 @@ const fetchAllProducts = async (
     throw new Error("Failed to fetch products");
   }
 
-  const paginationHeader = response.headers.get("X-Pagination");
-
-  console.log("Pagination Header:", paginationHeader);
-
-  let paginationInfo: PaginationInfo;
-
-  if (paginationHeader) {
-    const parsed = JSON.parse(paginationHeader);
-    paginationInfo = {
-      currentPage: parsed.CurrentPage || 1,
-      totalPages: parsed.TotalPages || 1,
-      totalCount: parsed.TotalCount || 0,
-      pageSize: parsed.PageSize || 10,
-      hasPrevious: parsed.HasPrevious || false,
-      hasNext: parsed.HasNext || false,
-    };
-  } else {
-    paginationInfo = {
-      currentPage: 1,
-      totalPages: 1,
-      totalCount: 0,
-      pageSize: 10,
-      hasPrevious: false,
-      hasNext: false,
-    };
-  }
+  const paginationInfo = ParsePaginationHeader(response);
 
   const rawData = await response.json();
   return {
@@ -101,13 +57,42 @@ const fetchAllProducts = async (
   };
 };
 
-export const useAllProducts = (
+export const useAllProductsPaginated = (
   params: PaginationParams,
-  filters?: ProductFilters
+  filters?: ProductFilter
 ) => {
   return useQuery<PaginatedResponse<Product>>({
     queryKey: ["products", params.CurrentPage, params.PageSize, filters],
-    queryFn: () => fetchAllProducts(params, filters),
+    queryFn: () => fetchAllProductsPaginated(params, filters),
+  });
+};
+
+// Fetch all products from the API
+const fetchAllProducts = async (
+  filters?: ProductFilter
+): Promise<Product[]> => {
+  const searchParams = new URLSearchParams();
+  ParseFiltersSearchParams(filters, searchParams, ProductFilterConfig);
+
+  const response = await fetch(
+    queryEndpoint(
+      "products" +
+        (searchParams.toString() ? `?${searchParams.toString()}` : "")
+    ),
+    API_OPTIONS_GET
+  );
+  if (!response.ok) {
+    throw new Error("Failed to fetch products");
+  }
+
+  const rawData = await response.json();
+  return ProductArraySchema.parse(rawData);
+};
+
+export const useAllProducts = (filters?: ProductFilter) => {
+  return useQuery<Product[]>({
+    queryKey: ["products", filters],
+    queryFn: () => fetchAllProducts(filters),
   });
 };
 

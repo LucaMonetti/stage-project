@@ -7,10 +7,7 @@ import { type Product, type ProductFilter } from "../../../models/Product";
 import { type Table } from "@tanstack/react-table";
 import type { Config } from "../../../components/Forms/GenericForm";
 import { useEffect, useState } from "react";
-import {
-  useAllProducts,
-  type ProductFilters,
-} from "../../../hooks/products/useQueryProducts";
+import { useAllProductsPaginated } from "../../../hooks/products/useQueryProducts";
 import { useAllCompanies } from "../../../hooks/companies/useQueryCompanies";
 
 const useDebounce = (value: string, delay: number) => {
@@ -32,7 +29,7 @@ const useDebounce = (value: string, delay: number) => {
 const ProductsListView = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-  const [filters, setFilters] = useState<ProductFilters>({});
+  const [filters, setFilters] = useState<ProductFilter>({});
   const [productCodeInput, setProductCodeInput] = useState("");
 
   const debouncedProductCode = useDebounce(productCodeInput, 800);
@@ -46,7 +43,7 @@ const ProductsListView = () => {
     setCurrentPage(1);
   }, [debouncedProductCode]);
 
-  const { data, isPending, isError, error } = useAllProducts(
+  const { data, isPending, isError, error } = useAllProductsPaginated(
     {
       CurrentPage: currentPage,
       PageSize: pageSize,
@@ -63,7 +60,7 @@ const ProductsListView = () => {
     setCurrentPage(1); // Reset to first page when changing page size
   };
 
-  const handleFilterChange = (newFilters: Partial<ProductFilters>) => {
+  const handleFilterChange = (newFilters: Partial<ProductFilter>) => {
     setFilters((prev) => ({ ...prev, ...newFilters }));
     setCurrentPage(1); // Reset to first page when filters change
   };

@@ -15,11 +15,11 @@ export const ProductArraySchema = z.array(ProductSchema);
 export type Product = z.infer<typeof ProductSchema>;
 
 // Filter Schema
-export const ProductFilterSchema = ProductLiteSchema.extend({
-  companyId: z.string(),
-  productCode: z.string(),
-  pricelist_name: z.string(),
-  currentInstance_description: z.string(),
+export const ProductFilterSchema = z.object({
+  companyId: z.string().optional(),
+  productCode: z.string().optional(),
+  pricelist_name: z.string().optional(),
+  currentInstance_description: z.string().optional(),
 });
 
 export type ProductFilter = z.infer<typeof ProductFilterSchema>;
