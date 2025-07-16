@@ -126,6 +126,25 @@ namespace pricelist_manager.Server.Repositories
             return res;
         }
 
+        public async Task<PagedList<Product>> GetAvailableProducts(int id, UpdateListQueryParams requestParams)
+        {
+            if (!CanConnect())
+                throw new StorageUnavailableException();
+
+            var updatelist = await Context.UpdateLists
+            .FirstOrDefaultAsync(ul => ul.Id == id) ?? throw new NotFoundException<UpdateList>(id);
+
+            var existingIds = await Context.ProductsToUpdateLists
+            .Where(ptul => ptul.UpdateListId == id)
+            .Select(ptul => ptul.ProductId)
+            .ToListAsync();
+
+            var availableProducts = Context.Products
+            .Where(p => p.CompanyId == updatelist.CompanyId && !existingIds.Contains(p.Id)).Include(p => p.Versions).Include(p => p.Pricelist).Include(p => p.Company);
+
+            return await PagedList<Product>.ToPagedList(availableProducts, requestParams.Pagination.PageNumber, requestParams.Pagination.PageSize);
+        }
+
         public async Task<ICollection<ProductToUpdateList>> GetProductsByList(int id)
         {
             if (!CanConnect())
