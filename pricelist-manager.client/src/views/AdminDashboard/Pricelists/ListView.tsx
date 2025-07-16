@@ -5,16 +5,54 @@ import {
   type Pricelist,
   type PricelistFilter,
 } from "../../../models/Pricelist";
-import { useGet } from "../../../hooks/useGenericFetch";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { ColumnDef, Table } from "@tanstack/react-table";
-import { CompanyArraySchema } from "../../../models/Company";
 import type { Config } from "../../../components/Forms/GenericForm";
-import { useAllPricelists } from "../../../hooks/pricelists/useQueryPricelists";
+import {
+  useAllPricelists,
+  useAllPricelistsPaginated,
+} from "../../../hooks/pricelists/useQueryPricelists";
+import { useDebounce } from "../../../hooks/useDebounce";
+import { useAllCompanies } from "../../../hooks/companies/useQueryCompanies";
 
 const PricelistListView = () => {
-  let pricelists = useAllPricelists();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [filters, setFilters] = useState<PricelistFilter>({});
+  const [nameInput, setNameInput] = useState("");
 
+  const debouncedNameInput = useDebounce(nameInput, 800);
+
+  useEffect(() => {
+    setFilters((prev) => ({
+      ...prev,
+      name: debouncedNameInput || undefined,
+    }));
+    setCurrentPage(1);
+  }, [debouncedNameInput]);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handlePageSizeChange = (newPageSize: number) => {
+    setPageSize(newPageSize);
+    setCurrentPage(1); // Reset to first page when changing page size
+  };
+
+  const handleFilterChange = (newFilters: Partial<PricelistFilter>) => {
+    setFilters((prev) => ({ ...prev, ...newFilters }));
+    setCurrentPage(1); // Reset to first page when filters change
+  };
+
+  const pricelists = useAllPricelistsPaginated(
+    {
+      CurrentPage: currentPage,
+      PageSize: pageSize,
+    },
+    filters
+  );
+  const companies = useAllCompanies();
   const [table, setTable] = useState<Table<Pricelist>>();
 
   const filterConfig = {
@@ -30,7 +68,7 @@ const PricelistListView = () => {
             autocomplete: false,
             outerClass: "flex-1",
             onChange: (e) => {
-              table?.getColumn("name")?.setFilterValue(e.target.value);
+              setNameInput(e.target.value);
             },
           },
           {
@@ -38,14 +76,10 @@ const PricelistListView = () => {
             label: "Codice Azienda",
             type: "searchable",
             placeholder: "Selezionare codice azienda...",
-            fetchData: useGet({
-              endpoint: "companies",
-              method: "GET",
-              schema: CompanyArraySchema,
-            }),
+            fetchData: companies,
             schema: "company",
             onChange: (value) => {
-              table?.getColumn("company_id")?.setFilterValue(value);
+              handleFilterChange({ company_id: value || undefined });
             },
           },
         ],
@@ -129,7 +163,7 @@ const PricelistListView = () => {
       </div>
 
       <GenericTableView
-        data={pricelists.data ?? []}
+        data={pricelists.data?.items ?? []}
         isPending={pricelists.isPending}
         isError={pricelists.isError}
         error={pricelists.error}
@@ -142,6 +176,9 @@ const PricelistListView = () => {
           columnId: { ":pid": "id" },
         }}
         keyField="id"
+        pagination={pricelists.data?.pagination}
+        onPageChange={handlePageChange}
+        onPageSizeChange={handlePageSizeChange}
       />
     </div>
   );

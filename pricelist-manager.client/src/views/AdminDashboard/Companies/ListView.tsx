@@ -4,12 +4,16 @@ import GenericTableView, {
   type CustomColumnDef,
 } from "../../../components/Dashboard/Tables/GenericTableView";
 import { type Company, type CompanyFilter } from "../../../models/Company";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Table } from "@tanstack/react-table";
 import type { Config } from "../../../components/Forms/GenericForm";
-import { useAllCompanies } from "../../../hooks/companies/useQueryCompanies";
+import {
+  useAllCompanies,
+  useAllCompaniesPaginated,
+} from "../../../hooks/companies/useQueryCompanies";
 import { useAuth } from "../../../components/Authentication/AuthenticationProvider";
 import { useNavigate } from "react-router";
+import { useDebounce } from "../../../hooks/useDebounce";
 
 const CompanyListView = () => {
   const { isAdmin } = useAuth();
@@ -17,7 +21,47 @@ const CompanyListView = () => {
 
   if (!isAdmin()) navigate("/auth/login");
 
-  const { data: companies, isPending, isError, error } = useAllCompanies();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [filters, setFilters] = useState<CompanyFilter>({});
+  const [companyName, setCompanyName] = useState("");
+
+  const debouncedCompanyName = useDebounce(companyName, 800);
+
+  useEffect(() => {
+    setFilters((prev) => ({
+      ...prev,
+      name: debouncedCompanyName || undefined,
+    }));
+    setCurrentPage(1);
+  }, [debouncedCompanyName]);
+
+  const {
+    data: companies,
+    isPending,
+    isError,
+    error,
+  } = useAllCompaniesPaginated(
+    {
+      CurrentPage: currentPage,
+      PageSize: pageSize,
+    },
+    filters
+  );
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handlePageSizeChange = (newPageSize: number) => {
+    setPageSize(newPageSize);
+    setCurrentPage(1); // Reset to first page when changing page size
+  };
+
+  const handleFilterChange = (newFilters: Partial<CompanyFilter>) => {
+    setFilters((prev) => ({ ...prev, ...newFilters }));
+    setCurrentPage(1); // Reset to first page when filters change
+  };
 
   const [table, setTable] = useState<Table<Company>>();
 
@@ -77,7 +121,7 @@ const CompanyListView = () => {
             autocomplete: false,
             outerClass: "flex-1",
             onChange: (e) => {
-              table?.getColumn("name")?.setFilterValue(e.target.value);
+              setCompanyName(e.target.value);
             },
           },
         ],
@@ -108,7 +152,7 @@ const CompanyListView = () => {
         />
       </div>
       <GenericTableView
-        data={companies ?? []}
+        data={companies?.items ?? []}
         isPending={isPending}
         isError={isError}
         error={error}
@@ -121,6 +165,9 @@ const CompanyListView = () => {
           columnId: { ":pid": "id" },
         }}
         keyField="id"
+        pagination={companies?.pagination}
+        onPageChange={handlePageChange}
+        onPageSizeChange={handlePageSizeChange}
       />
     </div>
   );

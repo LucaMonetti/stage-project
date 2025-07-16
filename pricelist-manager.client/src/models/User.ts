@@ -28,10 +28,10 @@ export type UserStatistics = z.infer<typeof UserStatisticsSchema>;
 
 // User Statistics
 export const UserFilterSchema = z.object({
-  username: z.string(),
-  email: z.string(),
-  phone: z.string(),
-  company_id: z.string(),
+  username: z.string().optional(),
+  email: z.string().optional(),
+  phone: z.string().optional(),
+  company_id: z.string().optional(),
 });
 
 export type UserFilter = z.infer<typeof UserFilterSchema>;

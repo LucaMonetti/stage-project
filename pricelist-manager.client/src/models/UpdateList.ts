@@ -2,7 +2,7 @@ import { z } from "zod/v4";
 import { UpdateListProductArraySchema } from "./UpdateListProduct";
 import { Status } from "../types";
 
-// Product
+// Updatelist Schema
 export const UpdateListSchema = z.object({
   id: z.number(),
   name: z.string(),
@@ -21,3 +21,12 @@ export const UpdateListSchema = z.object({
 export const UpdateListArraySchema = z.array(UpdateListSchema);
 
 export type UpdateList = z.infer<typeof UpdateListSchema>;
+
+// UpdateListFilter Schema
+export const UpdateListFilterSchema = z.object({
+  name: z.string().optional(),
+  status: z.enum(Status).optional(),
+  companyId: z.string().optional(),
+});
+
+export type UpdateListFilter = z.infer<typeof UpdateListFilterSchema>;

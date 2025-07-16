@@ -9,22 +9,7 @@ import type { Config } from "../../../components/Forms/GenericForm";
 import { useEffect, useState } from "react";
 import { useAllProductsPaginated } from "../../../hooks/products/useQueryProducts";
 import { useAllCompanies } from "../../../hooks/companies/useQueryCompanies";
-
-const useDebounce = (value: string, delay: number) => {
-  const [debouncedValue, setDebouncedValue] = useState(value);
-
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedValue(value);
-    }, delay);
-
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [value, delay]);
-
-  return debouncedValue;
-};
+import { useDebounce } from "../../../hooks/useDebounce";
 
 const ProductsListView = () => {
   const [currentPage, setCurrentPage] = useState(1);

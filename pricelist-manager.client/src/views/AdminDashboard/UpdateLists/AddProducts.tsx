@@ -1,6 +1,5 @@
 import FormButton from "../../../components/Buttons/FormButton";
 import { FaPlus } from "react-icons/fa6";
-import { useGet } from "../../../hooks/useGenericFetch";
 import {
   AddProductsUpdateListSchema,
   type AddProductsUpdateList,
@@ -9,18 +8,20 @@ import GenericForm, {
   GenericFormProvider,
   type Config,
 } from "../../../components/Forms/GenericForm";
-import { UpdateListSchema } from "../../../models/UpdateList";
 import { useParams } from "react-router";
 import { useState, useEffect, useRef } from "react";
 import { useFormContext } from "react-hook-form";
 import GenericTableView from "../../../components/Dashboard/Tables/GenericTableView";
-import { ProductArraySchema, type Product } from "../../../models/Product";
+import { type Product, type ProductFilter } from "../../../models/Product";
 import { useUpdateList } from "../../../hooks/updatelists/useQueryUpdatelists";
 import { useEditUpdateListProducts } from "../../../hooks/updatelists/useMutationUpdateList";
 import {
-  useAllProductsPaginated,
   useAllProductsByCompany,
+  useAllProductsPaginated,
+  useAvailableProducts,
 } from "../../../hooks/products/useQueryProducts";
+import { useDebounce } from "../../../hooks/useDebounce";
+import BasicLoader from "../../../components/Loader/BasicLoader";
 
 const AddProductsForm = () => {
   let data: AddProductsUpdateList | undefined = undefined;
@@ -28,6 +29,14 @@ const AddProductsForm = () => {
   const { updateListId } = useParams();
   const updatelist = useUpdateList(updateListId ?? "");
   const mutation = useEditUpdateListProducts();
+
+  if (updatelist.isPending) {
+    return (
+      <div>
+        <BasicLoader />
+      </div>
+    );
+  }
 
   const config = {
     fieldset: [
@@ -49,9 +58,7 @@ const AddProductsForm = () => {
   if (updatelist.data) {
     data = {
       id: updatelist.data.id.toString(),
-      productIds: updatelist.data.products.map((product) =>
-        product.id.toString()
-      ),
+      productIds: [],
     };
   }
 
@@ -84,57 +91,57 @@ const AddProductsForm = () => {
           externalProvider={true}
           mutation={mutation}
         />
-        <ProductTable companyId={updatelist.data?.companyId ?? ""} />
+        <ProductTable updatelistId={updatelist.data?.id ?? -1} />
       </GenericFormProvider>
     </div>
   );
 };
 
-function ProductTable({ companyId }: { companyId: string }) {
-  const products = useAllProductsByCompany(companyId);
+function ProductTable({ updatelistId }: { updatelistId: number }) {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [filters, setFilters] = useState<ProductFilter>({});
+  const [productCodeInput, setProductCodeInput] = useState("");
 
-  console.log("Products data:", products, companyId);
+  const debouncedProductCode = useDebounce(productCodeInput, 800);
+
+  useEffect(() => {
+    setFilters((prev) => ({
+      ...prev,
+      productCode: debouncedProductCode || undefined,
+    }));
+    setCurrentPage(1);
+  }, [debouncedProductCode]);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handlePageSizeChange = (newPageSize: number) => {
+    setPageSize(newPageSize);
+    setCurrentPage(1); // Reset to first page when changing page size
+  };
+
+  const products = useAvailableProducts(
+    updatelistId,
+    {
+      CurrentPage: currentPage,
+      PageSize: pageSize,
+    },
+    filters
+  );
 
   const [selectedItem, setSelectedItem] = useState<Product[]>([]);
-  const isInitializedRef = useRef(false);
   const methods = useFormContext<AddProductsUpdateList>();
 
-  // Initialize selectedItem with existing products from the form - run only once when both data sources are ready
   useEffect(() => {
-    if (!products.data || isInitializedRef.current) return;
-
-    // Get productIds from form values directly (without watching)
-    const currentFormValues = methods.getValues();
-    const formProductIds = currentFormValues.productIds || [];
-
-    // Initialize selectedItem
-    if (formProductIds.length > 0) {
-      const existingProducts = products.data.filter((product) =>
-        formProductIds.includes(product.id)
-      );
-      setSelectedItem(existingProducts);
-      console.log(
-        "Initialized selectedItem with existing products:",
-        existingProducts
-      );
-    }
-    isInitializedRef.current = true;
-  }, [products, methods]);
-
-  // Update form values when selectedItem changes (but not during initialization)
-  useEffect(() => {
-    if (!isInitializedRef.current) return; // Skip during initialization
-
     const selectedIds = selectedItem.map((item) => item.id);
     methods.setValue("productIds", selectedIds);
-
-    // Debug: Log what we're sending
-    console.log("Updated productIds in form:", selectedIds);
   }, [selectedItem, methods]);
 
   return (
     <GenericTableView
-      data={products.data ?? []}
+      data={products.data?.items ?? []}
       error={products.error}
       isPending={products.isPending}
       isError={products.isError}
@@ -171,6 +178,9 @@ function ProductTable({ companyId }: { companyId: string }) {
           return [...prev, item];
         });
       }}
+      onPageChange={handlePageChange}
+      onPageSizeChange={handlePageSizeChange}
+      pagination={products.data?.pagination}
     />
   );
 }

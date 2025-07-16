@@ -62,8 +62,60 @@ export const useAllProductsPaginated = (
   filters?: ProductFilter
 ) => {
   return useQuery<PaginatedResponse<Product>>({
-    queryKey: ["products", params.CurrentPage, params.PageSize, filters],
+    queryKey: [
+      "products",
+      params?.CurrentPage ?? 1,
+      params?.PageSize ?? 0,
+      filters,
+    ],
     queryFn: () => fetchAllProductsPaginated(params, filters),
+  });
+};
+// Fetch all products from the API
+const fetchAvailableProducts = async (
+  updatelistId: number,
+  params: PaginationParams,
+  filters?: ProductFilter
+): Promise<PaginatedResponse<Product>> => {
+  const searchParams = new URLSearchParams();
+  ParsePaginationSearchParams(params, searchParams);
+  ParseFiltersSearchParams(filters, searchParams, ProductFilterConfig);
+
+  const response = await fetch(
+    queryEndpoint(
+      `updatelists/${updatelistId}/available-products` +
+        (searchParams.toString() ? `?${searchParams.toString()}` : "")
+    ),
+    API_OPTIONS_GET
+  );
+  if (!response.ok) {
+    throw new Error("Failed to fetch products");
+  }
+
+  const paginationInfo = ParsePaginationHeader(response);
+
+  const rawData = await response.json();
+  return {
+    items: ProductArraySchema.parse(rawData),
+    pagination: paginationInfo,
+  };
+};
+
+export const useAvailableProducts = (
+  updatelistId: number,
+  params: PaginationParams,
+  filters?: ProductFilter
+) => {
+  return useQuery<PaginatedResponse<Product>>({
+    queryKey: [
+      "updatelists",
+      updatelistId,
+      "products",
+      params?.CurrentPage ?? 1,
+      params?.PageSize ?? 0,
+      filters,
+    ],
+    queryFn: () => fetchAvailableProducts(updatelistId, params, filters),
   });
 };
 

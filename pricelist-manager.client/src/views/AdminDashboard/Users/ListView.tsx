@@ -4,14 +4,14 @@ import GenericTableView, {
   type CustomColumnDef,
 } from "../../../components/Dashboard/Tables/GenericTableView";
 import { type User, type UserFilter } from "../../../models/User";
-import { useGet } from "../../../hooks/useGenericFetch";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Table } from "@tanstack/react-table";
 import type { Config } from "../../../components/Forms/GenericForm";
-import { CompanyArraySchema } from "../../../models/Company";
-import { useAllUsers } from "../../../hooks/users/useQueryUsers";
+import { useAllUsersPaged } from "../../../hooks/users/useQueryUsers";
 import { useAuth } from "../../../components/Authentication/AuthenticationProvider";
 import { useNavigate } from "react-router";
+import { useDebounce } from "../../../hooks/useDebounce";
+import { useAllCompanies } from "../../../hooks/companies/useQueryCompanies";
 
 const UsersListView = () => {
   const { isAdmin } = useAuth();
@@ -19,17 +19,46 @@ const UsersListView = () => {
 
   if (!isAdmin()) navigate("/auth/login");
 
-  const { data, isPending, isError, error } = useAllUsers();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [filters, setFilters] = useState<UserFilter>({});
+  const [usernameInput, setUsernameInput] = useState("");
 
-  // Add debugging
-  console.log("useAllUsers result:", { data, isPending, isError, error });
-  console.log("Data type:", typeof data);
-  console.log(
-    "Data length:",
-    Array.isArray(data) ? data.length : "Not an array"
+  const debouncedUsername = useDebounce(usernameInput, 800);
+
+  // Add this useEffect to update filters when debouncedUsername changes
+  useEffect(() => {
+    setFilters((prev) => ({
+      ...prev,
+      username: debouncedUsername || undefined,
+    }));
+    setCurrentPage(1);
+  }, [debouncedUsername]);
+
+  const { data, isPending, isError, error } = useAllUsersPaged(
+    {
+      CurrentPage: currentPage,
+      PageSize: pageSize,
+    },
+    filters
   );
 
-  const [table, setTable] = useState<Table<User>>();
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handlePageSizeChange = (newPageSize: number) => {
+    setPageSize(newPageSize);
+    setCurrentPage(1); // Reset to first page when changing page size
+  };
+
+  const handleFilterChange = (newFilters: Partial<UserFilter>) => {
+    setFilters((prev) => ({ ...prev, ...newFilters }));
+    setCurrentPage(1); // Reset to first page when filters change
+  };
+
+  const companies = useAllCompanies();
+  const [, setTable] = useState<Table<User>>();
 
   const columns: CustomColumnDef<User>[] = [
     {
@@ -76,7 +105,7 @@ const UsersListView = () => {
             autocomplete: false,
             outerClass: "flex-1",
             onChange: (e) => {
-              table?.getColumn("username")?.setFilterValue(e.target.value);
+              setUsernameInput(e.target.value);
             },
           },
           {
@@ -84,14 +113,10 @@ const UsersListView = () => {
             label: "Codice Azienda",
             type: "searchable",
             placeholder: "Selezionare codice azienda...",
-            fetchData: useGet({
-              endpoint: "companies",
-              method: "GET",
-              schema: CompanyArraySchema,
-            }),
+            fetchData: companies,
             schema: "company",
             onChange: (value) => {
-              table?.getColumn("company_id")?.setFilterValue(value);
+              handleFilterChange({ company_id: value || undefined });
             },
           },
         ],
@@ -123,7 +148,7 @@ const UsersListView = () => {
       </div>
 
       <GenericTableView
-        data={data ?? []}
+        data={data?.items ?? []}
         isPending={isPending}
         isError={isError}
         error={error}
@@ -136,6 +161,9 @@ const UsersListView = () => {
           columnId: { ":uid": "id" },
         }}
         keyField="id"
+        pagination={data?.pagination}
+        onPageChange={handlePageChange}
+        onPageSizeChange={handlePageSizeChange}
       />
     </div>
   );

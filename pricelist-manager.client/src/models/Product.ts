@@ -20,6 +20,7 @@ export const ProductFilterSchema = z.object({
   productCode: z.string().optional(),
   pricelist_name: z.string().optional(),
   currentInstance_description: z.string().optional(),
+  excludedIds: z.array(z.string()).optional(),
 });
 
 export type ProductFilter = z.infer<typeof ProductFilterSchema>;
