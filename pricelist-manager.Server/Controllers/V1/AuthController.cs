@@ -50,12 +50,6 @@ namespace pricelist_manager.Server.Controllers.V1
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Register([FromBody] CreateUserDTO dto)
         {
-            // Basic Checks
-            if (!Roles.IsValidRole(dto.Role))
-            {
-                ModelState.AddModelError("", "Invalid role!");
-            }
-
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
@@ -73,8 +67,20 @@ namespace pricelist_manager.Server.Controllers.V1
                 return BadRequest(res.Errors);
             }
 
+            if (!await RoleManager.RoleExistsAsync(Roles.USER))
+            {
+                var role = new IdentityRole(Roles.USER);
+                res = await RoleManager.CreateAsync(role);
+
+                if (res.Errors.Any())
+                {
+                    await transition.RollbackAsync();
+                    return BadRequest(res.Errors);
+                }
+            }
+
             // Add Roles
-            res = await UserManager.AddToRoleAsync(user, dto.Role);
+            res = await UserManager.AddToRoleAsync(user, Roles.USER);
 
             if (res.Errors.Any())
             {

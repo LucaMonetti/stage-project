@@ -77,47 +77,6 @@ namespace pricelist_manager.Server.Controllers.V1
             return Ok(UserMapping.MapToDTOs(data));
         }
 
-        [HttpPost("register")]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Register([FromBody] CreateUserDTO dto)
-        {
-            // Basic Checks
-            if (!Roles.IsValidRole(dto.Role))
-            {
-                ModelState.AddModelError("", "Invalid role!");
-            }
-
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            var user = UserMapping.MapToUser(dto);
-
-            using var transition = await Context.Database.BeginTransactionAsync();
-
-            var res = await UserManager.CreateAsync(user, dto.Password);
-
-            if (res.Errors.Any())
-            {
-                await transition.RollbackAsync();
-                return BadRequest(res.Errors);
-            }
-
-            // Add Roles
-            res = await UserManager.AddToRoleAsync(user, dto.Role);
-
-            if (res.Errors.Any())
-            {
-                await transition.RollbackAsync();
-                return BadRequest(res.Errors);
-            }
-
-            // Success Response
-            await transition.CommitAsync();
-            return Ok(new { message = "User registered successfully!" });
-        }
-
         [HttpPut("{id}")]
         public async Task<IActionResult> EditUser(string id, [FromBody] UpdateUserDTO dto)
         {

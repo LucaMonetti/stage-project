@@ -16,6 +16,5 @@ namespace pricelist_manager.Server.DTOs.V1
         public required string Email { get; set; }
         public string? Phone { get; set; } = string.Empty;
         public required string CompanyID { get; set; }
-        public required string Role {  get; set; } = Roles.USER;
     }
 }
