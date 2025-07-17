@@ -22,7 +22,7 @@ const createUser = async (createUserData: CreateUser): Promise<User> => {
   }
 
   const response = await fetch(
-    QueryEndpoint.buildUrl(`accounts/register`),
+    QueryEndpoint.buildUrl(`auth/register`),
     apiConfig.post(parsedData.data)
   );
 

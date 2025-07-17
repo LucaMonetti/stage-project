@@ -93,15 +93,6 @@ const CreateUserForm = () => {
               required: "Necessario inserire una password.",
             },
           },
-          {
-            id: "role",
-            label: "Ruolo",
-            type: "text",
-            placeholder: "Inserire un ruolo per l'Utente.",
-            registerOptions: {
-              required: "Necessario selezionare un ruolo.",
-            },
-          },
         ],
       },
     ],

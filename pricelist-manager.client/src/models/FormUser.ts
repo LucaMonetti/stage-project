@@ -8,7 +8,6 @@ export const CreateUserSchema = z.object({
   email: z.email().min(1, "Necessario inserire la email dell'Utente."),
   phone: z.string(),
   companyId: z.string().min(1, "Necessario inserire il codice di un'Azienda."),
-  role: z.string(),
   password: z.string().min(1, "Necessario inserire una password per l'Utente"),
 });
 

@@ -87,15 +87,6 @@ const EditUserForm = () => {
               required: "Necessario inserire una password.",
             },
           },
-          {
-            id: "role",
-            label: "Ruolo",
-            type: "text",
-            placeholder: "Inserire un ruolo per l'Utente.",
-            registerOptions: {
-              required: "Necessario selezionare un ruolo.",
-            },
-          },
         ],
       },
     ],
@@ -116,7 +107,6 @@ const EditUserForm = () => {
       firstName: user.data.firstName,
       lastName: user.data.lastName,
       phone: user.data.phone,
-      role: user.data.roles.join(", "),
       username: user.data.username,
       password: "",
     };
