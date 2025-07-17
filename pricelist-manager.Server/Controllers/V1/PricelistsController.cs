@@ -19,7 +19,8 @@ namespace pricelist_manager.Server.Controllers.V1
     [ApiController]
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/pricelists")]
-    public class PricelistsController: ControllerBase
+    [Authorize]
+    public class PricelistsController : ControllerBase
     {
         private readonly IPricelistRepository PricelistRepository;
         private readonly IProductRepository ProductRepository;

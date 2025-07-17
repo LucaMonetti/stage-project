@@ -1,4 +1,5 @@
 ﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using pricelist_manager.Server.DTOs.V1;
@@ -15,6 +16,7 @@ namespace pricelist_manager.Server.Controllers.V1
     [ApiController]
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/updatelists")]
+    [Authorize]
     public class UpdateListController : ControllerBase
     {
         private readonly IUpdateListRepository UpdateListRepository;

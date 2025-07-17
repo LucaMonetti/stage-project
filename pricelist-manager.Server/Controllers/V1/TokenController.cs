@@ -13,6 +13,7 @@ namespace pricelist_manager.Server.Controllers.V1
     [ApiController]
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/auth")]
+    [Authorize]
     public class TokenController : ControllerBase
     {
         private readonly ITokenService TokenService;
@@ -70,7 +71,7 @@ namespace pricelist_manager.Server.Controllers.V1
         }
 
         [HttpPost("revoke")]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Revoke()
         {
             if (User.Identity == null)

@@ -18,6 +18,7 @@ namespace pricelist_manager.Server.Controllers.V1
     [ApiController]
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/companies")]
+    [Authorize]
     public class CompaniesController : ControllerBase
     {
         private readonly ICompanyRepository CompanyRepository;
@@ -80,6 +81,7 @@ namespace pricelist_manager.Server.Controllers.V1
         }
 
         [HttpGet("{id}/accounts")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<ICollection<UserDTO>>> GetAccountByCompany(string id)
         {
             if (!ModelState.IsValid)
@@ -138,6 +140,7 @@ namespace pricelist_manager.Server.Controllers.V1
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create([FromBody] CreateCompanyDTO dto)
         {
             if (!ModelState.IsValid)
@@ -159,6 +162,7 @@ namespace pricelist_manager.Server.Controllers.V1
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Update(string id, [FromBody] Company dto)
         {
             if (id != dto.Id)
@@ -184,6 +188,7 @@ namespace pricelist_manager.Server.Controllers.V1
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(string id)
         {
             if (!ModelState.IsValid)

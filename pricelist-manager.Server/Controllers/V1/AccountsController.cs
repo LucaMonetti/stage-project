@@ -1,4 +1,5 @@
 ﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -20,6 +21,7 @@ namespace pricelist_manager.Server.Controllers.V1
     [ApiController]
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/accounts")]
+    [Authorize]
     public class AccountsController : ControllerBase
     {
         private readonly UserManager<User> UserManager;
@@ -62,6 +64,7 @@ namespace pricelist_manager.Server.Controllers.V1
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<ICollection<UserDTO>>> GetAll()
         {
             if (!ModelState.IsValid)
@@ -75,10 +78,12 @@ namespace pricelist_manager.Server.Controllers.V1
         }
 
         [HttpPost("register")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Register([FromBody] CreateUserDTO dto)
         {
             // Basic Checks
-            if (!Roles.IsValidRole(dto.Role)) {
+            if (!Roles.IsValidRole(dto.Role))
+            {
                 ModelState.AddModelError("", "Invalid role!");
             }
 
@@ -88,7 +93,7 @@ namespace pricelist_manager.Server.Controllers.V1
             }
 
             var user = UserMapping.MapToUser(dto);
-           
+
             using var transition = await Context.Database.BeginTransactionAsync();
 
             var res = await UserManager.CreateAsync(user, dto.Password);
@@ -110,46 +115,7 @@ namespace pricelist_manager.Server.Controllers.V1
 
             // Success Response
             await transition.CommitAsync();
-            return Ok(new {message = "User registered successfully!"});
-        }
-
-        [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginDTO dto)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            var user = await UserManager.FindByEmailAsync(dto.Email);
-
-            if (user == null)
-                return NotFound("User Not Found!");
-
-            bool isPasswordCorrect = await UserManager.CheckPasswordAsync(user, dto.Password);
-
-            if (!isPasswordCorrect)
-            {
-                return Unauthorized();
-            }
-
-            var userRoles = await UserManager.GetRolesAsync(user);
-            var authClaims = new List<Claim>
-            {
-                new Claim(JwtRegisteredClaimNames.Sub, user.UserName!),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-            };
-
-            authClaims.AddRange(userRoles.Select(role => new Claim(ClaimTypes.Role, role)));
-
-            var token = new JwtSecurityToken(
-                    issuer: Configuration["Jwt:Issuer"],
-                    expires: DateTime.Now.AddMinutes(double.Parse(Configuration["Jwt:ExpiryMinutes"]!)),
-                    claims: authClaims,
-                    signingCredentials: new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]!)),
-                    SecurityAlgorithms.HmacSha256));
-
-            return Ok(new {token = new JwtSecurityTokenHandler().WriteToken(token)});
+            return Ok(new { message = "User registered successfully!" });
         }
 
         [HttpPut("{id}")]
@@ -202,7 +168,7 @@ namespace pricelist_manager.Server.Controllers.V1
                     user.EmailConfirmed = false;
                 }
 
-                if(!string.IsNullOrWhiteSpace(dto.Username))
+                if (!string.IsNullOrWhiteSpace(dto.Username))
                     user.UserName = dto.Username;
 
                 var result = await UserManager.UpdateAsync(user);
@@ -223,6 +189,7 @@ namespace pricelist_manager.Server.Controllers.V1
         }
 
         [HttpPost("add-role")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> AddRole([FromBody] string role)
         {
             if (!await RoleManager.RoleExistsAsync(role))
@@ -240,6 +207,7 @@ namespace pricelist_manager.Server.Controllers.V1
         }
 
         [HttpPost("assign-role")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> AssignRole([FromBody] UserRoleDTO dto)
         {
             if (!ModelState.IsValid)
