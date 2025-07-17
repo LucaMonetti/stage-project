@@ -1,4 +1,3 @@
-
 using Asp.Versioning.ApiExplorer;
 using Asp.Versioning.Conventions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -21,7 +20,7 @@ namespace pricelist_manager.Server
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -127,7 +126,7 @@ namespace pricelist_manager.Server
 
             builder.Services.AddScoped<IUserMappingService, UserMappingService>();
             builder.Services.AddScoped<IUserLiteMappingService, UserLiteMappingService>();
-            
+
             builder.Services.AddScoped<IUpdateListLiteMappingService, UpdateListLiteMappingService>();
             builder.Services.AddScoped<IUpdateListMappingService, UpdateListMappingService>();
             builder.Services.AddScoped<IProductToUpdateListMappingService, ProductToUpdateListMappingService>();
@@ -135,6 +134,84 @@ namespace pricelist_manager.Server
             builder.Services.AddScoped<IMetadataMappingService, MetadataMappingService>();
 
             var app = builder.Build();
+
+            // Create admin user if no users exist
+            using (var scope = app.Services.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+                try
+                {
+                    var context = services.GetRequiredService<DataContext>();
+                    var userManager = services.GetRequiredService<UserManager<User>>();
+                    var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+
+                    // Ensure database is created
+                    await context.Database.EnsureCreatedAsync();
+
+                    // Create roles if they don't exist
+                    if (!await roleManager.RoleExistsAsync("Admin"))
+                    {
+                        await roleManager.CreateAsync(new IdentityRole("Admin"));
+                    }
+                    if (!await roleManager.RoleExistsAsync("User"))
+                    {
+                        await roleManager.CreateAsync(new IdentityRole("User"));
+                    }
+
+                    // Check if any users exist
+                    if (!context.Users.Any())
+                    {
+                        // Create default company first
+                        var defaultCompany = new Company
+                        {
+                            Id = "ADMIN001",
+                            Name = "Default Admin Company",
+                            Address = "Default Address",
+                            PostalCode = "00000",
+                            Province = "Default",
+                            Phone = "0000000000",
+                            LogoUri = "",
+                            InterfaceColor = "#000000"
+                        };
+
+                        context.Companies.Add(defaultCompany);
+                        await context.SaveChangesAsync();
+
+                        // Create admin user
+                        var adminUser = new User
+                        {
+                            UserName = "Admin",
+                            Email = "admin@admin.com",
+                            FirstName = "Admin",
+                            LastName = "Admin",
+                            CompanyId = defaultCompany.Id,
+                            EmailConfirmed = true
+                        };
+
+                        var result = await userManager.CreateAsync(adminUser, "Admin123!");
+
+                        if (result.Succeeded)
+                        {
+                            await userManager.AddToRoleAsync(adminUser, "Admin");
+                            Console.WriteLine("Default admin user created successfully!");
+                            Console.WriteLine("Email: admin@admin.com");
+                            Console.WriteLine("Password: Admin123!");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Failed to create admin user:");
+                            foreach (var error in result.Errors)
+                            {
+                                Console.WriteLine($"- {error.Description}");
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"An error occurred while creating admin user: {ex.Message}");
+                }
+            }
 
             app.UseDefaultFiles();
             app.UseStaticFiles();
@@ -166,7 +243,7 @@ namespace pricelist_manager.Server
 
             app.MapFallbackToFile("/index.html");
 
-            app.Run();
+            await app.RunAsync();
         }
     }
 }
