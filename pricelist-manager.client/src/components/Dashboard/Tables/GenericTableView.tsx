@@ -13,6 +13,7 @@ import {
 } from "@tanstack/react-table";
 import FilterRenderer from "./FilterRenderer";
 import type { Config } from "../../Forms/GenericForm";
+import type { PaginationInfo } from "../../../hooks/products/useQueryProducts";
 
 export type CustomColumnDef<T> = ColumnDef<T> & {
   linkUrl?: (item: T) => string;
@@ -33,6 +34,10 @@ type Prods<T extends Record<string, any>, TFilter extends FieldValues> = {
   selectedItems?: T[];
   enableCheckbox?: boolean;
   onRowSelect?: (item: T) => void;
+
+  pagination?: PaginationInfo;
+  onPageChange?: (page: number) => void;
+  onPageSizeChange?: (pageSize: number) => void;
 };
 
 export interface Column<T> {
@@ -51,6 +56,82 @@ export interface TableConfig<T> {
   baseUrl: string;
   columnId: Record<string, keyof T>;
 }
+
+const PaginationControls = ({
+  pagination,
+  onPageChange,
+  onPageSizeChange,
+}: {
+  pagination: PaginationInfo;
+  onPageChange?: (page: number) => void;
+  onPageSizeChange?: (pageSize: number) => void;
+}) => {
+  const {
+    currentPage,
+    totalPages,
+    totalCount,
+    pageSize,
+    hasNext,
+    hasPrevious,
+  } = pagination;
+
+  return (
+    <div className="flex items-center justify-between px-6 py-3 bg-gray-800 border-t border-gray-700">
+      <div className="flex items-center space-x-2">
+        <span className="text-sm text-gray-400">Mostra</span>
+        <select
+          value={pageSize}
+          onChange={(e) =>
+            onPageSizeChange && onPageSizeChange(Number(e.target.value))
+          }
+          className="px-3 py-1 bg-gray-700 border border-gray-600 rounded text-sm"
+        >
+          <option value={10}>10</option>
+          <option value={25}>25</option>
+          <option value={50}>50</option>
+          <option value={100}>100</option>
+        </select>
+        <span className="text-sm text-gray-400">di {totalCount} risultati</span>
+      </div>
+
+      <div className="flex items-center space-x-1">
+        <button
+          onClick={() => onPageChange && onPageChange(1)}
+          disabled={currentPage === 1}
+          className="px-3 py-1 text-sm bg-gray-700 border border-gray-600 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-600"
+        >
+          ««
+        </button>
+        <button
+          onClick={() => onPageChange && onPageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+          className="px-3 py-1 text-sm bg-gray-700 border border-gray-600 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-600"
+        >
+          ‹
+        </button>
+
+        <span className="px-3 py-1 text-sm">
+          Pagina {currentPage} di {totalPages}
+        </span>
+
+        <button
+          onClick={() => onPageChange && onPageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+          className="px-3 py-1 text-sm bg-gray-700 border border-gray-600 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-600"
+        >
+          ›
+        </button>
+        <button
+          onClick={() => onPageChange && onPageChange(totalPages)}
+          disabled={currentPage === totalPages}
+          className="px-3 py-1 text-sm bg-gray-700 border border-gray-600 rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-600"
+        >
+          »»
+        </button>
+      </div>
+    </div>
+  );
+};
 
 function GenericTableView<
   T extends Record<string, any>,
@@ -71,20 +152,16 @@ function GenericTableView<
   selectedItems,
   enableCheckbox = false,
   onRowSelect,
+  pagination,
+  onPageChange,
+  onPageSizeChange,
 }: Prods<T, TFilter>) {
   const navigate = useNavigate();
-
-  const [columnFilters, setColumnFilters] = useState<ColumnFilter[]>([]);
 
   const table = useReactTable({
     data: data ?? [],
     columns,
     getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    state: {
-      columnFilters,
-    },
-    onColumnFiltersChange: setColumnFilters,
   });
 
   const handleRowSelect = (item: T) => {
@@ -318,6 +395,14 @@ function GenericTableView<
             </tbody>
           )}
         </table>
+
+        {pagination && (
+          <PaginationControls
+            pagination={pagination}
+            onPageChange={onPageChange}
+            onPageSizeChange={onPageSizeChange}
+          />
+        )}
       </div>
     </div>
   );

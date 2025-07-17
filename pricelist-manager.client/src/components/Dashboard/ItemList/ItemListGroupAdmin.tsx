@@ -1,6 +1,6 @@
 import { useAllCompanies } from "../../../hooks/companies/useQueryCompanies";
 import { useAllPricelists } from "../../../hooks/pricelists/useQueryPricelists";
-import { useAllProducts } from "../../../hooks/products/useQueryProducts";
+import { useAllProductsPaginated } from "../../../hooks/products/useQueryProducts";
 import { useFetch } from "../../../hooks/useFetch";
 import { useAllUsers } from "../../../hooks/users/useQueryUsers";
 import { CompanyArraySchema } from "../../../models/Company";
@@ -15,7 +15,7 @@ const ItemListGroupAdmin = () => {
     isPending: isProductsPending,
     isError: isProductError,
     error: productErrot,
-  } = useAllProducts();
+  } = useAllProductsPaginated();
 
   const {
     data: pricelists,

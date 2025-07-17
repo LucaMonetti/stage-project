@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from "react-router";
 import BasicLoader from "../../../components/Loader/BasicLoader";
-import { FaPencil, FaDownload, FaPlus } from "react-icons/fa6";
+import { FaPencil, FaDownload, FaPlus, FaTrash } from "react-icons/fa6";
 import InfoWidget from "../../../components/SinglePage/Widgets/InfoWidget";
 import TableWidget from "../../../components/SinglePage/Widgets/TableWidget";
 import type { CustomColumnDef } from "../../../components/Dashboard/Tables/GenericTableView";
@@ -10,44 +10,15 @@ import {
   useProductsByStatus,
   useUpdateList,
 } from "../../../hooks/updatelists/useQueryUpdatelists";
-
-const productCols = [
-  {
-    accessorKey: "id",
-    header: "Codice Prodotto",
-    meta: {
-      className: "whitespace-nowrap",
-    },
-  },
-  {
-    accessorKey: "currentInstance.name",
-    header: "Nome Prodotto",
-  },
-  {
-    accessorKey: "currentInstance.price",
-    header: "Prezzo",
-    meta: {
-      className: "font-medium text-green-600 whitespace-nowrap",
-    },
-    accessorFn: (row: UpdateListProduct) =>
-      `${row.currentInstance.price.toFixed(2)} €`,
-  },
-  {
-    accessorKey: "currentInstance.cost",
-    header: "Costo",
-    meta: {
-      className: "font-medium text-red-600 whitespace-nowrap",
-    },
-    accessorFn: (row: UpdateListProduct) =>
-      `${row.currentInstance.cost.toFixed(2)} €`,
-  },
-] satisfies CustomColumnDef<UpdateListProduct>[];
+import ActionRenderer from "../../../components/Buttons/ActionRenderer";
+import { useDeleteUpdatelistProduct } from "../../../hooks/updatelists/useMutationUpdateList";
 
 const UpdateListSingleView = () => {
   const navigate = useNavigate();
   const { updateListId } = useParams();
 
   const { data, isPending, isError } = useUpdateList(updateListId ?? "");
+  const deleteMutation = useDeleteUpdatelistProduct();
 
   const {
     data: toUpdateProducts,
@@ -70,18 +41,82 @@ const UpdateListSingleView = () => {
     );
   }
 
-  if (isError) {
+  if (isError || updateListId === undefined) {
     navigate("/error/404");
+    return;
   }
+
+  const productCols = [
+    {
+      accessorKey: "id",
+      header: "Codice Prodotto",
+      meta: {
+        className: "whitespace-nowrap",
+      },
+    },
+    {
+      accessorKey: "currentInstance.name",
+      header: "Nome Prodotto",
+    },
+    {
+      accessorKey: "currentInstance.price",
+      header: "Prezzo",
+      meta: {
+        className: "font-medium text-green-600 whitespace-nowrap",
+      },
+      accessorFn: (row: UpdateListProduct) =>
+        `${row.currentInstance.price.toFixed(2)} €`,
+    },
+    {
+      accessorKey: "currentInstance.cost",
+      header: "Costo",
+      meta: {
+        className: "font-medium text-red-600 whitespace-nowrap",
+      },
+      accessorFn: (row: UpdateListProduct) =>
+        `${row.currentInstance.cost.toFixed(2)} €`,
+    },
+    {
+      accessorKey: "actions",
+      header: "Actions",
+      cell: ({ row }) => {
+        const { id } = row.original;
+
+        return (
+          <div className="flex gap-4">
+            <ActionRenderer
+              actions={[
+                {
+                  Icon: FaTrash,
+                  type: "button",
+                  color: "red",
+                  modalConfig: {
+                    title: "Eliminare la lista?",
+                    description: "Sei sicuro di voler eliminare questa lista?",
+                  },
+                  handler: async () => {
+                    deleteMutation.mutate({
+                      updateListId: updateListId,
+                      productId: id,
+                    });
+                  },
+                },
+              ]}
+            />
+          </div>
+        );
+      },
+    },
+  ] satisfies CustomColumnDef<UpdateListProduct>[];
 
   return (
     <div className="px-8 py-8 grid grid-cols-4 gap-4">
       <InfoWidget
         title={data?.name}
         subtitle={data?.description}
-        callout={`Completamento: ${(
-          ((data?.editedProducts ?? 0) / (data?.totalProducts ?? 1)) *
-          100
+        callout={`Completamento: ${(data?.editedProducts == data.totalProducts
+          ? 100
+          : ((data?.editedProducts ?? 0) / (data?.totalProducts ?? 1)) * 100
         ).toFixed(1)}%`}
         actions={[
           {

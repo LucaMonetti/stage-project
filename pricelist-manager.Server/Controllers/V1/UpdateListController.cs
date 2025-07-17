@@ -6,6 +6,7 @@ using pricelist_manager.Server.DTOs.V1.QueryParams;
 using pricelist_manager.Server.Exceptions;
 using pricelist_manager.Server.Helpers;
 using pricelist_manager.Server.Interfaces;
+using pricelist_manager.Server.Mappers;
 using pricelist_manager.Server.Models;
 using pricelist_manager.Server.Repositories;
 
@@ -19,16 +20,18 @@ namespace pricelist_manager.Server.Controllers.V1
         private readonly IUpdateListRepository UpdateListRepository;
         private readonly IProductRepository ProductRepository;
         private readonly IProductToUpdateListMappingService ProductToUpdateListMappingService;
+        private readonly IProductMappingService ProductMappingService;
         private readonly IUpdateListMappingService UpdateListMappingService;
         private readonly IMetadataMappingService MetadataMapping;
 
-        public UpdateListController(IUpdateListRepository updateListRepository, IProductRepository productRepository, IUpdateListMappingService updateListMappingService, IProductToUpdateListMappingService productToUpdateListMappingService, IMetadataMappingService metadataMapping)
+        public UpdateListController(IUpdateListRepository updateListRepository, IProductRepository productRepository, IUpdateListMappingService updateListMappingService, IProductToUpdateListMappingService productToUpdateListMappingService, IMetadataMappingService metadataMapping, IProductMappingService productMappingService)
         {
             UpdateListRepository = updateListRepository;
             ProductRepository = productRepository;
             UpdateListMappingService = updateListMappingService;
             ProductToUpdateListMappingService = productToUpdateListMappingService;
             MetadataMapping = metadataMapping;
+            ProductMappingService = productMappingService;
         }
 
         [HttpGet]
@@ -77,6 +80,27 @@ namespace pricelist_manager.Server.Controllers.V1
             {
                 var data = await UpdateListRepository.GetProductsByList(id, requestParams);
                 return Ok(ProductToUpdateListMappingService.MapToDTOs(data));
+            }
+            catch (NotFoundException<UpdateList> e)
+            {
+                return NotFound(e.Message);
+            }
+        }
+        [HttpGet("{id:int}/available-products")]
+        public async Task<ActionResult<ProductDTO>> GetAvailableProductsById(int id, [FromQuery] UpdateListQueryParams requestParams)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                var data = await UpdateListRepository.GetAvailableProducts(id, requestParams);
+
+                Response.Headers["X-Pagination"] = JsonConvert.SerializeObject(MetadataMapping.MapToMetadata(data));
+
+                return Ok(ProductMappingService.MapToDTOs(data));
             }
             catch (NotFoundException<UpdateList> e)
             {
@@ -132,12 +156,8 @@ namespace pricelist_manager.Server.Controllers.V1
                 var productsToAdd = newProducts
                     .Where(p => !existingProductIds.Contains(p.ProductId))
                     .ToList();
-                var productsToRemove = existingProducts
-                    .Where(p => newProductIDs != null ? !newProductIDs.Contains(p.ProductId) : false)
-                    .ToList();
 
                 await UpdateListRepository.AddProducts(productsToAdd);
-                await UpdateListRepository.RemoveProducts(productsToRemove);
 
                 // Update status of update list
                 var products = await UpdateListRepository.GetProductsByStatus(id, Status.Pending);
@@ -146,10 +166,6 @@ namespace pricelist_manager.Server.Controllers.V1
                 if (products.Count != 0 && updatelist.Status != Status.Pending)
                 {
                     updatelist.Status = Status.Pending;
-                    await UpdateListRepository.UpdateAsync(updatelist);
-                } else if (products.Count == 0 && updatelist.Status != Status.Edited)
-                {
-                    updatelist.Status = Status.Edited;
                     await UpdateListRepository.UpdateAsync(updatelist);
                 }
 
@@ -164,6 +180,38 @@ namespace pricelist_manager.Server.Controllers.V1
                 return base.Conflict(e.Message);
             }
         }
+
+        [HttpDelete("{id:int}/products")]
+        public async Task<IActionResult> RemoveProducts(int id, [FromQuery] RemoveProductUpdateListDTO dto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                // Check if the update list exists
+                var updatelist = await UpdateListRepository.GetByIdAsync(id);
+
+                await UpdateListRepository.DeleteProductAndUpdateStatus(id, dto.ProductId);
+
+                return base.NoContent();
+            }
+            catch (NotFoundException<UpdateList> e)
+            {
+                return base.NotFound(e.Message);
+            }
+            catch (NotFoundException<ProductToUpdateList> e)
+            {
+                return base.NotFound(e.Message);
+            }
+            catch (AlreadyExistException<UpdateList> e)
+            {
+                return base.Conflict(e.Message);
+            }
+        }
+
 
         [HttpPut("{id:int}")]
         public async Task<IActionResult> UpdateProduct(int id, [FromBody] UpdateUpdateListDTO dto)

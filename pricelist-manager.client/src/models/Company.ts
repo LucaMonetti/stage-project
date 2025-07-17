@@ -15,8 +15,8 @@ export type Company = z.infer<typeof CompanySchema>;
 
 // Company
 export const CompanyFilterSchema = z.object({
-  id: z.string(),
-  name: z.string(),
+  id: z.string().optional(),
+  name: z.string().optional(),
 });
 
 export type CompanyFilter = z.infer<typeof CompanyFilterSchema>;

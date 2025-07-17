@@ -5,13 +5,17 @@ import ActionRenderer, {
 import GenericTableView, {
   type CustomColumnDef,
 } from "../../../components/Dashboard/Tables/GenericTableView";
-import { useState } from "react";
+import { useEffect, useState, type ChangeEvent } from "react";
 import type { Table } from "@tanstack/react-table";
-import { type UpdateList } from "../../../models/UpdateList";
+import {
+  type UpdateList,
+  type UpdateListFilter,
+} from "../../../models/UpdateList";
 import { Status, StatusLabel } from "../../../types";
 import {
   useAllUpdateLists,
   useAllUpdateListsByCompany,
+  useAllUpdateListsPaged,
 } from "../../../hooks/updatelists/useQueryUpdatelists";
 import {
   useDeleteUpdateList,
@@ -19,20 +23,68 @@ import {
 } from "../../../hooks/updatelists/useMutationUpdateList";
 import type { UseQueryResult } from "@tanstack/react-query";
 import { useAuth } from "../../../components/Authentication/AuthenticationProvider";
+import { useDebounce } from "../../../hooks/useDebounce";
+import type { PaginatedResponse } from "../../../models/Pagination";
+import { useAllCompanies } from "../../../hooks/companies/useQueryCompanies";
+import type { Config } from "../../../components/Forms/GenericForm";
 
 const UpdateListListView = () => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [filters, setFilters] = useState<UpdateListFilter>({});
+  const [listNameInput, setListNameInput] = useState("");
+
+  const debouncedListName = useDebounce(listNameInput, 800);
+
+  // Add this useEffect to update filters when debouncedListName changes
+  useEffect(() => {
+    setFilters((prev) => ({
+      ...prev,
+      name: debouncedListName || undefined,
+    }));
+    setCurrentPage(1);
+  }, [debouncedListName]);
+
   const { isAdmin, user } = useAuth();
 
-  let updatelists: UseQueryResult<UpdateList[]>;
+  let updatelists: UseQueryResult<PaginatedResponse<UpdateList>>;
 
   if (isAdmin()) {
-    updatelists = useAllUpdateLists();
+    updatelists = useAllUpdateListsPaged(
+      {
+        CurrentPage: currentPage,
+        PageSize: pageSize,
+      },
+      filters
+    );
   } else {
     // If not admin, fetch only the update lists for the user's company
-    updatelists = useAllUpdateListsByCompany(user?.company.id ?? "");
+    updatelists = useAllUpdateListsByCompany(
+      user?.company.id ?? "",
+      {
+        CurrentPage: currentPage,
+        PageSize: pageSize,
+      },
+      filters
+    );
   }
 
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handlePageSizeChange = (newPageSize: number) => {
+    setPageSize(newPageSize);
+    setCurrentPage(1); // Reset to first page when changing page size
+  };
+
+  const handleFilterChange = (newFilters: Partial<UpdateListFilter>) => {
+    setFilters((prev) => ({ ...prev, ...newFilters }));
+    setCurrentPage(1); // Reset to first page when filters change
+  };
+
   const { data, isPending, isError, error } = updatelists;
+  const companies = useAllCompanies();
 
   const [table, setTable] = useState<Table<UpdateList>>();
 
@@ -129,6 +181,39 @@ const UpdateListListView = () => {
     },
   ];
 
+  let filterConfig = {
+    fieldset: [
+      {
+        title: "Filtri",
+        inputs: [
+          {
+            id: "name",
+            label: "Nome Lista",
+            type: "text",
+            placeholder: "Inserire il nome della lista",
+            autocomplete: false,
+            outerClass: "flex-1",
+            onChange: (e: ChangeEvent<HTMLInputElement>) => {
+              setListNameInput(e.target.value);
+            },
+          },
+          {
+            id: "companyId",
+            label: "Codice Azienda",
+            type: "searchable",
+            placeholder: "Selezionare codice azienda...",
+            fetchData: companies,
+            schema: "company",
+            onChange: (value: any) => {
+              handleFilterChange({ companyId: value || undefined });
+            },
+          },
+        ],
+      },
+    ],
+    endpoint: "products",
+  } satisfies Config<UpdateListFilter>;
+
   return (
     <div className="px-8 py-4">
       <div className="flex justify-between items-center mb-8">
@@ -151,11 +236,12 @@ const UpdateListListView = () => {
       </div>
 
       <GenericTableView
-        data={data ?? []}
+        data={data?.items ?? []}
         isPending={isPending}
         isError={isError}
         error={error}
         columns={columns}
+        filterConfig={filterConfig}
         onTableReady={setTable}
         config={{
           baseUrl: "/dashboard/updatelists/:pid",
@@ -163,6 +249,9 @@ const UpdateListListView = () => {
           columnId: { ":pid": "id" },
         }}
         keyField="id"
+        pagination={data?.pagination}
+        onPageChange={handlePageChange}
+        onPageSizeChange={handlePageSizeChange}
       />
     </div>
   );

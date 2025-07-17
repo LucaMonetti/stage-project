@@ -14,8 +14,8 @@ export const PricelistArraySchema = z.array(PricelistSchema);
 
 // Pricelist Filter
 export const PricelistFilterSchema = z.object({
-  name: z.string(),
-  company_id: z.string(),
+  name: z.string().optional(),
+  company_id: z.string().optional(),
 });
 
 export type PricelistFilter = z.infer<typeof PricelistFilterSchema>;

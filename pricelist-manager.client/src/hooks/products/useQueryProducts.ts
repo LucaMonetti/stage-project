@@ -3,23 +3,148 @@ import {
   ProductArraySchema,
   ProductSchema,
   type Product,
+  type ProductFilter,
 } from "../../models/Product";
 import { API_OPTIONS_GET, queryEndpoint } from "../../config/apiConfig";
+import type {
+  PaginatedResponse,
+  PaginationParams,
+} from "../../models/Pagination";
+import {
+  ParsePaginationHeader,
+  ParsePaginationSearchParams,
+} from "../../helpers/Pagination";
+import {
+  ParseFiltersSearchParams,
+  type FilterConfig,
+} from "../../helpers/Filters";
+
+const ProductFilterConfig: FilterConfig<ProductFilter> = {
+  productCode: {
+    paramName: "Filters.ProductCode",
+  },
+  companyId: {
+    paramName: "Filters.CompanyId",
+  },
+};
 
 // Fetch all products from the API
-const fetchAllProducts = async (): Promise<Product[]> => {
-  const response = await fetch(queryEndpoint("products"), API_OPTIONS_GET);
+const fetchAllProductsPaginated = async (
+  params: PaginationParams,
+  filters?: ProductFilter
+): Promise<PaginatedResponse<Product>> => {
+  const searchParams = new URLSearchParams();
+  ParsePaginationSearchParams(params, searchParams);
+  ParseFiltersSearchParams(filters, searchParams, ProductFilterConfig);
+
+  const response = await fetch(
+    queryEndpoint(
+      "products" +
+        (searchParams.toString() ? `?${searchParams.toString()}` : "")
+    ),
+    API_OPTIONS_GET
+  );
   if (!response.ok) {
     throw new Error("Failed to fetch products");
   }
+
+  const paginationInfo = ParsePaginationHeader(response);
+
+  const rawData = await response.json();
+  return {
+    items: ProductArraySchema.parse(rawData),
+    pagination: paginationInfo,
+  };
+};
+
+export const useAllProductsPaginated = (
+  params: PaginationParams,
+  filters?: ProductFilter
+) => {
+  return useQuery<PaginatedResponse<Product>>({
+    queryKey: [
+      "products",
+      params?.CurrentPage ?? 1,
+      params?.PageSize ?? 0,
+      filters,
+    ],
+    queryFn: () => fetchAllProductsPaginated(params, filters),
+  });
+};
+// Fetch all products from the API
+const fetchAvailableProducts = async (
+  updatelistId: number,
+  params: PaginationParams,
+  filters?: ProductFilter
+): Promise<PaginatedResponse<Product>> => {
+  const searchParams = new URLSearchParams();
+  ParsePaginationSearchParams(params, searchParams);
+  ParseFiltersSearchParams(filters, searchParams, ProductFilterConfig);
+
+  const response = await fetch(
+    queryEndpoint(
+      `updatelists/${updatelistId}/available-products` +
+        (searchParams.toString() ? `?${searchParams.toString()}` : "")
+    ),
+    API_OPTIONS_GET
+  );
+  if (!response.ok) {
+    throw new Error("Failed to fetch products");
+  }
+
+  const paginationInfo = ParsePaginationHeader(response);
+
+  const rawData = await response.json();
+  return {
+    items: ProductArraySchema.parse(rawData),
+    pagination: paginationInfo,
+  };
+};
+
+export const useAvailableProducts = (
+  updatelistId: number,
+  params: PaginationParams,
+  filters?: ProductFilter
+) => {
+  return useQuery<PaginatedResponse<Product>>({
+    queryKey: [
+      "updatelists",
+      updatelistId,
+      "products",
+      params?.CurrentPage ?? 1,
+      params?.PageSize ?? 0,
+      filters,
+    ],
+    queryFn: () => fetchAvailableProducts(updatelistId, params, filters),
+  });
+};
+
+// Fetch all products from the API
+const fetchAllProducts = async (
+  filters?: ProductFilter
+): Promise<Product[]> => {
+  const searchParams = new URLSearchParams();
+  ParseFiltersSearchParams(filters, searchParams, ProductFilterConfig);
+
+  const response = await fetch(
+    queryEndpoint(
+      "products" +
+        (searchParams.toString() ? `?${searchParams.toString()}` : "")
+    ),
+    API_OPTIONS_GET
+  );
+  if (!response.ok) {
+    throw new Error("Failed to fetch products");
+  }
+
   const rawData = await response.json();
   return ProductArraySchema.parse(rawData);
 };
 
-export const useAllProducts = () => {
+export const useAllProducts = (filters?: ProductFilter) => {
   return useQuery<Product[]>({
-    queryKey: ["products"],
-    queryFn: fetchAllProducts,
+    queryKey: ["products", filters],
+    queryFn: () => fetchAllProducts(filters),
   });
 };
 

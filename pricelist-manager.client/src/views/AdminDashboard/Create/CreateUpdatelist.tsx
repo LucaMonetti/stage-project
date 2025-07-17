@@ -1,29 +1,24 @@
 import FormButton from "../../../components/Buttons/FormButton";
 
 import { FaPlus } from "react-icons/fa6";
-import { useGet } from "../../../hooks/useGenericFetch";
-import { CompanyArraySchema } from "../../../models/Company";
 import {
   CreateUpdateListSchema,
   type CreateUpdateList,
 } from "../../../models/FormUpdateList";
-import { ProductArraySchema, type Product } from "../../../models/Product";
 import GenericForm, {
   GenericFormProvider,
   type Config,
 } from "../../../components/Forms/GenericForm";
 import GenericTableView from "../../../components/Dashboard/Tables/GenericTableView";
-import { use, useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { useCreateUpdateList } from "../../../hooks/updatelists/useMutationUpdateList";
-import {
-  useAllProducts,
-  useAllProductsByCompany,
-} from "../../../hooks/products/useQueryProducts";
+import { useAllProductsPaginated } from "../../../hooks/products/useQueryProducts";
 import { useAuth } from "../../../components/Authentication/AuthenticationProvider";
-import type { UseQueryResult } from "@tanstack/react-query";
 import { useAllCompanies } from "../../../hooks/companies/useQueryCompanies";
 import { useNavigate } from "react-router";
+import type { Product, ProductFilter } from "../../../models/Product";
+import { useDebounce } from "../../../hooks/useDebounce";
 
 const CreateUpdatelistForm = () => {
   const { user, isAdmin } = useAuth();
@@ -116,28 +111,63 @@ const CreateUpdatelistForm = () => {
   );
 };
 
-function ProductTable({ companyId }: { companyId?: string }) {
+function ProductTable({ companyId: initialCompanyId }: { companyId?: string }) {
   const [selectedItem, setSelectedItem] = useState<Product[]>([]);
   const methods = useFormContext<CreateUpdateList>();
 
-  let products: UseQueryResult<Product[], Error>;
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [filters, setFilters] = useState<ProductFilter>({});
+  const [productCodeInput, setProductCodeInput] = useState("");
 
-  if (companyId) {
-    products = useAllProductsByCompany(companyId);
-  } else {
-    products = useAllProducts();
-  }
+  const formCompanyId = methods.watch("companyId");
+
+  const debouncedProductCode = useDebounce(productCodeInput, 800);
+
+  const products = useAllProductsPaginated(
+    {
+      CurrentPage: currentPage,
+      PageSize: pageSize,
+    },
+    filters
+  );
+
+  useEffect(() => {
+    setFilters((prev) => ({
+      ...prev,
+      productCode: debouncedProductCode || undefined,
+    }));
+    setCurrentPage(1);
+  }, [debouncedProductCode]);
+
+  useEffect(() => {
+    setFilters((prev) => ({
+      ...prev,
+      companyId: formCompanyId,
+    }));
+    setSelectedItem([]);
+    setCurrentPage(1);
+  }, [formCompanyId]);
 
   useEffect(() => {
     methods.setValue(
       "products",
-      selectedItem.map((item) => item.id) // Assuming you want to store only the IDs of the selected products
+      selectedItem.map((item) => item.id)
     );
   }, [selectedItem, methods]);
 
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handlePageSizeChange = (newPageSize: number) => {
+    setPageSize(newPageSize);
+    setCurrentPage(1); // Reset to first page when changing page size
+  };
+
   return (
     <GenericTableView
-      data={products.data || []}
+      data={products.data?.items || []}
       isPending={products.isPending}
       isError={products.isError}
       error={products.error}
@@ -174,6 +204,30 @@ function ProductTable({ companyId }: { companyId?: string }) {
           return [...prev, item];
         });
       }}
+      onPageChange={handlePageChange}
+      onPageSizeChange={handlePageSizeChange}
+      filterConfig={{
+        fieldset: [
+          {
+            title: "Filtri Prodotti",
+            inputs: [
+              {
+                id: "productCode",
+                label: "Codice Prodotto",
+                type: "text",
+                placeholder: "Inserire il codice del prodotto",
+                autocomplete: false,
+                outerClass: "flex-1",
+                onChange: (e) => {
+                  setProductCodeInput(e.target.value);
+                },
+              },
+            ],
+          },
+        ],
+        endpoint: "products",
+      }}
+      pagination={products.data?.pagination}
     />
   );
 }

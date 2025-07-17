@@ -1,8 +1,8 @@
-import { type UserLogin } from "./../../models/UserLogin";
+import { type UserLogin } from "../../models/UserLogin";
 import {
   type AuthenticatedResponse,
   AuthenticatedResponseSchema,
-} from "./../../models/AuthenticatedResponse";
+} from "../../models/AuthenticatedResponse";
 import { API_OPTIONS_POST, queryEndpoint } from "../../config/apiConfig";
 import { useMutation } from "@tanstack/react-query";
 import { useAuth } from "../../components/Authentication/AuthenticationProvider";

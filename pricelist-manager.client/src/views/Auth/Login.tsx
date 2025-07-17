@@ -1,7 +1,7 @@
 import { useNavigate, useLocation } from "react-router";
 import { useAuth } from "../../components/Authentication/AuthenticationProvider";
 import GenericForm from "../../components/Forms/GenericForm";
-import { useLogin } from "../../hooks/auth/useAuthQuery";
+import { useLogin } from "../../hooks/auth/useLogin";
 import { UserLoginSchema } from "../../models/UserLogin";
 import { useEffect } from "react";
 

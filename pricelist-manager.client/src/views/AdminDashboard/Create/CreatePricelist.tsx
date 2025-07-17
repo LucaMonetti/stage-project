@@ -22,13 +22,7 @@ import { useNavigate } from "react-router";
 const CreatePricelistForm = () => {
   const { user, isAdmin } = useAuth();
   const navigate = useNavigate();
-  let companies: UseQueryResult<Company[] | Company, Error>;
-
-  if (isAdmin()) {
-    companies = useAllCompanies();
-  } else {
-    companies = useCompany(user?.company.id ?? "");
-  }
+  const companies = useAllCompanies();
 
   const config = {
     fieldset: [
@@ -46,8 +40,18 @@ const CreatePricelistForm = () => {
           },
           {
             id: "companyId",
-            label: "Codice Azienda",
-            type: "text",
+            label: "Azienda",
+            ...(isAdmin()
+              ? {
+                  type: "searchable",
+                  fetchData: companies,
+                  schema: "company",
+                  registerOptions: {
+                    required: "Necessario selezionare un'azienda!",
+                  },
+                }
+              : { type: "text" }),
+            placeholder: "Seleziona l'azienda",
             isDisabled: !isAdmin(),
           },
           {

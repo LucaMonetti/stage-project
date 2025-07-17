@@ -45,7 +45,22 @@ namespace pricelist_manager.Server.Repositories
         {
             if (!CanConnect()) throw new StorageUnavailableException();
 
-            var query = Context.Products
+            var query = Context.Products.AsQueryable();
+
+            if (requestParams.Filters != null)
+            {
+                if (!string.IsNullOrEmpty(requestParams.Filters.ProductCode))
+                {
+                    query = query.Where(p => p.ProductCode.Contains(requestParams.Filters.ProductCode));
+                }
+
+                if (!string.IsNullOrEmpty(requestParams.Filters.CompanyId))
+                {
+                    query = query.Where(p => p.CompanyId == requestParams.Filters.CompanyId);
+                }
+            }
+
+            query = query
                 .Include(p => p.Versions.OrderByDescending(v => v.Version))
                 .Include(p => p.Pricelist)
                 .Include(p => p.Company);

@@ -84,7 +84,7 @@ interface SearchableInput<T extends FieldValues> extends BaseInput<T> {
   onChange?: (value: string) => void;
 }
 
-type InputConfig<T extends FieldValues> =
+export type InputConfig<T extends FieldValues> =
   | SimpleInput<T>
   | NumberInput<T>
   | SearchableInput<T>

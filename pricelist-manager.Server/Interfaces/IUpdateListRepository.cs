@@ -8,8 +8,10 @@ namespace pricelist_manager.Server.Interfaces
     public interface IUpdateListRepository : IBaseRepository
     {
         Task<PagedList<UpdateList>> GetAllAsync(UpdateListQueryParams requestParams);
+        Task<PagedList<Product>> GetAvailableProducts(int id, UpdateListQueryParams requestParams);
         Task<ICollection<ProductToUpdateList>> GetProductsByList(int id, UpdateListQueryParams requestParams);
         Task<ICollection<ProductToUpdateList>> GetProductsByList(int id);
+        Task<ProductToUpdateList> GetProductByCode(int updatelistId, string productId);
         Task<ICollection<ProductToUpdateList>> GetProductsByStatus(int updateListId, Status status);
         Task<PagedList<UpdateList>> GetByCompanyAsync(string companyId, UpdateListQueryParams requestParams);
 
@@ -20,6 +22,7 @@ namespace pricelist_manager.Server.Interfaces
         Task<ProductToUpdateList> UpdateProductStatusAsync(string productId, int editUpdateList, Status status);
 
         Task<UpdateList> DeleteAsync(int id);
+        Task DeleteProductAndUpdateStatus(int updateListId, string productId);
 
         Task<ICollection<ProductToUpdateList>> AddProducts(ICollection<ProductToUpdateList> dto);
         Task<ICollection<ProductToUpdateList>> RemoveProducts(ICollection<ProductToUpdateList> dto);
