@@ -7,7 +7,7 @@ import { type User, type UserFilter } from "../../../models/User";
 import { useEffect, useState } from "react";
 import type { Table } from "@tanstack/react-table";
 import type { Config } from "../../../components/Forms/GenericForm";
-import { useAllUsersPaged } from "../../../hooks/users/useQueryUsers";
+import { useAllUsersPaginated } from "../../../hooks/users/useQueryUsers";
 import { useAuth } from "../../../components/Authentication/AuthenticationProvider";
 import { useNavigate } from "react-router";
 import { useDebounce } from "../../../hooks/useDebounce";
@@ -35,7 +35,7 @@ const UsersListView = () => {
     setCurrentPage(1);
   }, [debouncedUsername]);
 
-  const { data, isPending, isError, error } = useAllUsersPaged(
+  const { data, isPending, isError, error } = useAllUsersPaginated(
     {
       CurrentPage: currentPage,
       PageSize: pageSize,

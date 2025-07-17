@@ -208,10 +208,18 @@ export const useAllProductByPricelist = (pricelistId: string) => {
 
 // Fetch all the products by pricelist ID from the API
 const fetchProductsByCompany = async (
-  companyId: string
+  companyId: string,
+  params: PaginationParams
 ): Promise<Product[]> => {
+  const searchParams = new URLSearchParams();
+  ParsePaginationSearchParams(params, searchParams);
+
   const response = await fetch(
-    queryEndpoint(`companies/${companyId}/products`),
+    queryEndpoint(
+      `companies/${companyId}/products${
+        searchParams.toString() ? `?${searchParams.toString()}` : ""
+      }`
+    ),
     API_OPTIONS_GET
   );
   if (!response.ok) {
@@ -221,12 +229,21 @@ const fetchProductsByCompany = async (
   return ProductArraySchema.parse(rawData);
 };
 
-export const useAllProductsByCompany = (companyId: string) => {
+export const useAllProductsByCompany = (
+  companyId: string,
+  params: PaginationParams
+) => {
   const queryClient = useQueryClient();
 
   return useQuery<Product[]>({
-    queryKey: ["products", "company", companyId],
-    queryFn: () => fetchProductsByCompany(companyId),
+    queryKey: [
+      "products",
+      "company",
+      companyId,
+      params.CurrentPage ?? 1,
+      params.PageSize ?? 0,
+    ],
+    queryFn: () => fetchProductsByCompany(companyId, params),
     initialData: () => {
       const products = queryClient.getQueryData<Product[]>(["products"]);
       return (

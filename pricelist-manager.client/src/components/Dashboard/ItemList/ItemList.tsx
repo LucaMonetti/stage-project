@@ -13,6 +13,7 @@ type Props<T extends any[]> = {
   getline: (item: T[number]) => string;
   getUniqueId: (item: T[number]) => string;
   getRoute: (item: T[number]) => string;
+  showAllLink?: string;
 };
 
 const headerVariant = {
@@ -40,6 +41,7 @@ function ItemList<T extends any[]>({
   getCallout,
   getUniqueId,
   getRoute,
+  showAllLink,
 }: Props<T>) {
   return (
     <section className="flex-1 min-w-80 bg-gray-800 border-2 border-gray-700 rounded-md">
@@ -47,9 +49,11 @@ function ItemList<T extends any[]>({
         <h2 className={`text-xl font-medium ${headerVariant[color]}`}>
           {title}
         </h2>
-        <Link className="text-blue-400 text-sm" to={"/"}>
-          Vedi Tutte
-        </Link>
+        {showAllLink && (
+          <Link className="text-blue-400 text-sm" to={showAllLink}>
+            Vedi Tutte
+          </Link>
+        )}
       </header>
       <main className="px-4 pb-4">
         <ul className="flex flex-col">

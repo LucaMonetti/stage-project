@@ -115,10 +115,18 @@ export const usePricelist = (pricelistId: string) => {
 
 // Fetch a single pricelist by ID from the API
 const fetchPricelistsByCompany = async (
-  companyId: string
+  companyId: string,
+  params: PaginationParams
 ): Promise<Pricelist[]> => {
+  const searchParams = new URLSearchParams();
+  ParsePaginationSearchParams(params, searchParams);
+
   const response = await fetch(
-    queryEndpoint(`companies/${companyId}/pricelists`),
+    queryEndpoint(
+      `companies/${companyId}/pricelists${
+        searchParams.toString() ? `?${searchParams.toString()}` : ""
+      }`
+    ),
     API_OPTIONS_GET
   );
   if (!response.ok) {
@@ -128,12 +136,21 @@ const fetchPricelistsByCompany = async (
   return PricelistArraySchema.parse(rawData);
 };
 
-export const useAllPricelistsByCompany = (companyId: string) => {
+export const useAllPricelistsByCompany = (
+  companyId: string,
+  params: PaginationParams
+) => {
   const queryClient = useQueryClient();
 
   return useQuery<Pricelist[]>({
-    queryKey: ["pricelists", "company", companyId],
-    queryFn: () => fetchPricelistsByCompany(companyId),
+    queryKey: [
+      "pricelists",
+      "company",
+      companyId,
+      params.CurrentPage ?? 1,
+      params.PageSize ?? 0,
+    ],
+    queryFn: () => fetchPricelistsByCompany(companyId, params),
     initialData: () => {
       return (
         queryClient

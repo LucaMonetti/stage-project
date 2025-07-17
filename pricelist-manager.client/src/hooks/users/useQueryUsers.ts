@@ -75,7 +75,7 @@ const fetchAllUsersPaged = async (
   };
 };
 
-export const useAllUsersPaged = (
+export const useAllUsersPaginated = (
   params: PaginationParams,
   filters?: UserFilter
 ) => {

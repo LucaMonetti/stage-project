@@ -9,21 +9,21 @@ const ItemListGroupCompany = ({ companyId }: { companyId: string }) => {
     isPending: isProductsPending,
     isError: isProductError,
     error: productErrot,
-  } = useAllProductsByCompany(companyId);
+  } = useAllProductsByCompany(companyId, { CurrentPage: 1, PageSize: 5 });
 
   const {
     data: pricelists,
     isPending: isPricelistsPending,
     isError: isPricelistsError,
     error: pricelistsError,
-  } = useAllPricelistsByCompany(companyId);
+  } = useAllPricelistsByCompany(companyId, { CurrentPage: 1, PageSize: 5 });
 
   const {
     data: updatelists,
     isPending: isUpdateListsPending,
     isError: isUpdatelistsError,
     error: updatelistsError,
-  } = useAllUpdateListsByCompany(companyId);
+  } = useAllUpdateListsByCompany(companyId, { CurrentPage: 1, PageSize: 5 });
 
   return (
     <div className="flex flex-col flex-wrap gap-8 mt-8">
@@ -39,6 +39,7 @@ const ItemListGroupCompany = ({ companyId }: { companyId: string }) => {
         }
         getUniqueId={(item) => item.id}
         getRoute={(item) => `/dashboard/pricelists/${item.id}`}
+        showAllLink="/dashboard/pricelists"
       />
       <ItemList
         title="Prodotti"
@@ -50,16 +51,18 @@ const ItemListGroupCompany = ({ companyId }: { companyId: string }) => {
         getCallout={(item) => item.id}
         getUniqueId={(item) => item.id}
         getRoute={(item) => `/dashboard/products/${item.id}`}
+        showAllLink="/dashboard/products"
       />
       <ItemList
         title="Liste di aggiornamento"
-        data={updatelists ?? []}
+        data={updatelists?.items ?? []}
         isPending={isUpdateListsPending}
         isError={isUpdatelistsError}
         error={updatelistsError}
         getline={(item) => item.name}
         getUniqueId={(item) => `#${item.id.toString()}`}
         getRoute={(item) => `/dashboard/updatelists/${item.id}`}
+        showAllLink="/dashboard/updatelists"
       />
     </div>
   );

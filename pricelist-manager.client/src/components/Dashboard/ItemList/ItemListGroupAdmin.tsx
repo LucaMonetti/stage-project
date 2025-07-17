@@ -1,12 +1,16 @@
-import { useAllCompanies } from "../../../hooks/companies/useQueryCompanies";
-import { useAllPricelists } from "../../../hooks/pricelists/useQueryPricelists";
+import {
+  useAllCompanies,
+  useAllCompaniesPaginated,
+} from "../../../hooks/companies/useQueryCompanies";
+import {
+  useAllPricelists,
+  useAllPricelistsPaginated,
+} from "../../../hooks/pricelists/useQueryPricelists";
 import { useAllProductsPaginated } from "../../../hooks/products/useQueryProducts";
-import { useFetch } from "../../../hooks/useFetch";
-import { useAllUsers } from "../../../hooks/users/useQueryUsers";
-import { CompanyArraySchema } from "../../../models/Company";
-import { PricelistArraySchema } from "../../../models/Pricelist";
-import { ProductArraySchema } from "../../../models/Product";
-import { UserArraySchema } from "../../../models/User";
+import {
+  useAllUsers,
+  useAllUsersPaginated,
+} from "../../../hooks/users/useQueryUsers";
 import ItemList from "./ItemList";
 
 const ItemListGroupAdmin = () => {
@@ -15,34 +19,34 @@ const ItemListGroupAdmin = () => {
     isPending: isProductsPending,
     isError: isProductError,
     error: productErrot,
-  } = useAllProductsPaginated();
+  } = useAllProductsPaginated({ CurrentPage: 1, PageSize: 5 });
 
   const {
     data: pricelists,
     isPending: isPricelistsPending,
     isError: isPricelistsError,
     error: pricelistsError,
-  } = useAllPricelists();
+  } = useAllPricelistsPaginated({ CurrentPage: 1, PageSize: 5 });
 
   const {
     data: companies,
     isPending: isCompaniesPending,
     isError: isCompaniesError,
     error: companiesError,
-  } = useAllCompanies();
+  } = useAllCompaniesPaginated({ CurrentPage: 1, PageSize: 5 });
 
   const {
     data: users,
     isPending: isUsersPending,
     isError: isUsersError,
     error: usersError,
-  } = useAllUsers();
+  } = useAllUsersPaginated({ CurrentPage: 1, PageSize: 5 });
 
   return (
     <div className="flex flex-col flex-wrap gap-8 mt-8">
       <ItemList
         title="Aziende"
-        data={companies ?? []}
+        data={companies?.items ?? []}
         isPending={isCompaniesPending}
         isError={isCompaniesError}
         error={companiesError}
@@ -53,7 +57,7 @@ const ItemListGroupAdmin = () => {
       />
       <ItemList
         title="Listini"
-        data={pricelists ?? []}
+        data={pricelists?.items ?? []}
         isPending={isPricelistsPending}
         isError={isPricelistsError}
         error={pricelistsError}
@@ -66,7 +70,7 @@ const ItemListGroupAdmin = () => {
       />
       <ItemList
         title="Prodotti"
-        data={products ?? []}
+        data={products?.items ?? []}
         isPending={isProductsPending}
         isError={isProductError}
         error={productErrot}
@@ -77,7 +81,7 @@ const ItemListGroupAdmin = () => {
       />
       <ItemList
         title="Utenti"
-        data={users ?? []}
+        data={users?.items ?? []}
         isPending={isUsersPending}
         isError={isUsersError}
         error={usersError}
