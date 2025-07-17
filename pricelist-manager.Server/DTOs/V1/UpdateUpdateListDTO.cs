@@ -11,7 +11,19 @@ namespace pricelist_manager.Server.DTOs.V1
     }
 
     public class AddProductsUpdateListDTO
-    {   
+    {
+        public required int Id { get; set; }
+        public required ICollection<string>? ProductIds { get; set; } = [];
+    }
+
+    public class RemoveProductUpdateListDTO
+    {
+        public required string ProductId { get; set; }
+    }
+
+
+    public class RemoveProductsUpdateListDTO
+    {
         public required int Id { get; set; }
         public required ICollection<string>? ProductIds { get; set; } = [];
     }

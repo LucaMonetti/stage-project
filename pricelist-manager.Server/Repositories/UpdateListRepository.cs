@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using pricelist_manager.Server.Data;
-using pricelist_manager.Server.DTOs.V1;
 using pricelist_manager.Server.DTOs.V1.QueryParams;
 using pricelist_manager.Server.Exceptions;
 using pricelist_manager.Server.Helpers;
@@ -126,6 +125,20 @@ namespace pricelist_manager.Server.Repositories
             return res;
         }
 
+        public async Task<ProductToUpdateList> GetProductByCode(int updatelistId, string productId)
+        {
+            if (!CanConnect())
+                throw new StorageUnavailableException();
+
+            var res = await Context.ProductsToUpdateLists.Where(ptul => ptul.UpdateListId == updatelistId &&
+                ptul.ProductId == productId).Include(ptul => ptul.Product).ThenInclude(p => p.Versions).FirstOrDefaultAsync();
+
+            if (res == null)
+                throw new NotFoundException<ProductToUpdateList>(updatelistId);
+
+            return res;
+        }
+
         public async Task<PagedList<Product>> GetAvailableProducts(int id, UpdateListQueryParams requestParams)
         {
             if (!CanConnect())
@@ -215,6 +228,42 @@ namespace pricelist_manager.Server.Repositories
             var res = await Context.SaveChangesAsync();
 
             return data.Entity;
+        }
+
+        public async Task DeleteProductAndUpdateStatus(int updateListId, string productId)
+        {
+            using var transaction = await Context.Database.BeginTransactionAsync();
+
+            try
+            {
+                // 1. Remove the product (single query with joins if needed)
+                var removedCount = await Context.ProductsToUpdateLists
+                    .Where(p => p.UpdateListId == updateListId && p.ProductId == productId)
+                    .ExecuteDeleteAsync(); // EF Core 7+ bulk delete
+
+                if (removedCount == 0)
+                {
+                    throw new NotFoundException<ProductToUpdateList>($"Product {productId} not found in update list {updateListId}");
+                }
+
+                // 2. Check remaining pending products and update status in one query
+                var pendingCount = await Context.ProductsToUpdateLists
+                    .CountAsync(p => p.UpdateListId == updateListId && p.Status == Status.Pending);
+
+                if (pendingCount == 0)
+                {
+                    await Context.UpdateLists
+                        .Where(ul => ul.Id == updateListId && ul.Status != Status.Edited)
+                        .ExecuteUpdateAsync(ul => ul.SetProperty(u => u.Status, Status.Edited));
+                }
+
+                await transaction.CommitAsync();
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
         }
 
         private bool existsID(int id)
