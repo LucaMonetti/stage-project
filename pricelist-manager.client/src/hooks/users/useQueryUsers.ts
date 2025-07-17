@@ -99,7 +99,12 @@ const fetchUser = async (userId: string): Promise<User> => {
     throw new Error("Failed to fetch user");
   }
   const rawData = await response.json();
-  return UserSchema.parse(rawData);
+  try {
+    return UserSchema.parse(rawData);
+  } catch (e: any) {
+    console.error("Unable to fetch the user:", e.message);
+    throw new Error(e);
+  }
 };
 
 export const useUser = (userId: string, options?: { enabled?: boolean }) => {

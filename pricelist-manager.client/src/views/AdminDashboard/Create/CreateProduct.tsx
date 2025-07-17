@@ -137,7 +137,7 @@ const CreateProductForm = () => {
 
   return (
     <div className="pb-4 px-8">
-      <header className="flex justify-between items-center sticky top-[65.6px] bg-gray-900 z-50 py-4 border-gray-800 border-b-2">
+      <header className="flex justify-between items-center sticky top-[65.6px] bg-gray-900 z-20 py-4 border-gray-800 border-b-2">
         <div>
           <h1 className="text-3xl text-medium">Aggiungi un nuovo prodotto</h1>
           <p className="text-gray-400">

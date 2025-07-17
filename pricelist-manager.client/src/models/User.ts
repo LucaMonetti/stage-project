@@ -8,7 +8,7 @@ export const UserSchema = z.object({
   lastName: z.string(),
   username: z.string(),
   email: z.email(),
-  phone: z.string(),
+  phone: z.string().nullable(),
   roles: z.array(z.string()),
   company: CompanyLiteSchema,
 });

@@ -7,7 +7,7 @@ export const CompanyLiteSchema = z.object({
   postalCode: z.string(),
   province: z.string(),
   phone: z.string(),
-  logoUri: z.string(),
+  logoUri: z.string().optional(),
   interfaceColor: z.string().startsWith("#"),
 });
 
