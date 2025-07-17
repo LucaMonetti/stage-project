@@ -121,21 +121,31 @@ namespace pricelist_manager.Server.Controllers.V1
         [HttpPut("{id}")]
         public async Task<IActionResult> EditUser(string id, [FromBody] UpdateUserDTO dto)
         {
-            Console.WriteLine($"DEBUG: {dto}, {dto.Email}");
-
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            //// Get current user from JWT token
-            //var currentUserName = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
-            //if (string.IsNullOrEmpty(currentUserName))
-            //{
-            //    return Unauthorized("Invalid token");
-            //}
+            // Get current user from JWT token
+            var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-            var user = await UserManager.FindByIdAsync(id);
+            if (string.IsNullOrEmpty(currentUserId))
+            {
+                return Unauthorized("Invalid token");
+            }
+
+            // Check if user is admin or editing their own account
+            var isAdmin = User.IsInRole("Admin");
+            if (!isAdmin && currentUserId != id)
+            {
+                return StatusCode(403, new
+                {
+                    error = "Forbidden",
+                    message = "You can only edit your own account"
+                });
+            }
+
+            var (user, roles) = await UserRepository.GetById(id);
             if (user == null)
             {
                 return NotFound("User not found");
