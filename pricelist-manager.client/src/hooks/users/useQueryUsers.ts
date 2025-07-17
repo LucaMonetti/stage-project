@@ -5,7 +5,6 @@ import {
   type User,
   type UserFilter,
 } from "../../models/User";
-import { API_OPTIONS_GET, queryEndpoint } from "../../config/apiConfig";
 import type {
   PaginatedResponse,
   PaginationParams,
@@ -15,10 +14,15 @@ import {
   ParsePaginationSearchParams,
 } from "../../helpers/Pagination";
 import { ParseFiltersSearchParams } from "../../helpers/Filters";
+import { apiConfig } from "../../helpers/ApiConfig";
+import QueryEndpoint from "../../helpers/queryEndpoint";
 
 // Fetch all users from the API
 const fetchAllUsers = async (): Promise<User[]> => {
-  const response = await fetch(queryEndpoint("accounts"), API_OPTIONS_GET);
+  const response = await fetch(
+    QueryEndpoint.buildUrl("accounts"),
+    apiConfig.get()
+  );
   if (!response.ok) {
     throw new Error("Failed to fetch users");
   }
@@ -56,11 +60,11 @@ const fetchAllUsersPaged = async (
   ParseFiltersSearchParams(filters, searchParams, UserFilterConfig);
 
   const response = await fetch(
-    queryEndpoint(
+    QueryEndpoint.buildUrl(
       "accounts" +
         (searchParams.toString() ? `?${searchParams.toString()}` : "")
     ),
-    API_OPTIONS_GET
+    apiConfig.get()
   );
   if (!response.ok) {
     throw new Error("Failed to fetch users");
@@ -88,8 +92,8 @@ export const useAllUsersPaginated = (
 // Fetch a single user by ID from the API
 const fetchUser = async (userId: string): Promise<User> => {
   const response = await fetch(
-    queryEndpoint(`accounts/${userId}`),
-    API_OPTIONS_GET
+    QueryEndpoint.buildUrl(`accounts/${userId}`),
+    apiConfig.get()
   );
   if (!response.ok) {
     throw new Error("Failed to fetch user");

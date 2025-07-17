@@ -6,12 +6,9 @@ import {
 } from "../../models/FormProduct";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ProductSchema, type Product } from "../../models/Product";
-import {
-  API_OPTIONS_POST,
-  API_OPTIONS_PUT,
-  queryEndpoint,
-} from "../../config/apiConfig";
 import type { UseCreateOptions, UseEditOptions } from "../../types";
+import QueryEndpoint from "../../helpers/queryEndpoint";
+import { apiConfig } from "../../helpers/ApiConfig";
 
 const createProduct = async (
   createProductData: CreateProduct
@@ -22,12 +19,10 @@ const createProduct = async (
     throw new Error("Invalid product data");
   }
 
-  const options = {
-    ...API_OPTIONS_POST,
-    body: JSON.stringify(parsedData.data),
-  };
-
-  const response = await fetch(queryEndpoint(`products`), options);
+  const response = await fetch(
+    QueryEndpoint.buildUrl(`products`),
+    apiConfig.post(parsedData.data)
+  );
 
   if (!response.ok) {
     throw new Error("Failed to create product");
@@ -65,18 +60,13 @@ const editProduct = async (
     throw new Error("Invalid product data for update");
   }
 
-  const options = {
-    ...API_OPTIONS_PUT,
-    body: JSON.stringify(parsedData.data),
-  };
-
   const response = await fetch(
-    queryEndpoint(
+    QueryEndpoint.buildUrl(
       `products/${productId}${
         editUpdateList ? `?editUpdateList=${editUpdateList}` : ""
       }`
     ),
-    options
+    apiConfig.put(parsedData.data)
   );
 
   if (!response.ok) {

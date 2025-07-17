@@ -10,11 +10,10 @@ const SingleUserView = () => {
   const { isAdmin } = useAuth();
   const navigate = useNavigate();
 
-  if (!isAdmin()) navigate("/auth/login");
-
   const { userId } = useParams();
-
   const { data, isPending, isError } = useUser(userId ?? "");
+
+  if (!(isAdmin() || userId == data?.id)) navigate("/auth/login");
 
   if (isPending) {
     return (

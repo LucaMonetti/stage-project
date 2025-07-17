@@ -1,5 +1,4 @@
 import { useQuery } from "@tanstack/react-query";
-import { API_OPTIONS_GET, queryEndpoint } from "../../config/apiConfig";
 import {
   ProductStatisticsSchema,
   type ProductStatistics,
@@ -13,12 +12,14 @@ import {
   type CompanyStatistics,
 } from "../../models/CompanyStatistics";
 import { UserStatisticsSchema, type UserStatistics } from "../../models/User";
+import QueryEndpoint from "../../helpers/queryEndpoint";
+import { apiConfig } from "../../helpers/ApiConfig";
 
 // Fetch the product statistics from the API
 const fetchProductStatistics = async (): Promise<ProductStatistics> => {
   const response = await fetch(
-    queryEndpoint("statistics/products"),
-    API_OPTIONS_GET
+    QueryEndpoint.buildUrl("statistics/products"),
+    apiConfig.get()
   );
   if (!response.ok) {
     throw new Error("Failed to fetch product statistics");
@@ -39,8 +40,8 @@ const fetchProductStatisticsByCompany = async (
   companyId: string
 ): Promise<ProductStatistics> => {
   const response = await fetch(
-    queryEndpoint("statistics/products?companyId=" + companyId),
-    API_OPTIONS_GET
+    QueryEndpoint.buildUrl("statistics/products?companyId=" + companyId),
+    apiConfig.get()
   );
   if (!response.ok) {
     throw new Error("Failed to fetch product statistics");
@@ -59,8 +60,8 @@ export const useProductStatisticsByCompany = (companyId: string) => {
 // Fetch the pricelist statistics from the API
 const fetchPricelistStatistics = async (): Promise<PricelistStatistics> => {
   const response = await fetch(
-    queryEndpoint("statistics/pricelists"),
-    API_OPTIONS_GET
+    QueryEndpoint.buildUrl("statistics/pricelists"),
+    apiConfig.get()
   );
   if (!response.ok) {
     throw new Error("Failed to fetch pricelists statistics");
@@ -81,8 +82,8 @@ const fetchPricelistStatisticsByCompany = async (
   companyId: string
 ): Promise<PricelistStatistics> => {
   const response = await fetch(
-    queryEndpoint("statistics/pricelists?companyId=" + companyId),
-    API_OPTIONS_GET
+    QueryEndpoint.buildUrl("statistics/pricelists?companyId=" + companyId),
+    apiConfig.get()
   );
   if (!response.ok) {
     throw new Error("Failed to fetch pricelists statistics");
@@ -101,8 +102,8 @@ export const usePricelistStatisticsByCompany = (companyId: string) => {
 // Fetch the companies statistics from the API
 const fetchCompanyStatistics = async (): Promise<CompanyStatistics> => {
   const response = await fetch(
-    queryEndpoint("statistics/companies"),
-    API_OPTIONS_GET
+    QueryEndpoint.buildUrl("statistics/companies"),
+    apiConfig.get()
   );
   if (!response.ok) {
     throw new Error("Failed to fetch companies statistics");
@@ -121,8 +122,8 @@ export const useCompanyStatistics = () => {
 // Fetch the pricelist statistics from the API
 const fetchUserStatistics = async (): Promise<UserStatistics> => {
   const response = await fetch(
-    queryEndpoint("statistics/accounts"),
-    API_OPTIONS_GET
+    QueryEndpoint.buildUrl("statistics/accounts"),
+    apiConfig.get()
   );
   if (!response.ok) {
     throw new Error("Failed to fetch product statistics");

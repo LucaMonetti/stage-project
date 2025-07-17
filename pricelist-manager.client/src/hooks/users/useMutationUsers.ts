@@ -6,12 +6,9 @@ import {
 } from "../../models/FormUser";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { UserSchema, type User } from "../../models/User";
-import {
-  API_OPTIONS_POST,
-  API_OPTIONS_PUT,
-  queryEndpoint,
-} from "../../config/apiConfig";
 import type { UseEditOptions } from "../../types";
+import QueryEndpoint from "../../helpers/queryEndpoint";
+import { apiConfig } from "../../helpers/ApiConfig";
 
 interface UseCreateUserOptions {
   onSuccess?: (data: User) => void;
@@ -24,12 +21,10 @@ const createUser = async (createUserData: CreateUser): Promise<User> => {
     throw new Error("Invalid user data");
   }
 
-  const options = {
-    ...API_OPTIONS_POST,
-    body: JSON.stringify(parsedData.data),
-  };
-
-  const response = await fetch(queryEndpoint(`accounts/register`), options);
+  const response = await fetch(
+    QueryEndpoint.buildUrl(`accounts/register`),
+    apiConfig.post(parsedData.data)
+  );
 
   if (!response.ok) {
     throw new Error("Failed to create user");
@@ -63,12 +58,10 @@ const editUser = async (id: string, updateData: EditUser): Promise<User> => {
     throw new Error("Invalid updatelist data for update");
   }
 
-  const options = {
-    ...API_OPTIONS_PUT,
-    body: JSON.stringify(parsedData.data),
-  };
-
-  const response = await fetch(queryEndpoint(`accounts/${id}`), options);
+  const response = await fetch(
+    QueryEndpoint.buildUrl(`accounts/${id}`),
+    apiConfig.put(parsedData.data)
+  );
 
   if (!response.ok) {
     throw new Error(`Failed to update user with ID: ${id}`);

@@ -6,9 +6,6 @@ import GenericForm, {
 import { FaPlus } from "react-icons/fa6";
 import { EditUserSchema, type EditUser } from "../../../models/FormUser";
 import { useNavigate, useParams } from "react-router";
-import { useGet } from "../../../hooks/useGenericFetch";
-import { UserSchema } from "../../../models/User";
-import { CompanyArraySchema } from "../../../models/Company";
 import { useUser } from "../../../hooks/users/useQueryUsers";
 import { useEditUser } from "../../../hooks/users/useMutationUsers";
 import { useAuth } from "../../../components/Authentication/AuthenticationProvider";

@@ -6,7 +6,6 @@ import {
   type UpdateList,
   type UpdateListFilter,
 } from "../../models/UpdateList";
-import { API_OPTIONS_GET, queryEndpoint } from "../../config/apiConfig";
 import { Status } from "../../types";
 import {
   UpdateListProductArraySchema,
@@ -21,10 +20,15 @@ import {
   ParseFiltersSearchParams,
   type FilterConfig,
 } from "../../helpers/Filters";
+import QueryEndpoint from "../../helpers/queryEndpoint";
+import { apiConfig } from "../../helpers/ApiConfig";
 
 // Fetch all updatelists from the API
 const fetchAllUpdateLists = async (): Promise<UpdateList[]> => {
-  const response = await fetch(queryEndpoint("updatelists"), API_OPTIONS_GET);
+  const response = await fetch(
+    QueryEndpoint.buildUrl("updatelists"),
+    apiConfig.get()
+  );
   if (!response.ok) {
     throw new Error("Failed to fetch updatelists");
   }
@@ -60,7 +64,10 @@ const fetchAllUpdateListsPaged = async (
   ParsePaginationSearchParams(params, searchParams);
   ParseFiltersSearchParams(filters, searchParams, updatelistFilterConfig);
 
-  const response = await fetch(queryEndpoint("updatelists"), API_OPTIONS_GET);
+  const response = await fetch(
+    QueryEndpoint.buildUrl("updatelists"),
+    apiConfig.get()
+  );
   if (!response.ok) {
     throw new Error("Failed to fetch updatelists");
   }
@@ -92,8 +99,8 @@ export const useAllUpdateListsPaged = (
 // Fetch a single updatelist by ID from the API
 const fetchUpdateList = async (updatelistId: string): Promise<UpdateList> => {
   const response = await fetch(
-    queryEndpoint(`updatelists/${updatelistId}`),
-    API_OPTIONS_GET
+    QueryEndpoint.buildUrl(`updatelists/${updatelistId}`),
+    apiConfig.get()
   );
   if (!response.ok) {
     throw new Error("Failed to fetch updatelist");
@@ -115,8 +122,10 @@ const fetchProductToUpdatelistByStatus = async (
   status: Status
 ): Promise<UpdateListProduct[]> => {
   const response = await fetch(
-    queryEndpoint(`updatelists/${updatelistId}/products?status=${status}`),
-    API_OPTIONS_GET
+    QueryEndpoint.buildUrl(
+      `updatelists/${updatelistId}/products?status=${status}`
+    ),
+    apiConfig.get()
   );
   if (!response.ok) {
     throw new Error("Failed to fetch updatelist");
@@ -156,8 +165,8 @@ const fetchAllUpdateListsByCompany = async (
   );
 
   const response = await fetch(
-    queryEndpoint(`companies/${companyId}/updatelists`),
-    API_OPTIONS_GET
+    QueryEndpoint.buildUrl(`companies/${companyId}/updatelists`),
+    apiConfig.get()
   );
   if (!response.ok) {
     throw new Error("Failed to fetch updatelists");

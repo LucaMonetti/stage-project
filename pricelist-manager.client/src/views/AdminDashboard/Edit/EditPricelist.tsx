@@ -9,8 +9,6 @@ import {
   type EditPricelist,
 } from "../../../models/FormPricelist";
 import { useNavigate, useParams } from "react-router";
-import { useGet } from "../../../hooks/useGenericFetch";
-import { CompanyArraySchema } from "../../../models/Company";
 import { usePricelist } from "../../../hooks/pricelists/useQueryPricelists";
 import { useEditPricelist } from "../../../hooks/pricelists/useMutationPricelists";
 

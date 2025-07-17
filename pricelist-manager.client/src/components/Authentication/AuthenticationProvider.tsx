@@ -1,7 +1,14 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useCallback,
+} from "react";
 import { jwtDecode } from "jwt-decode";
 import type { User } from "../../models/User";
 import { useUser } from "../../hooks/users/useQueryUsers";
+import BasicLoader from "../Loader/BasicLoader";
 
 interface AuthContextType {
   user: User | undefined;
@@ -9,6 +16,7 @@ interface AuthContextType {
   login: (token: string) => void;
   logout: () => void;
   isAdmin: () => boolean;
+  isLoading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -31,66 +39,100 @@ const AuthenticationProvider = ({
     undefined
   );
   const [userId, setUserId] = useState<string>("");
+  const [isInitialized, setIsInitialized] = useState(false);
 
   // Only call the hook when user is authenticated and we have a userId
   const userQuery = useUser(userId, {
     enabled: !!userId && isAuthenticated === true,
   });
 
-  useEffect(() => {
-    const token = localStorage.getItem("jwtToken");
-    if (token) {
+  const logout = useCallback(() => {
+    console.log("Logging out...");
+    localStorage.removeItem("jwtToken");
+    setUser(undefined);
+    setUserId("");
+    setIsAuthenticated(false);
+    setIsInitialized(true);
+  }, []);
+
+  const processToken = useCallback(
+    (token: string) => {
       try {
         const decodedToken = jwtDecode(token);
+
+        // Check if token is expired
         if (!decodedToken.exp || decodedToken.exp * 1000 < Date.now()) {
+          console.error("Token is expired");
           logout();
-          return;
+          return false;
         }
 
-        // Set the userId to trigger the user query
+        console.log("Processing token, userId:", decodedToken.sub);
         setUserId(decodedToken.sub ?? "");
-
         setIsAuthenticated(true);
+        setIsInitialized(true);
+        return true;
       } catch (error) {
-        console.error(error);
+        console.error("Error decoding token:", error);
         logout();
+        return false;
       }
-    } else {
-      // No token found, user is not authenticated
-      setIsAuthenticated(false);
-    }
-  }, []);
+    },
+    [logout]
+  );
+
+  const login = useCallback(
+    (token: string) => {
+      console.log("Login with token:", token);
+
+      localStorage.setItem("jwtToken", token);
+
+      processToken(token);
+    },
+    [processToken]
+  );
+
+  // Initialize authentication state on app start
+  useEffect(() => {
+    const initializeAuth = () => {
+      console.log("Initializing authentication...");
+      const token = localStorage.getItem("jwtToken");
+
+      if (!token) {
+        console.log("No token found");
+        setIsAuthenticated(false);
+        setIsInitialized(true);
+        return;
+      }
+
+      processToken(token);
+    };
+
+    initializeAuth();
+  }, [processToken]);
 
   // Update user when userQuery data changes
   useEffect(() => {
     if (userQuery.data && userId) {
+      console.log("User data received:", userQuery.data);
       setUser(userQuery.data);
-      console.log("FROM USEEFFECT:", userQuery.data);
     }
   }, [userQuery.data, userId]);
 
-  const login = (token: string) => {
-    console.log("Login with token:", token);
+  // Handle user query errors
+  useEffect(() => {
+    if (userQuery.isError && isAuthenticated) {
+      console.error("Error fetching user data:", userQuery.error);
+      logout();
+    }
+  }, [userQuery.isError, userQuery.error, isAuthenticated, logout]);
 
-    localStorage.setItem("jwtToken", token);
-    const decodedToken = jwtDecode(token);
-
-    // Set the userId to trigger the user query
-    setUserId(decodedToken.sub ?? "");
-
-    setIsAuthenticated(true);
-  };
-
-  const logout = () => {
-    localStorage.removeItem("jwtToken");
-
-    setUser(undefined);
-    setIsAuthenticated(false);
-  };
-
-  const isAdmin = () => {
+  const isAdmin = useCallback(() => {
     return user?.roles.includes("Admin") ?? false;
-  };
+  }, [user?.roles]);
+
+  // Show loading while initializing or fetching user data
+  const isLoading = !isInitialized || (userId ? userQuery.isPending : false);
 
   return (
     <AuthContext.Provider
@@ -100,6 +142,7 @@ const AuthenticationProvider = ({
         login,
         logout,
         isAdmin,
+        isLoading,
       }}
     >
       {children}

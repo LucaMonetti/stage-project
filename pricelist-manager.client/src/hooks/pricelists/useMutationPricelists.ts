@@ -6,13 +6,9 @@ import {
 } from "../../models/FormPricelist";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { PricelistSchema, type Pricelist } from "../../models/Pricelist";
-import {
-  API_OPTIONS_POST,
-  API_OPTIONS_PUT,
-  queryEndpoint,
-} from "../../config/apiConfig";
 import type { UseEditOptions } from "../../types";
-import type { EditCompany } from "../../models/FormCompany";
+import QueryEndpoint from "../../helpers/queryEndpoint";
+import { apiConfig } from "../../helpers/ApiConfig";
 
 interface UseCreatePricelistOptions {
   onSuccess?: (data: Pricelist) => void;
@@ -27,12 +23,10 @@ const createPricelist = async (
     throw new Error("Invalid pricelist data");
   }
 
-  const options = {
-    ...API_OPTIONS_POST,
-    body: JSON.stringify(parsedData.data),
-  };
-
-  const response = await fetch(queryEndpoint(`pricelists`), options);
+  const response = await fetch(
+    QueryEndpoint.buildUrl(`pricelists`),
+    apiConfig.post(parsedData.data)
+  );
 
   if (!response.ok) {
     throw new Error("Failed to create pricelist");
@@ -69,12 +63,10 @@ const editPricelist = async (
     throw new Error("Invalid pricelist data for update");
   }
 
-  const options = {
-    ...API_OPTIONS_PUT,
-    body: JSON.stringify(parsedData.data),
-  };
-
-  const response = await fetch(queryEndpoint(`pricelists/${id}`), options);
+  const response = await fetch(
+    QueryEndpoint.buildUrl(`pricelists/${id}`),
+    apiConfig.put(parsedData.data)
+  );
 
   if (!response.ok) {
     throw new Error(`Failed to update product with ID: ${id}`);

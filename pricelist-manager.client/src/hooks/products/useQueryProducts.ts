@@ -5,7 +5,6 @@ import {
   type Product,
   type ProductFilter,
 } from "../../models/Product";
-import { API_OPTIONS_GET, queryEndpoint } from "../../config/apiConfig";
 import type {
   PaginatedResponse,
   PaginationParams,
@@ -18,6 +17,8 @@ import {
   ParseFiltersSearchParams,
   type FilterConfig,
 } from "../../helpers/Filters";
+import QueryEndpoint from "../../helpers/queryEndpoint";
+import { apiConfig } from "../../helpers/ApiConfig";
 
 const ProductFilterConfig: FilterConfig<ProductFilter> = {
   productCode: {
@@ -38,11 +39,11 @@ const fetchAllProductsPaginated = async (
   ParseFiltersSearchParams(filters, searchParams, ProductFilterConfig);
 
   const response = await fetch(
-    queryEndpoint(
+    QueryEndpoint.buildUrl(
       "products" +
         (searchParams.toString() ? `?${searchParams.toString()}` : "")
     ),
-    API_OPTIONS_GET
+    apiConfig.get()
   );
   if (!response.ok) {
     throw new Error("Failed to fetch products");
@@ -82,11 +83,11 @@ const fetchAvailableProducts = async (
   ParseFiltersSearchParams(filters, searchParams, ProductFilterConfig);
 
   const response = await fetch(
-    queryEndpoint(
+    QueryEndpoint.buildUrl(
       `updatelists/${updatelistId}/available-products` +
         (searchParams.toString() ? `?${searchParams.toString()}` : "")
     ),
-    API_OPTIONS_GET
+    apiConfig.get()
   );
   if (!response.ok) {
     throw new Error("Failed to fetch products");
@@ -127,11 +128,11 @@ const fetchAllProducts = async (
   ParseFiltersSearchParams(filters, searchParams, ProductFilterConfig);
 
   const response = await fetch(
-    queryEndpoint(
+    QueryEndpoint.buildUrl(
       "products" +
         (searchParams.toString() ? `?${searchParams.toString()}` : "")
     ),
-    API_OPTIONS_GET
+    apiConfig.get()
   );
   if (!response.ok) {
     throw new Error("Failed to fetch products");
@@ -151,8 +152,8 @@ export const useAllProducts = (filters?: ProductFilter) => {
 // Fetch a single product by ID from the API
 const fetchProduct = async (productId: string): Promise<Product> => {
   const response = await fetch(
-    queryEndpoint(`products/${productId}`),
-    API_OPTIONS_GET
+    QueryEndpoint.buildUrl(`products/${productId}`),
+    apiConfig.get()
   );
   if (!response.ok) {
     throw new Error("Failed to fetch product");
@@ -180,8 +181,8 @@ const fetchProductsByPricelist = async (
   pricelistId: string
 ): Promise<Product[]> => {
   const response = await fetch(
-    queryEndpoint(`pricelists/${pricelistId}/products`),
-    API_OPTIONS_GET
+    QueryEndpoint.buildUrl(`pricelists/${pricelistId}/products`),
+    apiConfig.get()
   );
   if (!response.ok) {
     throw new Error("Failed to fetch product");
@@ -215,12 +216,12 @@ const fetchProductsByCompany = async (
   ParsePaginationSearchParams(params, searchParams);
 
   const response = await fetch(
-    queryEndpoint(
+    QueryEndpoint.buildUrl(
       `companies/${companyId}/products${
         searchParams.toString() ? `?${searchParams.toString()}` : ""
       }`
     ),
-    API_OPTIONS_GET
+    apiConfig.get()
   );
   if (!response.ok) {
     throw new Error("Failed to fetch product");

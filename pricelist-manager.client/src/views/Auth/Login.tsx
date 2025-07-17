@@ -8,17 +8,25 @@ import { useEffect } from "react";
 const Login = () => {
   const navigation = useNavigate();
   const location = useLocation();
-  const { user, isAuthenticated } = useAuth();
+  const { login, isLoading, isAuthenticated, user } = useAuth();
+
+  const mutation = useLogin({
+    onSuccess: (data) => {
+      login(data.token);
+    },
+    onError: () => {
+      console.error("Login failed");
+    },
+  });
 
   useEffect(() => {
     if (isAuthenticated && user) {
-      // Redirect to the previous page or home if no previous page exists
-      const from = (location.state as any)?.from?.pathname || "/dashboard";
-      navigation(from, { replace: true });
+      // Redirect to the page they were trying to access before login
+      const redirectPath =
+        (location.state as any)?.from?.pathname || "/dashboard";
+      navigation(redirectPath, { replace: true });
     }
-  }, [user]);
-
-  const mutation = useLogin();
+  }, [isAuthenticated, user, location.state, navigation]);
 
   return (
     <div className="w-full h-[calc(100vh-66px)] flex justify-center items-center">
@@ -50,7 +58,7 @@ const Login = () => {
             endpoint: "auth/login",
             submitButton: {
               label: "Login",
-              isLoading: mutation.isPending,
+              isLoading: isLoading,
             },
           }}
           mutation={mutation}

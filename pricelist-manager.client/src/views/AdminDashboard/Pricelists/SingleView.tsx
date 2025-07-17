@@ -1,16 +1,9 @@
 import { useNavigate, useParams } from "react-router";
-import { ProductArraySchema, type Product } from "../../../models/Product";
 import BasicLoader from "../../../components/Loader/BasicLoader";
 import { FaPencil, FaDownload, FaPlus } from "react-icons/fa6";
 import InfoWidget from "../../../components/SinglePage/Widgets/InfoWidget";
-import { useGet } from "../../../hooks/useGenericFetch";
-import { PricelistSchema } from "../../../models/Pricelist";
 import TableWidget from "../../../components/SinglePage/Widgets/TableWidget";
-import type { Column } from "../../../components/Dashboard/Tables/GenericTableView";
-import {
-  useAllPricelists,
-  usePricelist,
-} from "../../../hooks/pricelists/useQueryPricelists";
+import { usePricelist } from "../../../hooks/pricelists/useQueryPricelists";
 import { useAllProductByPricelist } from "../../../hooks/products/useQueryProducts";
 import { useAuth } from "../../../components/Authentication/AuthenticationProvider";
 import type { Action } from "../../../components/Buttons/ActionRenderer";
@@ -20,7 +13,7 @@ const SinglePricelistView = () => {
   const { pricelistId } = useParams();
   const { isAdmin, user } = useAuth();
 
-  const { data, isPending, error, isError } = usePricelist(pricelistId ?? "");
+  const { data, isPending, isError } = usePricelist(pricelistId ?? "");
 
   const {
     data: productsData,

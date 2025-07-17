@@ -15,19 +15,15 @@ import {
   type UseFormRegister,
 } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useGet, usePost } from "../../hooks/useGenericFetch";
 import { FaExclamation, FaPaperPlane } from "react-icons/fa6";
 import SearchSelect from "./SearchSelect";
-import { PricelistArraySchema, type Pricelist } from "../../models/Pricelist";
-import type { z, ZodType } from "zod/v4";
-import type { FetchData } from "../../types";
+import { type Pricelist } from "../../models/Pricelist";
+import type { z } from "zod/v4";
 import type { Company } from "../../models/Company";
 import type { Product } from "../../models/Product";
 import isEqual from "lodash.isequal";
 import type { UseMutationResult, UseQueryResult } from "@tanstack/react-query";
-import FormButton from "../Buttons/FormButton";
-import SimpleIconButton from "../Buttons/SimpleButton";
-import ActionButton from "../Buttons/ActionButton";
+import BasicLoader from "../Loader/BasicLoader";
 
 type InferredZodSchema<T extends FieldValues> = z.ZodType<T, any, any>;
 
@@ -306,8 +302,14 @@ function GenericActualForm<T extends FieldValues>({
           type="submit"
           className={`p-2 rounded flex gap-2 items-center bg-blue-600 hover:bg-blue-700 transition-colors`}
         >
-          <FaPaperPlane className="text-white" />
-          Login
+          {config.submitButton.isLoading ? (
+            <BasicLoader />
+          ) : (
+            <>
+              <FaPaperPlane className="text-white" />
+              {config.submitButton.label}
+            </>
+          )}
         </button>
       )}
     </form>

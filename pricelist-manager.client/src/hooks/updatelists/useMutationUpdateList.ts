@@ -8,14 +8,10 @@ import {
 } from "../../models/FormUpdateList";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { UpdateListSchema, type UpdateList } from "../../models/UpdateList";
-import {
-  API_OPTIONS_DELETE,
-  API_OPTIONS_POST,
-  API_OPTIONS_PUT,
-  queryEndpoint,
-} from "../../config/apiConfig";
 import { Status, type UseEditOptions } from "../../types";
 import z from "zod/v4";
+import QueryEndpoint from "../../helpers/queryEndpoint";
+import { apiConfig } from "../../helpers/ApiConfig";
 
 interface UseCreateUpdateListOptions {
   onSuccess?: (
@@ -32,12 +28,10 @@ const createUpdateList = async (
     throw new Error("Invalid updatelist data");
   }
 
-  const options = {
-    ...API_OPTIONS_POST,
-    body: JSON.stringify(parsedData.data),
-  };
-
-  const response = await fetch(queryEndpoint(`updatelists`), options);
+  const response = await fetch(
+    QueryEndpoint.buildUrl(`updatelists`),
+    apiConfig.post(parsedData.data)
+  );
 
   if (!response.ok) {
     throw new Error("Failed to create updatelist");
@@ -76,12 +70,10 @@ const editUpdateList = async (
     throw new Error("Invalid updatelist data for update");
   }
 
-  const options = {
-    ...API_OPTIONS_PUT,
-    body: JSON.stringify(parsedData.data),
-  };
-
-  const response = await fetch(queryEndpoint(`updatelists/${id}`), options);
+  const response = await fetch(
+    QueryEndpoint.buildUrl(`updatelists/${id}`),
+    apiConfig.put(parsedData.data)
+  );
 
   if (!response.ok) {
     throw new Error(`Failed to update updatelist with ID: ${id}`);
@@ -121,14 +113,9 @@ const editUpdateListProducts = async (
     throw new Error("Invalid updatelistProducts data for update");
   }
 
-  const options = {
-    ...API_OPTIONS_POST,
-    body: JSON.stringify(parsedData.data),
-  };
-
   const response = await fetch(
-    queryEndpoint(`updatelists/${id}/products`),
-    options
+    QueryEndpoint.buildUrl(`updatelists/${id}/products`),
+    apiConfig.put(parsedData.data)
   );
 
   if (!response.ok) {
@@ -174,14 +161,9 @@ const editUpdateListStatus = async (
     throw new Error("Invalid updatelist data for update");
   }
 
-  const options = {
-    ...API_OPTIONS_PUT,
-    body: JSON.stringify(parsedData.data),
-  };
-
   const response = await fetch(
-    queryEndpoint(`updatelists/${id}/status`),
-    options
+    QueryEndpoint.buildUrl(`updatelists/${id}/status`),
+    apiConfig.put(parsedData.data)
   );
 
   if (!response.ok) {
@@ -218,8 +200,8 @@ export const useEditUpdateListStatus = (
 // Delete updatelist
 const deleteUpdateList = async (id: number): Promise<UpdateList> => {
   const response = await fetch(
-    queryEndpoint(`updatelists/${id}`),
-    API_OPTIONS_DELETE
+    QueryEndpoint.buildUrl(`updatelists/${id}`),
+    apiConfig.delete()
   );
 
   if (!response.ok) {
@@ -262,12 +244,12 @@ const deleteUpdateListProduct = async (
   }
 
   const response = await fetch(
-    queryEndpoint(
+    QueryEndpoint.buildUrl(
       `updatelists/${updateListId}/products${
         searchParams.toString() ? `?${searchParams.toString()}` : ""
       }`
     ),
-    API_OPTIONS_DELETE
+    apiConfig.delete()
   );
 
   if (!response.ok) {

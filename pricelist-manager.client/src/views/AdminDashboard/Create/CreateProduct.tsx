@@ -8,11 +8,7 @@ import {
   CreateProductSchema,
   type CreateProduct,
 } from "../../../models/FormProduct";
-import { useGet } from "../../../hooks/useGenericFetch";
-import {
-  PricelistArraySchema,
-  type Pricelist,
-} from "../../../models/Pricelist";
+import { type Pricelist } from "../../../models/Pricelist";
 import { useCreateProduct } from "../../../hooks/products/useMutationProduct";
 import {
   useAllPricelists,
@@ -30,7 +26,7 @@ const CreateProductForm = () => {
   if (isAdmin()) {
     pricelists = useAllPricelists();
   } else {
-    pricelists = useAllPricelistsByCompany(user?.company.id ?? "");
+    pricelists = useAllPricelists({ company_id: user?.company.id ?? "" });
   }
 
   const config = {

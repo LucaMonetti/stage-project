@@ -1,11 +1,6 @@
-import type { Table } from "@tanstack/react-table";
-import { useForm, type FieldValues } from "react-hook-form";
-import { z } from "zod/v4";
 import GenericForm, { type Config } from "../../Forms/GenericForm";
-import { PricelistArraySchema } from "../../../models/Pricelist";
-import { useGet } from "../../../hooks/useGenericFetch";
-import { CompanyArraySchema } from "../../../models/Company";
 import { ProductFilterSchema } from "../../../models/Product";
+import type { FieldValues } from "react-hook-form";
 
 type Props<T extends FieldValues> = {
   config: Config<T>;

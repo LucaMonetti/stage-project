@@ -5,7 +5,6 @@ import {
   type Pricelist,
   type PricelistFilter,
 } from "../../models/Pricelist";
-import { API_OPTIONS_GET, queryEndpoint } from "../../config/apiConfig";
 import type {
   PaginatedResponse,
   PaginationParams,
@@ -18,10 +17,32 @@ import {
   ParseFiltersSearchParams,
   type FilterConfig,
 } from "../../helpers/Filters";
+import QueryEndpoint from "../../helpers/queryEndpoint";
+import { apiConfig } from "../../helpers/ApiConfig";
+
+const PricelistFilterConfig: FilterConfig<PricelistFilter> = {
+  name: {
+    paramName: "Filters.Name",
+  },
+  company_id: {
+    paramName: "Filters.CompanyId",
+  },
+};
 
 // Fetch all pricelists from the API
-const fetchAllPricelists = async (): Promise<Pricelist[]> => {
-  const response = await fetch(queryEndpoint("pricelists"), API_OPTIONS_GET);
+const fetchAllPricelists = async (
+  filter?: PricelistFilter
+): Promise<Pricelist[]> => {
+  const searchParams = new URLSearchParams();
+  ParseFiltersSearchParams(filter, searchParams, PricelistFilterConfig);
+
+  const response = await fetch(
+    QueryEndpoint.buildUrl(
+      "pricelists" +
+        (searchParams.toString() ? `?${searchParams.toString()}` : "")
+    ),
+    apiConfig.get()
+  );
   if (!response.ok) {
     throw new Error("Failed to fetch pricelists");
   }
@@ -29,17 +50,11 @@ const fetchAllPricelists = async (): Promise<Pricelist[]> => {
   return PricelistArraySchema.parse(rawData);
 };
 
-export const useAllPricelists = () => {
+export const useAllPricelists = (filters?: PricelistFilter) => {
   return useQuery<Pricelist[]>({
-    queryKey: ["pricelists"],
-    queryFn: fetchAllPricelists,
+    queryKey: ["pricelists", filters],
+    queryFn: () => fetchAllPricelists(filters),
   });
-};
-
-const PricelistFilterConfig: FilterConfig<PricelistFilter> = {
-  name: {
-    paramName: "Filters.Name",
-  },
 };
 
 // Fetch all pricelists from the API
@@ -52,11 +67,11 @@ const fetchAllPricelistsPaginated = async (
   ParseFiltersSearchParams(filters, searchParams, PricelistFilterConfig);
 
   const response = await fetch(
-    queryEndpoint(
+    QueryEndpoint.buildUrl(
       "pricelists" +
         (searchParams.toString() ? `?${searchParams.toString()}` : "")
     ),
-    API_OPTIONS_GET
+    apiConfig.get()
   );
   if (!response.ok) {
     throw new Error("Failed to fetch pricelists");
@@ -89,8 +104,8 @@ export const useAllPricelistsPaginated = (
 // Fetch a single pricelist by ID from the API
 const fetchPricelist = async (pricelistId: string): Promise<Pricelist> => {
   const response = await fetch(
-    queryEndpoint(`pricelists/${pricelistId}`),
-    API_OPTIONS_GET
+    QueryEndpoint.buildUrl(`pricelists/${pricelistId}`),
+    apiConfig.get()
   );
   if (!response.ok) {
     throw new Error("Failed to fetch pricelist");
@@ -122,12 +137,12 @@ const fetchPricelistsByCompany = async (
   ParsePaginationSearchParams(params, searchParams);
 
   const response = await fetch(
-    queryEndpoint(
+    QueryEndpoint.buildUrl(
       `companies/${companyId}/pricelists${
         searchParams.toString() ? `?${searchParams.toString()}` : ""
       }`
     ),
-    API_OPTIONS_GET
+    apiConfig.get()
   );
   if (!response.ok) {
     throw new Error("Failed to fetch pricelist");

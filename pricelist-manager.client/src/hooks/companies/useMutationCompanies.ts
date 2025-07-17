@@ -6,12 +6,9 @@ import {
 } from "../../models/FormCompany";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { CompanySchema, type Company } from "../../models/Company";
-import {
-  API_OPTIONS_POST,
-  API_OPTIONS_PUT,
-  queryEndpoint,
-} from "../../config/apiConfig";
 import type { UseEditOptions } from "../../types";
+import QueryEndpoint from "../../helpers/queryEndpoint";
+import { apiConfig } from "../../helpers/ApiConfig";
 
 interface UseCreateCompanyOptions {
   onSuccess?: (data: Company) => void;
@@ -26,12 +23,10 @@ const createCompany = async (
     throw new Error("Invalid company data");
   }
 
-  const options = {
-    ...API_OPTIONS_POST,
-    body: JSON.stringify(parsedData.data),
-  };
-
-  const response = await fetch(queryEndpoint(`companies`), options);
+  const response = await fetch(
+    QueryEndpoint.buildUrl("companies"),
+    apiConfig.post(parsedData.data)
+  );
 
   if (!response.ok) {
     throw new Error("Failed to create company");
@@ -68,12 +63,10 @@ const editCompany = async (
     throw new Error("Invalid company data for update");
   }
 
-  const options = {
-    ...API_OPTIONS_PUT,
-    body: JSON.stringify(parsedData.data),
-  };
-
-  const response = await fetch(queryEndpoint(`companies/${id}`), options);
+  const response = await fetch(
+    QueryEndpoint.buildUrl(`companies/${id}`),
+    apiConfig.put(parsedData.data)
+  );
 
   if (!response.ok) {
     throw new Error(`Failed to update compay with ID: ${id}`);

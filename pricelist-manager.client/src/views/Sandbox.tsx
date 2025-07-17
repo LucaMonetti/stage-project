@@ -13,7 +13,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import FormButton from "../components/Buttons/FormButton";
 import type z from "zod/v4";
 import GenericTableView from "../components/Dashboard/Tables/GenericTableView";
-import { useGet } from "../hooks/useGenericFetch";
 import { ProductArraySchema, type Product } from "../models/Product";
 import { useEffect, useState } from "react";
 
@@ -81,11 +80,7 @@ const Table = () => {
 
   return (
     <GenericTableView
-      data={useGet({
-        endpoint: "products",
-        method: "GET",
-        schema: ProductArraySchema,
-      })}
+      data={null!}
       keyField="id"
       config={{
         enableLink: false,
