@@ -1,19 +1,17 @@
 import { useNavigate } from "react-router";
 import BasicLoader from "../../Loader/BasicLoader";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import type { FieldValues, Path } from "react-hook-form";
 import {
   flexRender,
   getCoreRowModel,
-  getFilteredRowModel,
   useReactTable,
   type ColumnDef,
-  type ColumnFilter,
   type Table,
 } from "@tanstack/react-table";
 import FilterRenderer from "./FilterRenderer";
 import type { Config } from "../../Forms/GenericForm";
-import type { PaginationInfo } from "../../../hooks/products/useQueryProducts";
+import type { PaginationInfo } from "../../../models/Pagination";
 
 export type CustomColumnDef<T> = ColumnDef<T> & {
   linkUrl?: (item: T) => string;
@@ -66,14 +64,7 @@ const PaginationControls = ({
   onPageChange?: (page: number) => void;
   onPageSizeChange?: (pageSize: number) => void;
 }) => {
-  const {
-    currentPage,
-    totalPages,
-    totalCount,
-    pageSize,
-    hasNext,
-    hasPrevious,
-  } = pagination;
+  const { currentPage, totalPages, totalCount, pageSize } = pagination;
 
   return (
     <div className="flex items-center justify-between px-6 py-3 bg-gray-800 border-t border-gray-700">

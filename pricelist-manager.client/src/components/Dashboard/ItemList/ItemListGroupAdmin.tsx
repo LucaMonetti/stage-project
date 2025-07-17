@@ -53,7 +53,7 @@ const ItemListGroupAdmin = () => {
         getline={(item) => item.name}
         getCallout={(item) => item.id}
         getUniqueId={(item) => item.id}
-        getRoute={(item) => `/admin-dashboard/companies/${item.id}`}
+        getRoute={(item) => `/dashboard/companies/${item.id}`}
       />
       <ItemList
         title="Listini"
@@ -66,7 +66,7 @@ const ItemListGroupAdmin = () => {
           item.products ? item.products.length.toString() : "0"
         }
         getUniqueId={(item) => item.id}
-        getRoute={(item) => `/admin-dashboard/pricelists/${item.id}`}
+        getRoute={(item) => `/dashboard/pricelists/${item.id}`}
       />
       <ItemList
         title="Prodotti"
@@ -77,7 +77,7 @@ const ItemListGroupAdmin = () => {
         getline={(item) => item.currentInstance.name}
         getCallout={(item) => item.productCode}
         getUniqueId={(item) => item.id}
-        getRoute={(item) => `/admin-dashboard/products/${item.id}`}
+        getRoute={(item) => `/dashboard/products/${item.id}`}
       />
       <ItemList
         title="Utenti"
@@ -87,7 +87,7 @@ const ItemListGroupAdmin = () => {
         error={usersError}
         getline={(item) => item.username}
         getUniqueId={(item) => item.id}
-        getRoute={(item) => `/admin-dashboard/users/${item.id}`}
+        getRoute={(item) => `/dashboard/users/${item.id}`}
       />
     </div>
   );

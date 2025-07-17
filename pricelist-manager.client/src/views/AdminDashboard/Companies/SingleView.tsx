@@ -6,16 +6,48 @@ import TableWidget from "../../../components/SinglePage/Widgets/TableWidget";
 import DefinitionListWidget from "../../../components/SinglePage/Widgets/DefinitionListWidget";
 import { useCompany } from "../../../hooks/companies/useQueryCompanies";
 import { useAllProductsByCompany } from "../../../hooks/products/useQueryProducts";
-import { useAllPricelistsByCompany } from "../../../hooks/pricelists/useQueryPricelists";
+import {
+  useAllPricelists,
+  useAllPricelistsByCompany,
+  useAllPricelistsPaginated,
+} from "../../../hooks/pricelists/useQueryPricelists";
 import { useAuth } from "../../../components/Authentication/AuthenticationProvider";
+import { useEffect, useState } from "react";
+import type { PricelistFilter } from "../../../models/Pricelist";
+import { useDebounce } from "../../../hooks/useDebounce";
 
 const SingleCompanyView = () => {
+  const { companyId } = useParams();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [filters, setFilters] = useState<PricelistFilter>({
+    company_id: companyId ?? "",
+  });
+  const [nameInput, setNameInput] = useState("");
+
+  const debouncedNameInput = useDebounce(nameInput, 800);
+
+  useEffect(() => {
+    setFilters((prev) => ({
+      ...prev,
+      name: debouncedNameInput || undefined,
+    }));
+    setCurrentPage(1);
+  }, [debouncedNameInput]);
+
   const { isAdmin } = useAuth();
   const navigate = useNavigate();
 
   if (!isAdmin()) navigate("/auth/login");
 
-  const { companyId } = useParams();
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handlePageSizeChange = (newPageSize: number) => {
+    setPageSize(newPageSize);
+    setCurrentPage(1); // Reset to first page when changing page size
+  };
 
   const {
     data: company,
@@ -23,17 +55,13 @@ const SingleCompanyView = () => {
     error: companyError,
   } = useCompany(companyId ?? "");
 
-  const {
-    data: products,
-    isPending: isProductsPending,
-    error: productsError,
-  } = useAllProductsByCompany(companyId ?? "");
-
-  const {
-    data: pricelists,
-    isPending: isPricelistsPending,
-    error: pricelistsError,
-  } = useAllPricelistsByCompany(companyId ?? "");
+  const pricelists = useAllPricelistsPaginated(
+    {
+      CurrentPage: currentPage,
+      PageSize: pageSize,
+    },
+    filters
+  );
 
   if (isCompanyPending) {
     return (
@@ -105,10 +133,10 @@ const SingleCompanyView = () => {
             route: `/dashboard/create/pricelists?companyId=${companyId}`,
           },
         ]}
-        data={pricelists}
-        isPending={isPricelistsPending}
-        isError={!!pricelistsError}
-        error={pricelistsError}
+        data={pricelists.data?.items ?? []}
+        isPending={pricelists.isPending}
+        isError={pricelists.isError}
+        error={pricelists.error}
         columns={[
           {
             accessorKey: "id",
@@ -145,68 +173,9 @@ const SingleCompanyView = () => {
           columnId: { ":pid": "id" },
         }}
         keyField="id"
-      />
-
-      <TableWidget
-        title="Prodotti Associati"
-        actions={[
-          {
-            color: "blue",
-            type: "link",
-            Icon: FaPlus,
-            route: `/dashboard/create/products?companyId=${companyId}`,
-          },
-        ]}
-        data={products ?? []}
-        isPending={isProductsPending}
-        isError={!!productsError}
-        error={productsError}
-        columns={[
-          {
-            accessorKey: "id",
-            header: "Codice Prodotto",
-            meta: {
-              className: "text-white",
-              headerClassName: "text-white",
-            },
-          },
-          {
-            accessorKey: "currentInstance.name",
-            header: "Nome Prodotto",
-            meta: {
-              className: "text-white",
-              headerClassName: "text-white",
-            },
-          },
-          {
-            accessorKey: "currentInstance.price",
-            header: "Prezzo",
-            meta: {
-              className: "font-medium text-green-600",
-            },
-            cell: ({ getValue }) => {
-              const value = getValue() as number;
-              return `${value.toFixed(2)} €`;
-            },
-          },
-          {
-            accessorKey: "currentInstance.cost",
-            header: "Costo",
-            meta: {
-              className: "font-medium text-red-600",
-            },
-            cell: ({ getValue }) => {
-              const value = getValue() as number;
-              return `${value.toFixed(2)} €`;
-            },
-          },
-        ]}
-        config={{
-          baseUrl: "/dashboard/products/:pid",
-          enableLink: true,
-          columnId: { ":pid": "id" },
-        }}
-        keyField="id"
+        pagination={pricelists.data?.pagination}
+        onPageChange={handlePageChange}
+        onPageSizeChange={handlePageSizeChange}
       />
     </div>
   );

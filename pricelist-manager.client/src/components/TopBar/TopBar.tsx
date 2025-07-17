@@ -21,6 +21,15 @@ function TopBar() {
           </ul>
         </nav>
 
+        {user && (
+          <img
+            src={user.company.logoUri}
+            alt={`Logo dell'azienda ${user.company.name}`}
+            className="max-h-5"
+            loading="eager"
+          />
+        )}
+
         {isAuthenticated ? (
           <div className="flex gap-4 items-center">
             <p>

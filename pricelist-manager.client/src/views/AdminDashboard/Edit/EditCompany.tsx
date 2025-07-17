@@ -86,7 +86,7 @@ const config = {
         {
           id: "logoUri",
           label: "Indirizzo Logo Azienda",
-          type: "url",
+          type: "text",
         },
         {
           id: "interfaceColor",

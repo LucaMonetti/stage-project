@@ -1,3 +1,4 @@
+import type { PaginationInfo } from "../../../models/Pagination";
 import type { Action } from "../../Buttons/ActionRenderer";
 import ActionRenderer from "../../Buttons/ActionRenderer";
 import GenericTableView, {
@@ -16,6 +17,10 @@ type Props<T> = {
   keyField: keyof T;
   title: string;
   actions?: Action[];
+
+  pagination?: PaginationInfo;
+  onPageChange?: (page: number) => void;
+  onPageSizeChange?: (pageSize: number) => void;
 };
 
 function TableWidget<T extends Record<string, any>>({
@@ -28,6 +33,9 @@ function TableWidget<T extends Record<string, any>>({
   keyField,
   title,
   actions,
+  pagination,
+  onPageChange,
+  onPageSizeChange,
 }: Props<T>) {
   return (
     <WidgetBase>
@@ -48,6 +56,9 @@ function TableWidget<T extends Record<string, any>>({
         config={config}
         keyField={keyField}
         className="mt-4"
+        pagination={pagination}
+        onPageChange={onPageChange}
+        onPageSizeChange={onPageSizeChange}
       />
     </WidgetBase>
   );
