@@ -55,16 +55,18 @@ const SinglePricelistView = () => {
     });
   }
 
+  useEffect(() => {
+    if (isError) {
+      navigate("/error/404");
+    }
+  }, [user, data, isError]);
+
   if (isPending) {
     return (
       <div className="px-8 py-4 flex justify-center align-center h-full">
         <BasicLoader />
       </div>
     );
-  }
-
-  if (isError) {
-    navigate("/error/404");
   }
 
   return (

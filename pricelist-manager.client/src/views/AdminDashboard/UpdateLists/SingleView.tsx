@@ -10,14 +10,18 @@ import {
   useProductsByStatus,
   useUpdateList,
 } from "../../../hooks/updatelists/useQueryUpdatelists";
-import ActionRenderer from "../../../components/Buttons/ActionRenderer";
+import ActionRenderer, {
+  type Action,
+} from "../../../components/Buttons/ActionRenderer";
 import { useDeleteUpdatelistProduct } from "../../../hooks/updatelists/useMutationUpdateList";
 import { useEffect, useState } from "react";
 import { useExportCSV } from "../../../hooks/exports/useExportQuery";
+import { useAuth } from "../../../components/Authentication/AuthenticationProvider";
 
 const UpdateListSingleView = () => {
   const navigate = useNavigate();
   const { updateListId } = useParams();
+  const { isAdmin, user } = useAuth();
 
   const [exportData, setExportData] = useState<boolean>(false);
   const exportCSV = useExportCSV(`updatelists/${updateListId}`, {
@@ -44,17 +48,43 @@ const UpdateListSingleView = () => {
     error: updatedProductsError,
   } = useProductsByStatus(updateListId ?? "", Status.Edited);
 
+  let actions: Action[] = [
+    {
+      color: "blue",
+      type: "button",
+      Icon: FaDownload,
+      handler: () => {
+        setExportData(true);
+      },
+      text: "Scarica",
+    },
+  ];
+
+  if (isAdmin()) {
+    actions.unshift({
+      color: "purple",
+      type: "link",
+      Icon: FaPencil,
+      route: `/dashboard/edit/updatelists/${updateListId}`,
+      text: "Modifica",
+    });
+  }
+
+  useEffect(() => {
+    if (!(isAdmin() || user?.company.id === data?.companyId))
+      navigate("/auth/login");
+
+    if (isError) {
+      navigate("/error/404");
+    }
+  }, [user, data, isError]);
+
   if (isPending) {
     return (
       <div className="px-8 py-4 flex justify-center align-center h-full">
         <BasicLoader />
       </div>
     );
-  }
-
-  if (isError || updateListId === undefined) {
-    navigate("/error/404");
-    return;
   }
 
   const productCols = [
@@ -107,7 +137,7 @@ const UpdateListSingleView = () => {
                   },
                   handler: async () => {
                     deleteMutation.mutate({
-                      updateListId: updateListId,
+                      updateListId: updateListId ?? "",
                       productId: id,
                     });
                   },
@@ -125,28 +155,11 @@ const UpdateListSingleView = () => {
       <InfoWidget
         title={data?.name}
         subtitle={data?.description}
-        callout={`Completamento: ${(data?.editedProducts == data.totalProducts
+        callout={`Completamento: ${(data?.editedProducts == data?.totalProducts
           ? 100
           : ((data?.editedProducts ?? 0) / (data?.totalProducts ?? 1)) * 100
         ).toFixed(1)}%`}
-        actions={[
-          {
-            color: "purple",
-            type: "link",
-            Icon: FaPencil,
-            route: `/dashboard/edit/updatelists/${updateListId}`,
-            text: "Modifica",
-          },
-          {
-            color: "blue",
-            type: "button",
-            Icon: FaDownload,
-            handler: () => {
-              setExportData(true);
-            },
-            text: "Scarica",
-          },
-        ]}
+        actions={actions}
       />
 
       <TableWidget

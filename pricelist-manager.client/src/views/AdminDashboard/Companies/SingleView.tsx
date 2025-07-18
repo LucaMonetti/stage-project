@@ -44,10 +44,8 @@ const SingleCompanyView = () => {
     setCurrentPage(1);
   }, [debouncedNameInput]);
 
-  const { isAdmin } = useAuth();
+  const { isAdmin, user } = useAuth();
   const navigate = useNavigate();
-
-  if (!isAdmin()) navigate("/auth/login");
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -72,16 +70,21 @@ const SingleCompanyView = () => {
     filters
   );
 
+  useEffect(() => {
+    if (!(isAdmin() || user?.company.id === company?.id))
+      navigate("/auth/login");
+
+    if (companyError) {
+      navigate("/error/404");
+    }
+  }, [user, company, companyError]);
+
   if (isCompanyPending) {
     return (
       <div className="px-8 py-4 flex justify-center align-center h-full">
         <BasicLoader />
       </div>
     );
-  }
-
-  if (companyError) {
-    navigate("/error/404");
   }
 
   return (

@@ -1,4 +1,4 @@
-import { FaPencil, FaDownload } from "react-icons/fa6";
+import { FaPencil } from "react-icons/fa6";
 import { useNavigate, useParams } from "react-router-dom";
 import BasicLoader from "../../../components/Loader/BasicLoader";
 import DefinitionListWidget from "../../../components/SinglePage/Widgets/DefinitionListWidget";
@@ -9,21 +9,14 @@ import GraphWidget from "../../../components/SinglePage/Widgets/GraphWidget";
 import { useProduct } from "../../../hooks/products/useQueryProducts";
 import type { Action } from "../../../components/Buttons/ActionRenderer";
 import { useAuth } from "../../../components/Authentication/AuthenticationProvider";
+import { useEffect } from "react";
 
 const SingleProductView = () => {
   const navigate = useNavigate();
   const { productId } = useParams();
   const { isAdmin, user } = useAuth();
 
-  const { data, isPending, error, isError } = useProduct(productId ?? "");
-
-  if (isPending) {
-    return (
-      <div className="px-8 py-4 flex justify-center align-center h-full">
-        <BasicLoader />
-      </div>
-    );
-  }
+  const { data, isPending, isError } = useProduct(productId ?? "");
 
   const actions: Action[] = [];
 
@@ -37,8 +30,21 @@ const SingleProductView = () => {
     });
   }
 
-  if (isError) {
-    navigate("/error/404");
+  useEffect(() => {
+    if (!(isAdmin() || user?.company.id === data?.company.id))
+      navigate("/auth/login");
+
+    if (isError) {
+      navigate("/error/404");
+    }
+  }, [user, data, isError]);
+
+  if (isPending) {
+    return (
+      <div className="px-8 py-4 flex justify-center align-center h-full">
+        <BasicLoader />
+      </div>
+    );
   }
 
   return (
