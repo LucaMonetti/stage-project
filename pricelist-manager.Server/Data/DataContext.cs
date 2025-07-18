@@ -19,6 +19,12 @@ namespace pricelist_manager.Server.Data
         public DbSet<UpdateList> UpdateLists { get; set; }
         public DbSet<ProductToUpdateList> ProductsToUpdateLists { get; set; }
 
+        // Loggers
+        public DbSet<CompanyLogger> CompanyLoggers { get; set; }
+        public DbSet<PricelistLogger> PricelistLoggers { get; set; }
+        public DbSet<UserLogger> UserLoggers { get; set; }
+        public DbSet<UpdateListLogger> UpdateListLoggers { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -72,7 +78,7 @@ namespace pricelist_manager.Server.Data
             // UpdateList - ProductToUpdateList - Product
 
             builder.Entity<ProductToUpdateList>()
-                .HasKey(ptul => new {ptul.UpdateListId, ptul.ProductId});
+                .HasKey(ptul => new { ptul.UpdateListId, ptul.ProductId });
 
             builder.Entity<ProductToUpdateList>()
                 .HasOne(ptul => ptul.Product)
@@ -95,7 +101,7 @@ namespace pricelist_manager.Server.Data
             builder.Entity<Product>()
                 .HasMany(ul => ul.ProductsToUpdateLists)
                 .WithOne(ptul => ptul.Product)
-                .OnDelete(DeleteBehavior.NoAction);   
+                .OnDelete(DeleteBehavior.NoAction);
         }
     }
 }

@@ -133,6 +133,8 @@ namespace pricelist_manager.Server
 
             builder.Services.AddScoped<IMetadataMappingService, MetadataMappingService>();
 
+            builder.Services.AddScoped<ILoggerRepository<Company>, CompanyLoggerRepository>();
+
             var app = builder.Build();
 
             // Create admin user if no users exist
@@ -146,7 +148,7 @@ namespace pricelist_manager.Server
                     var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
 
                     // Ensure database is created
-                    await context.Database.EnsureCreatedAsync();
+                    await context.Database.MigrateAsync();
 
                     // Create roles if they don't exist
                     if (!await roleManager.RoleExistsAsync("Admin"))

@@ -6,7 +6,7 @@ export const CreateUserSchema = z.object({
   lastName: z.string().min(1, "Necessario inserire il cognome dell'Utente."),
   username: z.string().min(1, "Necessario inserire lo username dell'Utente."),
   email: z.email().min(1, "Necessario inserire la email dell'Utente."),
-  phone: z.string(),
+  phone: z.string().nullable(),
   companyId: z.string().min(1, "Necessario inserire il codice di un'Azienda."),
   password: z.string().min(1, "Necessario inserire una password per l'Utente"),
 });

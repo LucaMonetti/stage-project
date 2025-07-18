@@ -18,7 +18,7 @@ export const EditCompanySchema = z.object({
       1,
       "Necessario inserire un recapito telefonico in fomato internazionale!"
     ),
-  logoUri: z.string(),
+  logoUri: z.string().optional(),
   interfaceColor: z
     .string()
     .min(
