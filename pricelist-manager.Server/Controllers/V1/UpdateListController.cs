@@ -1,4 +1,5 @@
-﻿using Asp.Versioning;
+﻿using System.Security.Claims;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -26,10 +27,13 @@ namespace pricelist_manager.Server.Controllers.V1
         private readonly IUpdateListMappingService UpdateListMappingService;
         private readonly IMetadataMappingService MetadataMapping;
 
-        public UpdateListController(IUpdateListRepository updateListRepository, IProductRepository productRepository, IUpdateListMappingService updateListMappingService, IProductToUpdateListMappingService productToUpdateListMappingService, IMetadataMappingService metadataMapping, IProductMappingService productMappingService)
+        private readonly ILoggerRepository<UpdateList> Logger;
+
+        public UpdateListController(IUpdateListRepository updateListRepository, IProductRepository productRepository, IUpdateListMappingService updateListMappingService, IProductToUpdateListMappingService productToUpdateListMappingService, IMetadataMappingService metadataMapping, IProductMappingService productMappingService, ILoggerRepository<UpdateList> logger)
         {
             UpdateListRepository = updateListRepository;
             ProductRepository = productRepository;
+            Logger = logger;
             UpdateListMappingService = updateListMappingService;
             ProductToUpdateListMappingService = productToUpdateListMappingService;
             MetadataMapping = metadataMapping;
@@ -120,11 +124,21 @@ namespace pricelist_manager.Server.Controllers.V1
 
             try
             {
+                // Get current user from JWT token
+                var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                if (string.IsNullOrEmpty(currentUserId))
+                {
+                    return Unauthorized("Invalid token");
+                }
+
                 // Create UpdateList
                 var item = await UpdateListRepository.CreateAsync(UpdateListMappingService.MapToUpdateList(dto));
+                await Logger.LogAsync(item, currentUserId, DatabaseOperationType.Create);
 
                 // Add Products To List
                 var res = await UpdateListRepository.AddProducts(ProductToUpdateListMappingService.MapToModels(item.Id, dto.Products ?? []));
+                await Logger.LogAsync(item, currentUserId, DatabaseOperationType.UpdateInnerProducts);
 
                 return base.Ok(UpdateListMappingService.MapToDTO(item));
             }
@@ -138,7 +152,7 @@ namespace pricelist_manager.Server.Controllers.V1
             }
         }
 
-        [HttpPost("{id:int}/products")]
+        [HttpPut("{id:int}/products")]
         public async Task<IActionResult> AddProducts(int id, [FromBody] AddProductsUpdateListDTO dto)
         {
             if (!ModelState.IsValid)
@@ -171,6 +185,16 @@ namespace pricelist_manager.Server.Controllers.V1
                     await UpdateListRepository.UpdateAsync(updatelist);
                 }
 
+                // Get current user from JWT token
+                var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                if (string.IsNullOrEmpty(currentUserId))
+                {
+                    return Unauthorized("Invalid token");
+                }
+
+                await Logger.LogAsync(updatelist, currentUserId, DatabaseOperationType.UpdateInnerProducts);
+
                 return base.Ok(UpdateListMappingService.MapToDTO(updatelist));
             }
             catch (Exceptions.AlreadyExistException<UpdateList> e)
@@ -197,6 +221,16 @@ namespace pricelist_manager.Server.Controllers.V1
                 var updatelist = await UpdateListRepository.GetByIdAsync(id);
 
                 await UpdateListRepository.DeleteProductAndUpdateStatus(id, dto.ProductId);
+
+                // Get current user from JWT token
+                var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                if (string.IsNullOrEmpty(currentUserId))
+                {
+                    return Unauthorized("Invalid token");
+                }
+
+                await Logger.LogAsync(updatelist, currentUserId, DatabaseOperationType.UpdateInnerProducts);
 
                 return base.NoContent();
             }
@@ -236,6 +270,17 @@ namespace pricelist_manager.Server.Controllers.V1
                 var model = UpdateListMappingService.MapToUpdateList(item, dto);
 
                 var res = await UpdateListRepository.UpdateAsync(model);
+
+                // Get current user from JWT token
+                var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                if (string.IsNullOrEmpty(currentUserId))
+                {
+                    return Unauthorized("Invalid token");
+                }
+
+                await Logger.LogAsync(res, currentUserId, DatabaseOperationType.Update);
+
                 return Ok(item);
             }
             catch (NotFoundException<UpdateList> e)
@@ -265,6 +310,17 @@ namespace pricelist_manager.Server.Controllers.V1
                 var model = UpdateListMappingService.MapToUpdateList(item, dto);
 
                 var res = await UpdateListRepository.UpdateAsync(model);
+
+                // Get current user from JWT token
+                var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                if (string.IsNullOrEmpty(currentUserId))
+                {
+                    return Unauthorized("Invalid token");
+                }
+
+                await Logger.LogAsync(res, currentUserId, DatabaseOperationType.Update);
+
                 return Ok(UpdateListMappingService.MapToDTO(res));
             }
             catch (NotFoundException<UpdateList> e)
@@ -284,6 +340,19 @@ namespace pricelist_manager.Server.Controllers.V1
             try
             {
                 var item = await UpdateListRepository.DeleteAsync(id);
+
+                // Todo: Disable instead of delete
+
+                // // Get current user from JWT token
+                // var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                // if (string.IsNullOrEmpty(currentUserId))
+                // {
+                //     return Unauthorized("Invalid token");
+                // }
+
+                // await Logger.LogAsync(item, currentUserId, DatabaseOperationType.Delete);
+
                 return Ok(UpdateListMappingService.MapToDTO(item));
             }
             catch (NotFoundException<UpdateList> e)

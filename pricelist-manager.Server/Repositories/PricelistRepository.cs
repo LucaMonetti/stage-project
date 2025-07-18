@@ -24,7 +24,7 @@ namespace pricelist_manager.Server.Repositories
             await Context.Pricelists.AddAsync(entity);
             await Context.SaveChangesAsync();
 
-            return entity;
+            return await GetByIdAsync(entity.Id);
         }
 
         public async Task<Pricelist> DeleteAsync(Guid id)

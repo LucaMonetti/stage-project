@@ -134,6 +134,9 @@ namespace pricelist_manager.Server
             builder.Services.AddScoped<IMetadataMappingService, MetadataMappingService>();
 
             builder.Services.AddScoped<ILoggerRepository<Company>, CompanyLoggerRepository>();
+            builder.Services.AddScoped<ILoggerRepository<Pricelist>, PricelistLoggerRepository>();
+            builder.Services.AddScoped<ILoggerRepository<UpdateList>, UpdateListLoggerRepository>();
+            builder.Services.AddScoped<ILoggerRepository<User>, UserLoggerRepository>();
 
             var app = builder.Build();
 

@@ -12,6 +12,7 @@ using pricelist_manager.Server.Interfaces;
 using pricelist_manager.Server.Models;
 using pricelist_manager.Server.Repositories;
 using System.Globalization;
+using System.Security.Claims;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace pricelist_manager.Server.Controllers.V1
@@ -29,10 +30,13 @@ namespace pricelist_manager.Server.Controllers.V1
         private readonly IPricelistMappingService PricelistMapping;
         private readonly IMetadataMappingService MetadataMapping;
 
-        public PricelistsController(IPricelistRepository pricelistRepository, IProductRepository productRepository, IPricelistMappingService pricelistMappingService, IProductMappingService productMappingService, IMetadataMappingService metadataMapping)
+        private readonly ILoggerRepository<Pricelist> Logger;
+
+        public PricelistsController(IPricelistRepository pricelistRepository, IProductRepository productRepository, IPricelistMappingService pricelistMappingService, IProductMappingService productMappingService, IMetadataMappingService metadataMapping, ILoggerRepository<Pricelist> logger)
         {
             PricelistRepository = pricelistRepository;
             ProductRepository = productRepository;
+            Logger = logger;
             ProductMapping = productMappingService;
             PricelistMapping = pricelistMappingService;
             MetadataMapping = metadataMapping;
@@ -104,6 +108,17 @@ namespace pricelist_manager.Server.Controllers.V1
             try
             {
                 var res = await PricelistRepository.CreateAsync(data);
+
+                // Get current user from JWT token
+                var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                if (string.IsNullOrEmpty(currentUserId))
+                {
+                    return Unauthorized("Invalid token");
+                }
+
+                await Logger.LogAsync(res, currentUserId, DatabaseOperationType.Create);
+
                 return Ok(PricelistMapping.MapToDTO(res));
             }
             catch (AlreadyExistException<Pricelist> e)
@@ -129,6 +144,17 @@ namespace pricelist_manager.Server.Controllers.V1
             try
             {
                 var res = await PricelistRepository.UpdateAsync(PricelistMapping.MapToPricelist(dto));
+
+                // Get current user from JWT token
+                var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                if (string.IsNullOrEmpty(currentUserId))
+                {
+                    return Unauthorized("Invalid token");
+                }
+
+                await Logger.LogAsync(res, currentUserId, DatabaseOperationType.Update);
+
                 return Ok(PricelistMapping.MapToDTO(res));
             }
             catch (NotFoundException<Pricelist> e)
@@ -148,6 +174,19 @@ namespace pricelist_manager.Server.Controllers.V1
             try
             {
                 var res = await PricelistRepository.DeleteAsync(id);
+
+                // Todo: Deactivate instead of delete
+
+                // // Get current user from JWT token
+                // var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                // if (string.IsNullOrEmpty(currentUserId))
+                // {
+                //     return Unauthorized("Invalid token");
+                // }
+
+                // await Logger.LogAsync(res, currentUserId, DatabaseOperationType.Delete);
+
                 return Ok(PricelistMapping.MapToDTO(res));
             }
             catch (NotFoundException<Company> e)

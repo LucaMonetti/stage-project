@@ -33,12 +33,15 @@ namespace pricelist_manager.Server.Controllers.V1
         private readonly IUserMappingService UserMapping;
         private readonly IMetadataMappingService MetadataMapping;
 
-        public AccountsController(UserManager<User> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration, DataContext context, IUserRepository userRepository, IUserMappingService userMapping, IMetadataMappingService metadataMapping)
+        private readonly ILoggerRepository<User> Logger;
+
+        public AccountsController(UserManager<User> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration, DataContext context, IUserRepository userRepository, IUserMappingService userMapping, IMetadataMappingService metadataMapping, ILoggerRepository<User> logger)
         {
             UserManager = userManager;
             RoleManager = roleManager;
             Configuration = configuration;
             Context = context;
+            Logger = logger;
             UserRepository = userRepository;
             UserMapping = userMapping;
             MetadataMapping = metadataMapping;
@@ -147,6 +150,8 @@ namespace pricelist_manager.Server.Controllers.V1
                     return BadRequest(result.Errors);
                 }
 
+                await Logger.LogAsync(user, currentUserId, DatabaseOperationType.Update);
+
                 await transaction.CommitAsync();
                 return Ok(UserMapping.MapToDTO(user, await UserManager.GetRolesAsync(user)));
             }
@@ -195,6 +200,16 @@ namespace pricelist_manager.Server.Controllers.V1
             {
                 return BadRequest(result.Errors);
             }
+
+            // Get current user from JWT token
+            var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(currentUserId))
+            {
+                return Unauthorized("Invalid token");
+            }
+
+            await Logger.LogAsync(user, currentUserId, DatabaseOperationType.Update);
 
             return Ok(new { message = "Role assigned successfully" });
 

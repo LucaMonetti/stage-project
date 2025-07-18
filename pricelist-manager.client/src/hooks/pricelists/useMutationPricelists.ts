@@ -9,9 +9,10 @@ import { PricelistSchema, type Pricelist } from "../../models/Pricelist";
 import type { UseEditOptions } from "../../types";
 import QueryEndpoint from "../../helpers/queryEndpoint";
 import { apiConfig } from "../../helpers/ApiConfig";
+import type { PricelistLite } from "../../models/PricelistLite";
 
 interface UseCreatePricelistOptions {
-  onSuccess?: (data: Pricelist) => void;
+  onSuccess?: (data: PricelistLite) => void;
   onError?: (error: Error) => void;
 }
 const createPricelist = async (
@@ -40,7 +41,7 @@ const createPricelist = async (
 export const useCreatePricelist = (options?: UseCreatePricelistOptions) => {
   const queryClient = useQueryClient();
 
-  return useMutation<Pricelist, Error, CreatePricelist>({
+  return useMutation<PricelistLite, Error, CreatePricelist>({
     mutationFn: createPricelist,
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["pricelists"] });

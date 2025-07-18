@@ -34,7 +34,9 @@ namespace pricelist_manager.Server.Controllers.V1
         private readonly IUserMappingService UserMapping;
         private readonly IMetadataMappingService MetadataMapping;
 
-        public AuthController(UserManager<User> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration, DataContext context, IUserRepository userRepository, IUserMappingService userMapping, IMetadataMappingService metadataMapping, ITokenService tokenService)
+        private readonly ILoggerRepository<User> Logger;
+
+        public AuthController(UserManager<User> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration, DataContext context, IUserRepository userRepository, IUserMappingService userMapping, IMetadataMappingService metadataMapping, ITokenService tokenService, ILoggerRepository<User> logger)
         {
             UserManager = userManager;
             RoleManager = roleManager;
@@ -44,6 +46,7 @@ namespace pricelist_manager.Server.Controllers.V1
             UserMapping = userMapping;
             MetadataMapping = metadataMapping;
             TokenService = tokenService;
+            Logger = logger;
         }
 
         [HttpPost("register")]
@@ -87,6 +90,16 @@ namespace pricelist_manager.Server.Controllers.V1
                 await transition.RollbackAsync();
                 return BadRequest(res.Errors);
             }
+
+            // Get current user from JWT token
+            var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(currentUserId))
+            {
+                return Unauthorized("Invalid token");
+            }
+
+            await Logger.LogAsync(user, currentUserId, DatabaseOperationType.Create);
 
             // Success Response
             await transition.CommitAsync();

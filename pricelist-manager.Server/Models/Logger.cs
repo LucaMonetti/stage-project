@@ -7,7 +7,9 @@ namespace pricelist_manager.Server.Models
     {
         Create,
         Update,
-        Delete
+        Delete,
+        UpdateInnerProducts,
+        ModifyRoles
     }
 
     public class Logger
