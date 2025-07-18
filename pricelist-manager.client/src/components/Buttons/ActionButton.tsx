@@ -44,7 +44,7 @@ export default function ActionButton({
   return (
     <>
       <button
-        className={`text-white px-4 py-2 rounded hover:cursor-pointer ${backgroundColors[color]} ${className}`}
+        className={`text-white px-4 py-2 rounded hover:cursor-pointer ${backgroundColors[color]} flex items-center gap-2 ${className}`}
         onClick={(e: React.MouseEvent) => {
           e.stopPropagation();
 

@@ -21,7 +21,7 @@ const SingleCompanyView = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [filters, setFilters] = useState<PricelistFilter>({
-    company_id: companyId ?? "",
+    company_id: "CON",
   });
   const [nameInput, setNameInput] = useState("");
 
@@ -89,9 +89,29 @@ const SingleCompanyView = () => {
           },
           {
             color: "blue",
-            type: "link",
+            type: "button",
             Icon: FaDownload,
-            route: `/dashboard/download/companies/${companyId}`,
+            handler: async () => {
+              const url = `/api/v1/export/companies/${companyId}`;
+
+              let res = await fetch(url, {
+                method: "GET",
+                headers: {
+                  Accept: "application/csv",
+                  "Content-Type": "application/csv",
+                },
+              });
+
+              if (res.ok) {
+                const blob = await res.blob();
+                const link = document.createElement("a");
+                link.href = URL.createObjectURL(blob);
+                link.setAttribute("download", `${company?.name}.csv`);
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+              }
+            },
             text: "Scarica",
           },
         ]}
@@ -138,14 +158,6 @@ const SingleCompanyView = () => {
         isError={pricelists.isError}
         error={pricelists.error}
         columns={[
-          {
-            accessorKey: "id",
-            header: "Codice",
-            meta: {
-              className: "text-white",
-              headerClassName: "text-white",
-            },
-          },
           {
             accessorKey: "name",
             header: "Nome Prodotto",

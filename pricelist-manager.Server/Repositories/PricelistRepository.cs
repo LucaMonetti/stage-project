@@ -57,7 +57,17 @@ namespace pricelist_manager.Server.Repositories
         {
             if (!CanConnect()) throw new StorageUnavailableException();
 
-            var query = Context.Pricelists.Include(p => p.Products).ThenInclude(p => p.Versions).ThenInclude(v => v.UpdatedBy).Include(p => p.Company);
+            var query = Context.Pricelists.AsQueryable();
+
+            if (requestParams.Filters != null)
+            { 
+                if (!string.IsNullOrEmpty(requestParams.Filters.CompanyId))
+                {
+                    query = query.Where(p => p.CompanyId == requestParams.Filters.CompanyId);
+                }
+            }
+
+            query = query.Include(p => p.Products).ThenInclude(p => p.Versions).ThenInclude(v => v.UpdatedBy).Include(p => p.Company);
 
             return await PagedList<Pricelist>.ToPagedList(query, requestParams.Pagination.PageNumber, requestParams.Pagination.PageSize);
         }

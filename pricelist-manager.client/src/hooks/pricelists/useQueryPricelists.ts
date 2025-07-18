@@ -64,6 +64,9 @@ const fetchAllPricelistsPaginated = async (
 ): Promise<PaginatedResponse<Pricelist>> => {
   const searchParams = new URLSearchParams();
   ParsePaginationSearchParams(params, searchParams);
+
+  console.log("Filtri", filters);
+
   ParseFiltersSearchParams(filters, searchParams, PricelistFilterConfig);
 
   const response = await fetch(
