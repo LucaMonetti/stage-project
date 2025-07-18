@@ -19,5 +19,6 @@ namespace pricelist_manager.Server.Models
         public string? RefreshToken { get; set; }
         public DateTime RefreshTokenExiryTime { get; set; }
 
+        public ICollection<ProductInstance> UpdatedProductInstances { get; set; } = [];
     }
 }

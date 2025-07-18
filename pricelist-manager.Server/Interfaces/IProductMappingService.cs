@@ -7,7 +7,7 @@ namespace pricelist_manager.Server.Interfaces
     public interface IProductMappingService
     {
         ProductDTO MapToDTO(Product product);
-        Product MapToProduct(CreateProductDTO createProductDTO, string companyId);
+        Product MapToProduct(CreateProductDTO createProductDTO, string companyId, string userId);
 
         PagedList<ProductDTO> MapToDTOs(PagedList<Product> products);
     }

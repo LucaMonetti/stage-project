@@ -7,7 +7,14 @@ namespace pricelist_manager.Server.Mappers
 {
     public class ProductInstanceMappingService : IProductInstanceMappingService
     {
-        public ProductInstance MapToProductInstance(CreateProductDTO dto, string companyId)
+        private readonly IUserLiteMappingService UserLiteMappingService;
+
+        public ProductInstanceMappingService(IUserLiteMappingService userLiteMappingService)
+        {
+            UserLiteMappingService = userLiteMappingService;
+        }
+
+        public ProductInstance MapToProductInstance(CreateProductDTO dto, string companyId, string userId)
         {
             ArgumentNullException.ThrowIfNull(dto);
 
@@ -22,11 +29,12 @@ namespace pricelist_manager.Server.Mappers
                 AccountingControl = dto.AccountingControl,
                 CDA = dto.CDA,
                 SalesItem = dto.SalesItem,
-                Margin = dto.Margin
+                Margin = dto.Margin,
+                UserId = userId,
             };
         }
 
-        public ProductInstance MapToProductInstance(UpdateProductDTO dto, int version)
+        public ProductInstance MapToProductInstance(UpdateProductDTO dto, int version, string userId)
         {
             ArgumentNullException.ThrowIfNull(dto);
 
@@ -41,7 +49,8 @@ namespace pricelist_manager.Server.Mappers
                 Cost = dto.Cost,
                 AccountingControl = dto.AccountingControl,
                 SalesItem = dto.SalesItem,
-                Margin = dto.Margin
+                Margin = dto.Margin,
+                UserId = userId
             };
         }
 
@@ -61,7 +70,8 @@ namespace pricelist_manager.Server.Mappers
                 SalesItem = dto.SalesItem,
                 Cost = dto.Cost,
                 UpdatedAt = dto.UpdatedAt,
-                Margin = dto.Margin
+                Margin = dto.Margin,
+                UserId = dto.UpdatedBy.Id
             };
         }
 
@@ -81,7 +91,8 @@ namespace pricelist_manager.Server.Mappers
                 CDA = product.CDA,
                 SalesItem = product.SalesItem,
                 UpdatedAt = product.UpdatedAt,
-                Margin = product.Margin
+                Margin = product.Margin,
+                UpdatedBy = UserLiteMappingService.MapToLiteDTO(product.UpdatedBy ?? throw new ArgumentNullException(nameof(product.UpdatedBy)))
             };
         }
 

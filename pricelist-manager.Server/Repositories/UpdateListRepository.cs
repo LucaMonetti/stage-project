@@ -87,7 +87,8 @@ namespace pricelist_manager.Server.Repositories
             var query = Context.UpdateLists
                 .Include(ul => ul.ProductsToUpdateLists)
                 .ThenInclude(ptul => ptul.Product)
-                .ThenInclude(p => p.Versions);
+                .ThenInclude(p => p.Versions)
+                .ThenInclude(v => v.UpdatedBy);
 
             return await PagedList<UpdateList>.ToPagedList(query, requestParams.Pagination.PageNumber, requestParams.Pagination.PageSize);
         }
@@ -101,6 +102,7 @@ namespace pricelist_manager.Server.Repositories
                 .Include(ul => ul.ProductsToUpdateLists)
                 .ThenInclude(ptul => ptul.Product)
                 .ThenInclude(p => p.Versions)
+                .ThenInclude(v => v.UpdatedBy)
                 .FirstOrDefaultAsync(ul => ul.Id == id);
 
             if (res == null)
@@ -117,7 +119,7 @@ namespace pricelist_manager.Server.Repositories
                 throw new StorageUnavailableException();
 
             var res = await Context.ProductsToUpdateLists.Where(ptul => ptul.UpdateListId == id &&
-                (requestParams.status.HasValue ? requestParams.status.Value == ptul.Status : true)).Include(ptul => ptul.Product).ThenInclude(p => p.Versions).ToListAsync();
+                (requestParams.status.HasValue ? requestParams.status.Value == ptul.Status : true)).Include(ptul => ptul.Product).ThenInclude(p => p.Versions).ThenInclude(v => v.UpdatedBy).ToListAsync();
 
             if (res == null)
                 throw new NotFoundException<UpdateList>(id);
@@ -131,7 +133,7 @@ namespace pricelist_manager.Server.Repositories
                 throw new StorageUnavailableException();
 
             var res = await Context.ProductsToUpdateLists.Where(ptul => ptul.UpdateListId == updatelistId &&
-                ptul.ProductId == productId).Include(ptul => ptul.Product).ThenInclude(p => p.Versions).FirstOrDefaultAsync();
+                ptul.ProductId == productId).Include(ptul => ptul.Product).ThenInclude(p => p.Versions).ThenInclude(v => v.UpdatedBy).FirstOrDefaultAsync();
 
             if (res == null)
                 throw new NotFoundException<ProductToUpdateList>(updatelistId);
@@ -153,7 +155,7 @@ namespace pricelist_manager.Server.Repositories
             .ToListAsync();
 
             var availableProducts = Context.Products
-            .Where(p => p.CompanyId == updatelist.CompanyId && !existingIds.Contains(p.Id)).Include(p => p.Versions).Include(p => p.Pricelist).Include(p => p.Company);
+            .Where(p => p.CompanyId == updatelist.CompanyId && !existingIds.Contains(p.Id)).Include(p => p.Versions).ThenInclude(v => v.UpdatedBy).Include(p => p.Pricelist).Include(p => p.Company);
 
             return await PagedList<Product>.ToPagedList(availableProducts, requestParams.Pagination.PageNumber, requestParams.Pagination.PageSize);
         }
@@ -163,7 +165,7 @@ namespace pricelist_manager.Server.Repositories
             if (!CanConnect())
                 throw new StorageUnavailableException();
 
-            var res = await Context.ProductsToUpdateLists.Where(ptul => ptul.UpdateListId == id).Include(ptul => ptul.Product).ThenInclude(p => p.Versions).ToListAsync();
+            var res = await Context.ProductsToUpdateLists.Where(ptul => ptul.UpdateListId == id).Include(ptul => ptul.Product).ThenInclude(p => p.Versions).ThenInclude(v => v.UpdatedBy).ToListAsync();
 
             if (res == null)
                 throw new NotFoundException<UpdateList>(id);
@@ -193,7 +195,8 @@ namespace pricelist_manager.Server.Repositories
                 .Where(ul => ul.CompanyId == companyId)
                 .Include(ul => ul.ProductsToUpdateLists)
                 .ThenInclude(ptul => ptul.Product)
-                .ThenInclude(p => p.Versions);
+                .ThenInclude(p => p.Versions)
+                .ThenInclude(v => v.UpdatedBy);
 
             return await PagedList<UpdateList>.ToPagedList(query, requestParams.Pagination.PageNumber, requestParams.Pagination.PageSize);
         }

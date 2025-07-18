@@ -62,6 +62,7 @@ namespace pricelist_manager.Server.Repositories
 
             query = query
                 .Include(p => p.Versions.OrderByDescending(v => v.Version))
+                .ThenInclude(v => v.UpdatedBy)
                 .Include(p => p.Pricelist)
                 .Include(p => p.Company);
 
@@ -75,6 +76,7 @@ namespace pricelist_manager.Server.Repositories
             var query = Context.Products
                 .Where(p => p.PricelistId == pricelistId)
                 .Include(p => p.Versions.OrderByDescending(v => v.Version))
+                .ThenInclude(v => v.UpdatedBy)
                 .Include(p => p.Pricelist)
                 .Include(p => p.Company);
 
@@ -88,6 +90,7 @@ namespace pricelist_manager.Server.Repositories
             var product = await Context.Products
                                     .Where(p => p.Id == productId)
                                     .Include(p => p.Versions.OrderByDescending(v => v.Version))
+                                    .ThenInclude(v => v.UpdatedBy)
                                     .Include(p => p.Pricelist)
                                     .Include(p => p.Company)
                                     .FirstOrDefaultAsync();
@@ -104,6 +107,7 @@ namespace pricelist_manager.Server.Repositories
             var product = await Context.Products
                                     .Where(p => productIds.Contains(p.Id))
                                     .Include(p => p.Versions.OrderByDescending(v => v.Version))
+                                    .ThenInclude(v => v.UpdatedBy)
                                     .Include(p => p.Pricelist)
                                     .Include(p => p.Company)
                                     .ToListAsync();
@@ -120,6 +124,7 @@ namespace pricelist_manager.Server.Repositories
             var query = Context.Products
                             .Where(p => p.Versions.Last().Name.Contains(name))
                             .Include(p => p.Versions.OrderByDescending(v => v.Version))
+                            .ThenInclude(v => v.UpdatedBy)
                             .Include(p => p.Pricelist)
                             .Include(p => p.Company);
 
@@ -133,6 +138,7 @@ namespace pricelist_manager.Server.Repositories
             var query = Context.Products
                             .Where(p => p.ProductCode == code)
                             .Include(p => p.Versions.OrderByDescending(v => v.Version))
+                            .ThenInclude(v => v.UpdatedBy)
                             .Include(p => p.Pricelist)
                             .Include(p => p.Company);
 
@@ -146,6 +152,7 @@ namespace pricelist_manager.Server.Repositories
             var query = Context.Products
                             .Where(p => p.CompanyId == companyId)
                             .Include(p => p.Versions.OrderByDescending(v => v.Version))
+                            .ThenInclude(v => v.UpdatedBy)
                             .Include(p => p.Pricelist)
                             .Include(p => p.Company);
 
@@ -216,7 +223,7 @@ namespace pricelist_manager.Server.Repositories
         {
             if (!CanConnect()) throw new StorageUnavailableException();
 
-            var products = await Context.Products.Include(p => p.Versions).ToListAsync();
+            var products = await Context.Products.Include(p => p.Versions).ThenInclude(v => v.UpdatedBy).ToListAsync();
             var groupedProd = products.GroupBy(p => p.PricelistId).AsQueryable();
 
             return await PagedList<IGrouping<Guid, Product>>.ToPagedList(groupedProd, requestParams.Pagination.PageNumber, requestParams.Pagination.PageSize);

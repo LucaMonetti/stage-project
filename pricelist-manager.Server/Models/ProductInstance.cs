@@ -19,7 +19,7 @@ namespace pricelist_manager.Server.Models
 
         [Precision(10, 2)]
         public Decimal Price { get; set; } = Decimal.Zero;
-        
+
         [Precision(10, 2)]
         public Decimal Cost { get; set; } = Decimal.Zero;
 
@@ -28,12 +28,15 @@ namespace pricelist_manager.Server.Models
         [Precision(3, 2)]
         public Decimal Margin { get; set; } = 1.0M;
 
-        public string CDA {  get; set; } = String.Empty;
+        public string CDA { get; set; } = String.Empty;
 
         public string SalesItem { get; set; } = String.Empty;
 
         public DateTime UpdatedAt { get; set; } = DateTime.Now;
 
         public Product? Product { get; set; } = null!;
+
+        public required string UserId { get; set; }
+        public virtual User? UpdatedBy { get; set; } = null!;
     }
 }

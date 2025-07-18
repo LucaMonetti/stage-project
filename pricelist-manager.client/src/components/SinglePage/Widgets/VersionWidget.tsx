@@ -1,4 +1,4 @@
-import { FaCalendar } from "react-icons/fa6";
+import { FaCalendar, FaUser } from "react-icons/fa6";
 import type { ProductInstance } from "../../../models/ProductInstance";
 import WidgetBase, { type QueryDimensions } from "./WidgetBase";
 
@@ -44,48 +44,57 @@ const VersionItem = ({
           : "border-l-gray-500"
       }`}
     >
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <div
-            className={`w-3 h-3 rounded-full ${
-              version.version == currentVersion ? "bg-green-500" : "bg-gray-500"
-            }`}
-          />
-          <span className="text-white text-md uppercase font-semibold">
-            Versione {version.version}
-          </span>
-        </div>
+      <div className="flex items-start justify-between">
+        <div>
+          <div className="flex items-center gap-2 mb-4">
+            <div
+              className={`w-3 h-3 rounded-full ${
+                version.version == currentVersion
+                  ? "bg-green-500"
+                  : "bg-gray-500"
+              }`}
+            />
+            <span className="text-white text-md uppercase font-semibold">
+              Versione {version.version}
+            </span>
+          </div>
 
-        <div className="text-gray-400 text-sm uppercase flex gap-2 items-center">
-          <FaCalendar />
-          <span>
-            {version.updatedAt.toLocaleDateString("it-IT", {
-              year: "numeric",
-              month: "numeric",
-              day: "numeric",
-              hour: "2-digit",
-              minute: "2-digit",
-            })}
-          </span>
-        </div>
-      </div>
+          <div className="text-gray-300 text-sm mb-3">{version.name}</div>
 
-      <div className="text-gray-300 text-sm mb-3">{version.name}</div>
-
-      <div className="flex gap-5 mb-2">
-        <div className="text-sm">
-          <span className="text-gray-400">Prezzo:</span>
-          <span className="ml-1 text-green-400">{version.price}</span>
+          <div className="flex gap-5 mb-2">
+            <div className="text-sm">
+              <span className="text-gray-400">Prezzo:</span>
+              <span className="ml-1 text-green-400">{version.price}</span>
+            </div>
+            <div className="text-sm">
+              <span className="text-gray-400">Costo:</span>
+              <span
+                className={`ml-1 ${
+                  version.cost === 0 ? "text-red-400" : "text-red-400"
+                }`}
+              >
+                {version.cost}
+              </span>
+            </div>
+          </div>
         </div>
-        <div className="text-sm">
-          <span className="text-gray-400">Costo:</span>
-          <span
-            className={`ml-1 ${
-              version.cost === 0 ? "text-red-400" : "text-red-400"
-            }`}
-          >
-            {version.cost}
-          </span>
+        <div className="flex gap-2 flex-col">
+          <div className="text-gray-400 text-sm uppercase flex gap-2 items-center">
+            <FaCalendar />
+            <span>
+              {version.updatedAt.toLocaleDateString("it-IT", {
+                year: "numeric",
+                month: "numeric",
+                day: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
+            </span>
+          </div>
+          <div className="text-gray-400 text-sm uppercase flex gap-2 items-center">
+            <FaUser />
+            <span>{version.updatedBy?.username || "Sconosciuto"}</span>
+          </div>
         </div>
       </div>
     </li>

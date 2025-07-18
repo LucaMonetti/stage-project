@@ -102,6 +102,19 @@ namespace pricelist_manager.Server.Data
                 .HasMany(ul => ul.ProductsToUpdateLists)
                 .WithOne(ptul => ptul.Product)
                 .OnDelete(DeleteBehavior.NoAction);
+
+            //  ProductInstance - User
+
+            // Gestire meglio l'eliminazione. Introdurre la stato attivo / disattivo per l'utente.
+            builder.Entity<ProductInstance>()
+                .HasOne(pi => pi.UpdatedBy)
+                .WithMany(u => u.UpdatedProductInstances)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<User>()
+                .HasMany(u => u.UpdatedProductInstances)
+                .WithOne(pi => pi.UpdatedBy)
+                .OnDelete(DeleteBehavior.NoAction);
         }
     }
 }

@@ -1,4 +1,5 @@
 import { z } from "zod/v4";
+import { UserLiteSchema } from "./UserLite";
 
 // Product Instance
 export const ProductInstanceSchema = z.object({
@@ -15,6 +16,7 @@ export const ProductInstanceSchema = z.object({
     z.date()
   ),
   margin: z.number().nonnegative(),
+  updatedBy: UserLiteSchema,
 });
 
 export const ProductInstanceArraySchema = z.array(ProductInstanceSchema);

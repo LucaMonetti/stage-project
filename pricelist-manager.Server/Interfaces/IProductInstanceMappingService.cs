@@ -7,8 +7,8 @@ namespace pricelist_manager.Server.Interfaces
     {
         ProductInstanceDTO MapToInstanceDTO(ProductInstance product);
 
-        public ProductInstance MapToProductInstance(CreateProductDTO dto, string companyId);
-        public ProductInstance MapToProductInstance(UpdateProductDTO dto, int version);
+        public ProductInstance MapToProductInstance(CreateProductDTO dto, string companyId, string userId);
+        public ProductInstance MapToProductInstance(UpdateProductDTO dto, int version, string userId);
         public ProductInstance MapToProductInstance(ProductInstanceDTO dto);
 
         ICollection<ProductInstanceDTO> MapToInstanceDTOs(ICollection<ProductInstance> products);

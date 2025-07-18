@@ -58,7 +58,7 @@ namespace pricelist_manager.Server.Mappers
                 .FirstOrDefault() ?? product.Versions.OrderByDescending(v => v.Version).First();
         }
 
-        public Product MapToProduct(CreateProductDTO dto, string companyId)
+        public Product MapToProduct(CreateProductDTO dto, string companyId, string userId)
         {
             ArgumentNullException.ThrowIfNull(dto);
 
@@ -69,7 +69,7 @@ namespace pricelist_manager.Server.Mappers
                 ProductCode = dto.ProductCode.ToUpper(),
                 CompanyId = companyId.ToUpper(),
                 LatestVersion = 0,
-                Versions = [ProductInstanceMapping.MapToProductInstance(dto, companyId)]
+                Versions = [ProductInstanceMapping.MapToProductInstance(dto, companyId, userId)]
             };
         }
     }

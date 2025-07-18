@@ -145,6 +145,3 @@ const SingleProductView = () => {
 };
 
 export default SingleProductView;
-function isAdmin() {
-  throw new Error("Function not implemented.");
-}

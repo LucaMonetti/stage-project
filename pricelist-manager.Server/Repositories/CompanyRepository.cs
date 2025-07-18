@@ -51,7 +51,7 @@ namespace pricelist_manager.Server.Repositories
         {
             if (!CanConnect()) throw new StorageUnavailableException();
 
-            var query = Context.Companies.Include(c => c.Products).ThenInclude(p => p.Versions).Include(c => c.Pricelists);
+            var query = Context.Companies.Include(c => c.Products).ThenInclude(p => p.Versions).ThenInclude(v => v.UpdatedBy).Include(c => c.Pricelists);
 
             return await PagedList<Company>.ToPagedList(query, requestParams.Pagination.PageNumber, requestParams.Pagination.PageSize);
         }
@@ -60,7 +60,7 @@ namespace pricelist_manager.Server.Repositories
         {
             if (!CanConnect()) throw new StorageUnavailableException();
 
-            var res = await Context.Companies.Include(c => c.Products).ThenInclude(p => p.Versions).Include(c => c.Pricelists).FirstOrDefaultAsync(x => x.Id == id);
+            var res = await Context.Companies.Include(c => c.Products).ThenInclude(p => p.Versions).ThenInclude(v => v.UpdatedBy).Include(c => c.Pricelists).FirstOrDefaultAsync(x => x.Id == id);
 
             if (res == null) throw new NotFoundException<Company>(id);
 

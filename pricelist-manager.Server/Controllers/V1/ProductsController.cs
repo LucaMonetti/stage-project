@@ -1,4 +1,5 @@
-﻿using Asp.Versioning;
+﻿using System.Security.Claims;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -77,9 +78,18 @@ namespace pricelist_manager.Server.Controllers.V1
 
             try
             {
+                // Get current user from JWT token
+                var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                if (string.IsNullOrEmpty(currentUserId))
+                {
+                    return Unauthorized("Invalid token");
+                }
+
+
                 Pricelist pricelist = await PricelistRepository.GetByIdAsync(dto.PricelistId);
-                Product data = ProductMapping.MapToProduct(dto, pricelist.CompanyId);
-                
+                Product data = ProductMapping.MapToProduct(dto, pricelist.CompanyId, currentUserId);
+
                 var res = await ProductRepository.CreateAsync(data);
                 return Ok(ProductMapping.MapToDTO(res));
             }
@@ -109,9 +119,17 @@ namespace pricelist_manager.Server.Controllers.V1
 
             try
             {
+                // Get current user from JWT token
+                var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                if (string.IsNullOrEmpty(currentUserId))
+                {
+                    return Unauthorized("Invalid token");
+                }
+
                 Product oldProd = await ProductRepository.GetByIdAsync(productId);
 
-                ProductInstance newInstance = ProductInstanceMapping.MapToProductInstance(dto, oldProd.LatestVersion + 1);
+                ProductInstance newInstance = ProductInstanceMapping.MapToProductInstance(dto, oldProd.LatestVersion + 1, currentUserId);
 
                 ProductRepository.ClearTracking();
 
@@ -125,10 +143,10 @@ namespace pricelist_manager.Server.Controllers.V1
                 if (editUpdateList != null)
                 {
                     await UpdateListRepository.UpdateProductStatusAsync(productId, editUpdateList.Value, Status.Edited);
-                    
+
                     // Check if there are still products to edit
                     var products = await UpdateListRepository.GetProductsByStatus(editUpdateList.Value, Status.Pending);
-                    if (products.Count == 0) 
+                    if (products.Count == 0)
                     {
                         var item = await UpdateListRepository.GetByIdAsync(editUpdateList.Value);
 

@@ -44,7 +44,6 @@ namespace pricelist_manager.Server.Mappers
 
         private static ProductInstance GetCurrentInstance(Product product)
         {
-            // More robust way to get current instance
             return product.Versions
                 .Where(v => v.Version == product.LatestVersion)
                 .FirstOrDefault() ?? product.Versions.OrderByDescending(v => v.Version).First();
