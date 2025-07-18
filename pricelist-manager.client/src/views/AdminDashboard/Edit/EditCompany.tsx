@@ -12,6 +12,7 @@ import { useNavigate, useParams } from "react-router";
 import { useCompany } from "../../../hooks/companies/useQueryCompanies";
 import { useEditCompany } from "../../../hooks/companies/useMutationCompanies";
 import { useAuth } from "../../../components/Authentication/AuthenticationProvider";
+import { useEffect } from "react";
 
 const config = {
   fieldset: [
@@ -103,8 +104,6 @@ const EditCompanyForm = () => {
   const { isAdmin } = useAuth();
   const navigate = useNavigate();
 
-  if (!isAdmin()) navigate("/auth/login");
-
   let data: EditCompany | undefined = undefined;
 
   const { companyId } = useParams();
@@ -123,6 +122,10 @@ const EditCompanyForm = () => {
       province: company.data?.province,
     };
   }
+
+  useEffect(() => {
+    if (!isAdmin()) navigate("/auth/login");
+  }, [isAdmin]);
 
   return (
     <div className="pb-4 px-8">

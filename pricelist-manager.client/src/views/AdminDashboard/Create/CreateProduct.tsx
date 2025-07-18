@@ -10,10 +10,7 @@ import {
 } from "../../../models/FormProduct";
 import { type Pricelist } from "../../../models/Pricelist";
 import { useCreateProduct } from "../../../hooks/products/useMutationProduct";
-import {
-  useAllPricelists,
-  useAllPricelistsByCompany,
-} from "../../../hooks/pricelists/useQueryPricelists";
+import { useAllPricelists } from "../../../hooks/pricelists/useQueryPricelists";
 import type { UseQueryResult } from "@tanstack/react-query";
 import { useAuth } from "../../../components/Authentication/AuthenticationProvider";
 import { useNavigate } from "react-router";

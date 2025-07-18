@@ -7,10 +7,7 @@ import { type Company, type CompanyFilter } from "../../../models/Company";
 import { useEffect, useState } from "react";
 import type { Table } from "@tanstack/react-table";
 import type { Config } from "../../../components/Forms/GenericForm";
-import {
-  useAllCompanies,
-  useAllCompaniesPaginated,
-} from "../../../hooks/companies/useQueryCompanies";
+import { useAllCompaniesPaginated } from "../../../hooks/companies/useQueryCompanies";
 import { useAuth } from "../../../components/Authentication/AuthenticationProvider";
 import { useNavigate } from "react-router";
 import { useDebounce } from "../../../hooks/useDebounce";
@@ -18,8 +15,6 @@ import { useDebounce } from "../../../hooks/useDebounce";
 const CompanyListView = () => {
   const { isAdmin } = useAuth();
   const navigate = useNavigate();
-
-  if (!isAdmin()) navigate("/auth/login");
 
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -58,12 +53,7 @@ const CompanyListView = () => {
     setCurrentPage(1); // Reset to first page when changing page size
   };
 
-  const handleFilterChange = (newFilters: Partial<CompanyFilter>) => {
-    setFilters((prev) => ({ ...prev, ...newFilters }));
-    setCurrentPage(1); // Reset to first page when filters change
-  };
-
-  const [table, setTable] = useState<Table<Company>>();
+  const [_, setTable] = useState<Table<Company>>();
 
   const columns: CustomColumnDef<Company>[] = [
     {
@@ -129,6 +119,10 @@ const CompanyListView = () => {
     ],
     endpoint: "products",
   } satisfies Config<CompanyFilter>;
+
+  useEffect(() => {
+    if (!isAdmin()) navigate("/auth/login");
+  }, [isAdmin]);
 
   return (
     <div className="px-8 py-4">

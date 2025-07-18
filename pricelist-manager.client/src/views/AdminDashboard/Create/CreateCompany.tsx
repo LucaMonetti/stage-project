@@ -11,12 +11,11 @@ import {
 import { useCreateCompany } from "../../../hooks/companies/useMutationCompanies";
 import { useAuth } from "../../../components/Authentication/AuthenticationProvider";
 import { useNavigate } from "react-router";
+import { useEffect } from "react";
 
 const CreateCompanyForm = () => {
   const { isAdmin } = useAuth();
   const navigate = useNavigate();
-
-  if (!isAdmin()) navigate("/auth/login");
 
   const config = {
     fieldset: [
@@ -106,6 +105,10 @@ const CreateCompanyForm = () => {
   } satisfies Config<CreateCompany>;
 
   const mutation = useCreateCompany();
+
+  useEffect(() => {
+    if (!isAdmin()) navigate("/auth/login");
+  }, [isAdmin]);
 
   return (
     <div className="pb-4 px-8">

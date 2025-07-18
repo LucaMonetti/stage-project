@@ -13,7 +13,6 @@ import {
 } from "../../../models/UpdateList";
 import { Status, StatusLabel } from "../../../types";
 import {
-  useAllUpdateLists,
   useAllUpdateListsByCompany,
   useAllUpdateListsPaged,
 } from "../../../hooks/updatelists/useQueryUpdatelists";
@@ -75,18 +74,18 @@ const UpdateListListView = () => {
 
   const handlePageSizeChange = (newPageSize: number) => {
     setPageSize(newPageSize);
-    setCurrentPage(1); // Reset to first page when changing page size
+    setCurrentPage(1);
   };
 
   const handleFilterChange = (newFilters: Partial<UpdateListFilter>) => {
     setFilters((prev) => ({ ...prev, ...newFilters }));
-    setCurrentPage(1); // Reset to first page when filters change
+    setCurrentPage(1);
   };
 
   const { data, isPending, isError, error } = updatelists;
   const companies = useAllCompanies();
 
-  const [table, setTable] = useState<Table<UpdateList>>();
+  const [_, setTable] = useState<Table<UpdateList>>();
 
   const deleteMutation = useDeleteUpdateList();
   const editStateMutation = useEditUpdateListStatus();

@@ -9,14 +9,13 @@ import { useCreateUser } from "../../../hooks/users/useMutationUsers";
 import { useAuth } from "../../../components/Authentication/AuthenticationProvider";
 import { useNavigate } from "react-router";
 import { useAllCompanies } from "../../../hooks/companies/useQueryCompanies";
+import { useEffect } from "react";
 
 const CreateUserForm = () => {
   const { isAdmin } = useAuth();
   const navigate = useNavigate();
 
   const companies = useAllCompanies();
-
-  if (!isAdmin()) navigate("/auth/login");
 
   const config = {
     fieldset: [
@@ -100,6 +99,10 @@ const CreateUserForm = () => {
   } satisfies Config<CreateUser>;
 
   const mutation = useCreateUser();
+
+  useEffect(() => {
+    if (!isAdmin()) navigate("/auth/login");
+  }, [isAdmin]);
 
   return (
     <div className="pb-4 px-8">

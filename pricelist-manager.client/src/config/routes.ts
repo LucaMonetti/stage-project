@@ -21,7 +21,6 @@ import EditUserForm from "../views/AdminDashboard/Edit/EditUser";
 import UpdateListListView from "../views/AdminDashboard/UpdateLists/ListView";
 import UpdateListSingleView from "../views/AdminDashboard/UpdateLists/SingleView";
 import CreateUpdatelistForm from "../views/AdminDashboard/Create/CreateUpdatelist";
-import Sandbox from "../views/Sandbox";
 import EditUpdatelistForm from "../views/AdminDashboard/Edit/EditUpdatelist";
 import AddProductsForm from "../views/AdminDashboard/UpdateLists/AddProducts";
 import Login from "../views/Auth/Login";
@@ -35,10 +34,6 @@ const router = createBrowserRouter([
       {
         index: true,
         Component: HomeView,
-      },
-      {
-        path: "sandbox",
-        Component: Sandbox,
       },
       {
         path: "auth/login",

@@ -10,10 +10,13 @@ import GenericForm, {
 import { useNavigate, useParams } from "react-router";
 import { useUpdateList } from "../../../hooks/updatelists/useQueryUpdatelists";
 import { useEditUpdateList } from "../../../hooks/updatelists/useMutationUpdateList";
+import { useAuth } from "../../../components/Authentication/AuthenticationProvider";
+import { useEffect } from "react";
 
 const EditUpdatelistForm = () => {
   let data: EditUpdateList | undefined = undefined;
 
+  const { user, isAdmin } = useAuth();
   const navigate = useNavigate();
 
   const { updateListId } = useParams();
@@ -59,6 +62,11 @@ const EditUpdatelistForm = () => {
       description: updatelist.data.description,
     };
   }
+
+  useEffect(() => {
+    if (!(isAdmin() || user?.company.id === updatelist.data?.companyId))
+      navigate("/auth/login");
+  }, [isAdmin, user, updatelist.data]);
 
   return (
     <div className="pb-4 px-8">

@@ -52,7 +52,7 @@ const ProductsListView = () => {
 
   const companies = useAllCompanies();
 
-  const [table, setTable] = useState<Table<Product>>();
+  const [_, setTable] = useState<Table<Product>>();
 
   const columns: CustomColumnDef<Product>[] = [
     {

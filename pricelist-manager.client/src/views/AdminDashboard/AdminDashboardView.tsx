@@ -1,7 +1,5 @@
-import { useAuth } from "../../components/Authentication/AuthenticationProvider";
 import ItenCounterGroupAdmin from "../../components/Dashboard/ItemCounter/ItenCounterGroupAdmin";
 import ItemListGroupAdmin from "../../components/Dashboard/ItemList/ItemListGroupAdmin";
-import BasicLoader from "../../components/Loader/BasicLoader";
 
 function AdminDashboardView() {
   return (

@@ -17,8 +17,6 @@ const UsersListView = () => {
   const { isAdmin } = useAuth();
   const navigate = useNavigate();
 
-  if (!isAdmin()) navigate("/auth/login");
-
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [filters, setFilters] = useState<UserFilter>({});
@@ -124,6 +122,10 @@ const UsersListView = () => {
     ],
     endpoint: "products",
   } satisfies Config<UserFilter>;
+
+  useEffect(() => {
+    if (!isAdmin()) navigate("/auth/login");
+  }, [isAdmin]);
 
   return (
     <div className="px-8 py-4">

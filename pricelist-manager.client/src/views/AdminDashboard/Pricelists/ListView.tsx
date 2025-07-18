@@ -8,10 +8,7 @@ import {
 import { useEffect, useState } from "react";
 import type { ColumnDef, Table } from "@tanstack/react-table";
 import type { Config } from "../../../components/Forms/GenericForm";
-import {
-  useAllPricelists,
-  useAllPricelistsPaginated,
-} from "../../../hooks/pricelists/useQueryPricelists";
+import { useAllPricelistsPaginated } from "../../../hooks/pricelists/useQueryPricelists";
 import { useDebounce } from "../../../hooks/useDebounce";
 import { useAllCompanies } from "../../../hooks/companies/useQueryCompanies";
 
@@ -53,7 +50,7 @@ const PricelistListView = () => {
     filters
   );
   const companies = useAllCompanies();
-  const [table, setTable] = useState<Table<Pricelist>>();
+  const [_, setTable] = useState<Table<Pricelist>>();
 
   const filterConfig = {
     fieldset: [
@@ -97,14 +94,6 @@ const PricelistListView = () => {
         className: "text-gray-500",
       },
     },
-    // {
-    //   accessorKey: "id",
-    //   header: "Listino",
-    //   meta: {
-    //     mobileLabel: "Pricelist",
-    //     className: "text-gray-500",
-    //   },
-    // },
     {
       accessorKey: "name",
       header: "Nome Listino",

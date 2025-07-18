@@ -105,13 +105,13 @@ const CreateUpdatelistForm = () => {
             navigate("/dashboard/pricelists");
           }}
         />
-        <ProductTable companyId={user?.company.id} />
+        <ProductTable />
       </GenericFormProvider>
     </div>
   );
 };
 
-function ProductTable({ companyId: initialCompanyId }: { companyId?: string }) {
+function ProductTable() {
   const [selectedItem, setSelectedItem] = useState<Product[]>([]);
   const methods = useFormContext<CreateUpdateList>();
 

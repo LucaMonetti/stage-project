@@ -11,8 +11,11 @@ import {
 import { useNavigate, useParams } from "react-router";
 import { usePricelist } from "../../../hooks/pricelists/useQueryPricelists";
 import { useEditPricelist } from "../../../hooks/pricelists/useMutationPricelists";
+import { useEffect } from "react";
+import { useAuth } from "../../../components/Authentication/AuthenticationProvider";
 
 const EditPricelistForm = () => {
+  const { user, isAdmin } = useAuth();
   const navigate = useNavigate();
 
   const config = {
@@ -67,6 +70,11 @@ const EditPricelistForm = () => {
       description: pricelist.data?.description,
     };
   }
+
+  useEffect(() => {
+    if (!(isAdmin() || user?.company.id === pricelist.data?.company.id))
+      navigate("/auth/login");
+  }, [isAdmin, user, pricelist.data]);
 
   return (
     <div className="pb-4 px-8">

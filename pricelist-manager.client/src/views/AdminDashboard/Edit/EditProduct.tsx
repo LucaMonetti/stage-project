@@ -10,13 +10,17 @@ import {
 import GenericForm from "../../../components/Forms/GenericForm";
 import { useProduct } from "../../../hooks/products/useQueryProducts";
 import { useEditProduct } from "../../../hooks/products/useMutationProduct";
+import { useEffect } from "react";
+import { useAuth } from "../../../components/Authentication/AuthenticationProvider";
 
 const EditProductForm = () => {
   let data: EditProduct | undefined = undefined;
 
+  const { user, isAdmin } = useAuth();
+
   const navigate = useNavigate();
   const { productId } = useParams();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams, _] = useSearchParams();
 
   const product = useProduct(productId ?? "");
   const mutation = useEditProduct(
@@ -135,6 +139,11 @@ const EditProductForm = () => {
       margin: product.data.currentInstance.margin ?? 1.0,
     };
   }
+
+  useEffect(() => {
+    if (!(isAdmin() || user?.company.id === product.data?.company.id))
+      navigate("/auth/login");
+  }, [isAdmin, user, product.data]);
 
   return (
     <div className="pb-4 px-8">

@@ -9,12 +9,11 @@ import { useNavigate, useParams } from "react-router";
 import { useUser } from "../../../hooks/users/useQueryUsers";
 import { useEditUser } from "../../../hooks/users/useMutationUsers";
 import { useAuth } from "../../../components/Authentication/AuthenticationProvider";
+import { useEffect } from "react";
 
 const EditUserForm = () => {
-  const { isAdmin } = useAuth();
+  const { isAdmin, user } = useAuth();
   const navigate = useNavigate();
-
-  if (!isAdmin()) navigate("/auth/login");
 
   const config = {
     fieldset: [
@@ -96,23 +95,25 @@ const EditUserForm = () => {
   let data: EditUser | undefined = undefined;
 
   const { userId } = useParams();
-  const user = useUser(userId ?? "");
+  const editUser = useUser(userId ?? "");
   const mutation = useEditUser();
 
-  if (user.data) {
+  if (editUser.data) {
     data = {
-      id: user.data.id,
-      companyId: user.data.company.id,
-      email: user.data.email,
-      firstName: user.data.firstName,
-      lastName: user.data.lastName,
-      phone: user.data.phone,
-      username: user.data.username,
+      id: editUser.data.id,
+      companyId: editUser.data.company.id,
+      email: editUser.data.email,
+      firstName: editUser.data.firstName,
+      lastName: editUser.data.lastName,
+      phone: editUser.data.phone,
+      username: editUser.data.username,
       password: "",
     };
-
-    console.log(data);
   }
+
+  useEffect(() => {
+    if (!(isAdmin() || user?.id === editUser.data?.id)) navigate("/auth/login");
+  }, [isAdmin, user, editUser.data]);
 
   return (
     <div className="pb-4 px-8">
