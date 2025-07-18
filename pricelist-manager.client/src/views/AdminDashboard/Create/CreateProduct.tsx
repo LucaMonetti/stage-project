@@ -13,11 +13,16 @@ import { useCreateProduct } from "../../../hooks/products/useMutationProduct";
 import { useAllPricelists } from "../../../hooks/pricelists/useQueryPricelists";
 import type { UseQueryResult } from "@tanstack/react-query";
 import { useAuth } from "../../../components/Authentication/AuthenticationProvider";
-import { useNavigate } from "react-router";
+import { useNavigate, useSearchParams } from "react-router";
+import CsvForm from "../../../components/Forms/CsvForm";
 
 const CreateProductForm = () => {
   const { user, isAdmin } = useAuth();
   const navigate = useNavigate();
+
+  const [searchParams] = useSearchParams();
+  const pricelistId = searchParams.get("pricelistId");
+
   let pricelists: UseQueryResult<Pricelist[], Error>;
 
   if (isAdmin()) {
@@ -157,10 +162,38 @@ const CreateProductForm = () => {
         id="create-product-form"
         method={"POST"}
         mutation={mutation}
+        values={{
+          pricelistId: pricelistId ?? "",
+          productCode: "",
+          name: "",
+          margin: 0,
+          price: 0,
+          cost: 0,
+          description: "",
+          accountingControl: "",
+          cda: "",
+          salesItem: "",
+        }}
         onSuccess={() => {
           navigate("/dashboard/products");
         }}
       />
+      {pricelistId && (
+        <>
+          <div className="my-8 flex items-center w-4/5 mx-auto">
+            <hr className="flex-1 border-gray-700" />
+            <span className="px-4 text-gray-400 text-sm">oppure</span>
+            <hr className="flex-1 border-gray-700" />
+          </div>
+
+          <CsvForm
+            pricelistId={pricelistId ?? ""}
+            onSuccess={() => {
+              navigate(`/dashboard/pricelists/${pricelistId}`);
+            }}
+          />
+        </>
+      )}
     </div>
   );
 };

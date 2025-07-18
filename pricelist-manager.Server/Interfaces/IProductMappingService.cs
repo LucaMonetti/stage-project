@@ -8,7 +8,9 @@ namespace pricelist_manager.Server.Interfaces
     {
         ProductDTO MapToDTO(Product product);
         Product MapToProduct(CreateProductDTO createProductDTO, string companyId, string userId);
+        Product MapToProduct(ProductCsvDTO csvDto, Pricelist pricelist, string userId);
 
         PagedList<ProductDTO> MapToDTOs(PagedList<Product> products);
+        public ICollection<Product> MapToProducts(ICollection<ProductCsvDTO> products, Pricelist pricelist, string userId);
     }
 }

@@ -102,5 +102,26 @@ namespace pricelist_manager.Server.Mappers
 
             return [.. products.Select(p => MapToInstanceDTO(p))];
         }
+
+        public ProductInstance MapToProductInstance(ProductCsvDTO csvDto, Pricelist pricelist, string userId)
+        {
+            ArgumentNullException.ThrowIfNull(csvDto);
+            ArgumentNullException.ThrowIfNull(pricelist);
+
+            return new ProductInstance
+            {
+                ProductId = $"{pricelist.CompanyId.ToUpper()}-{csvDto.ProductCode.ToUpper()}",
+                Name = csvDto.Name,
+                Description = csvDto.Description,
+                Price = csvDto.Price,
+                Cost = csvDto.Cost,
+                Version = 0,
+                AccountingControl = csvDto.AccountingControl,
+                CDA = csvDto.CDA,
+                SalesItem = csvDto.SalesItem,
+                Margin = csvDto.Margin,
+                UserId = userId
+            };
+        }
     }
 }

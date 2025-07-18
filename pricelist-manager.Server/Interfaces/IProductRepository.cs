@@ -1,4 +1,5 @@
-﻿using pricelist_manager.Server.DTOs.V1.QueryParams;
+﻿using pricelist_manager.Server.DTOs.V1;
+using pricelist_manager.Server.DTOs.V1.QueryParams;
 using pricelist_manager.Server.DTOs.V1.Statistics;
 using pricelist_manager.Server.Helpers;
 using pricelist_manager.Server.Models;
@@ -52,5 +53,7 @@ namespace pricelist_manager.Server.Interfaces
         Task<Boolean> ExistsIdAsync(string productId);
 
         Task<ProductStatistics> GetStatistics(string? companyId = null);
+
+        Task<Boolean> ImportProductsAsync(ICollection<Product> products, string companyId);
     }
 }

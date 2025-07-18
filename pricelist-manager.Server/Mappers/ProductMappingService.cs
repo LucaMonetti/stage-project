@@ -72,5 +72,28 @@ namespace pricelist_manager.Server.Mappers
                 Versions = [ProductInstanceMapping.MapToProductInstance(dto, companyId, userId)]
             };
         }
+
+        public Product MapToProduct(ProductCsvDTO csvDto, Pricelist pricelist, string userId)
+        {
+            ArgumentNullException.ThrowIfNull(csvDto);
+            ArgumentNullException.ThrowIfNull(pricelist);
+
+            return new Product
+            {
+                Id = $"{pricelist.CompanyId.ToUpper()}-{csvDto.ProductCode.ToUpper()}",
+                PricelistId = pricelist.Id,
+                ProductCode = csvDto.ProductCode.ToUpper(),
+                CompanyId = pricelist.CompanyId.ToUpper(),
+                LatestVersion = 0,
+                Versions = [ProductInstanceMapping.MapToProductInstance(csvDto, pricelist, userId)]
+            };
+        }
+
+        public ICollection<Product> MapToProducts(ICollection<ProductCsvDTO> products, Pricelist pricelist, string userId)
+        {
+            ArgumentNullException.ThrowIfNull(products);
+
+            return [.. products.Select(p => MapToProduct(p, pricelist, userId))];
+        }
     }
 }

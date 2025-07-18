@@ -228,5 +228,17 @@ namespace pricelist_manager.Server.Repositories
 
             return await PagedList<IGrouping<Guid, Product>>.ToPagedList(groupedProd, requestParams.Pagination.PageNumber, requestParams.Pagination.PageSize);
         }
+
+        public async Task<bool> ImportProductsAsync(ICollection<Product> products, string companyId)
+        {
+            if (!CanConnect()) throw new StorageUnavailableException();
+
+            var existringProducts = Context.Products.Where(p => p.CompanyId == companyId).Select(p => p.Id).ToHashSet();
+
+            Context.Products.AddRange(products.Where(p => !existringProducts.Contains(p.Id)));
+            var res = await Context.SaveChangesAsync();
+
+            return res > 0;
+        }
     }
 }

@@ -9,6 +9,7 @@ namespace pricelist_manager.Server.Interfaces
 
         public ProductInstance MapToProductInstance(CreateProductDTO dto, string companyId, string userId);
         public ProductInstance MapToProductInstance(UpdateProductDTO dto, int version, string userId);
+        public ProductInstance MapToProductInstance(ProductCsvDTO dto, Pricelist pricelist, string userId);
         public ProductInstance MapToProductInstance(ProductInstanceDTO dto);
 
         ICollection<ProductInstanceDTO> MapToInstanceDTOs(ICollection<ProductInstance> products);

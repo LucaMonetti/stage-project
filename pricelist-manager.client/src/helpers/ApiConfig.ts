@@ -7,7 +7,7 @@ interface ApiConfig {
 interface ApiConfigOptions {
   body?: any;
   token?: string;
-  contentType?: string;
+  contentType?: string | null;
 }
 
 class ApiConfigFactory {
@@ -21,17 +21,24 @@ class ApiConfigFactory {
   ): ApiConfig {
     const { body, token, contentType = "application/json" } = options;
 
-    const config: ApiConfig = {
+    let config: Partial<ApiConfig> = {
       method: method as ApiConfig["method"],
-      headers: {
-        "Content-Type": contentType,
-      },
     };
+
+    if (contentType != null) {
+      config.headers = {
+        ...config.headers,
+        "Content-Type": contentType,
+      };
+    }
 
     // Add authorization header
     const authToken = token || this.getToken();
     if (authToken) {
-      config.headers["Authorization"] = `Bearer ${authToken}`;
+      config.headers = {
+        ...config.headers,
+        Authorization: `Bearer ${authToken}`,
+      };
     }
 
     // Add body for POST and PUT requests
@@ -39,7 +46,7 @@ class ApiConfigFactory {
       config.body = typeof body === "string" ? body : JSON.stringify(body);
     }
 
-    return config;
+    return config as ApiConfig;
   }
 
   get(options?: Omit<ApiConfigOptions, "body">): ApiConfig {
@@ -48,6 +55,16 @@ class ApiConfigFactory {
 
   post(body: any, options?: Omit<ApiConfigOptions, "body">): ApiConfig {
     return this.createConfig("POST", { ...options, body });
+  }
+
+  postFormData(body: any): Partial<ApiConfig> {
+    return {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${this.getToken()}`,
+      },
+      body: body,
+    };
   }
 
   put(body: any, options?: Omit<ApiConfigOptions, "body">): ApiConfig {

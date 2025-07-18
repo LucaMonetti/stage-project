@@ -97,3 +97,42 @@ export const useEditProduct = (
     },
   });
 };
+
+// Upload CSV function
+const uploadProductsCsv = async (
+  pricelistId: string,
+  csvFile: File
+): Promise<boolean> => {
+  const formData = new FormData();
+  formData.append("file", csvFile);
+
+  const response = await fetch(
+    QueryEndpoint.buildUrl(`import/pricelists/${pricelistId}`),
+    apiConfig.postFormData(formData)
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to upload CSV file");
+  }
+
+  return true;
+};
+
+// Custom hook for CSV upload mutation
+export const useUploadProductsCsv = (options?: UseCreateOptions<boolean>) => {
+  const queryClient = useQueryClient();
+
+  return useMutation<boolean, Error, { pricelistId: string; csvFile: File }>({
+    mutationFn: ({ pricelistId, csvFile }) =>
+      uploadProductsCsv(pricelistId, csvFile),
+    onSuccess: (data) => {
+      // Invalidate products queries to refresh the data
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      queryClient.invalidateQueries({ queryKey: ["pricelists"] });
+      options?.onSuccess?.(data);
+    },
+    onError: (err) => {
+      options?.onError?.(err);
+    },
+  });
+};
