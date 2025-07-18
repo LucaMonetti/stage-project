@@ -7,6 +7,8 @@ import { usePricelist } from "../../../hooks/pricelists/useQueryPricelists";
 import { useAllProductByPricelist } from "../../../hooks/products/useQueryProducts";
 import { useAuth } from "../../../components/Authentication/AuthenticationProvider";
 import type { Action } from "../../../components/Buttons/ActionRenderer";
+import { useEffect, useState } from "react";
+import { useExportCSV } from "../../../hooks/exports/useExportQuery";
 
 const SinglePricelistView = () => {
   const navigate = useNavigate();
@@ -14,6 +16,15 @@ const SinglePricelistView = () => {
   const { isAdmin, user } = useAuth();
 
   const { data, isPending, isError } = usePricelist(pricelistId ?? "");
+
+  const [exportData, setExportData] = useState<boolean>(false);
+  const exportCSV = useExportCSV(`pricelists/${pricelistId}`, {
+    enabled: exportData,
+  });
+
+  useEffect(() => {
+    setExportData(false);
+  }, [exportCSV.isSuccess]);
 
   const {
     data: productsData,
@@ -26,8 +37,10 @@ const SinglePricelistView = () => {
     {
       color: "blue",
       Icon: FaDownload,
-      type: "link",
-      route: `/dashboard/download/pricelists/${pricelistId}`,
+      type: "button",
+      handler: () => {
+        setExportData(true);
+      },
       text: "Scarica",
     },
   ];

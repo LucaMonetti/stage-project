@@ -15,17 +15,26 @@ import { useAuth } from "../../../components/Authentication/AuthenticationProvid
 import { useEffect, useState } from "react";
 import type { PricelistFilter } from "../../../models/Pricelist";
 import { useDebounce } from "../../../hooks/useDebounce";
+import { useExportCSV } from "../../../hooks/exports/useExportQuery";
 
 const SingleCompanyView = () => {
   const { companyId } = useParams();
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [filters, setFilters] = useState<PricelistFilter>({
-    company_id: "CON",
+    company_id: companyId,
   });
   const [nameInput, setNameInput] = useState("");
+  const [exportData, setExportData] = useState<boolean>(false);
 
   const debouncedNameInput = useDebounce(nameInput, 800);
+  const exportCSV = useExportCSV(`companies/${companyId}`, {
+    enabled: exportData,
+  });
+
+  useEffect(() => {
+    setExportData(false);
+  }, [exportCSV.isSuccess]);
 
   useEffect(() => {
     setFilters((prev) => ({
@@ -91,26 +100,8 @@ const SingleCompanyView = () => {
             color: "blue",
             type: "button",
             Icon: FaDownload,
-            handler: async () => {
-              const url = `/api/v1/export/companies/${companyId}`;
-
-              let res = await fetch(url, {
-                method: "GET",
-                headers: {
-                  Accept: "application/csv",
-                  "Content-Type": "application/csv",
-                },
-              });
-
-              if (res.ok) {
-                const blob = await res.blob();
-                const link = document.createElement("a");
-                link.href = URL.createObjectURL(blob);
-                link.setAttribute("download", `${company?.name}.csv`);
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-              }
+            handler: () => {
+              setExportData(true);
             },
             text: "Scarica",
           },

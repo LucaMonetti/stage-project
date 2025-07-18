@@ -12,10 +12,21 @@ import {
 } from "../../../hooks/updatelists/useQueryUpdatelists";
 import ActionRenderer from "../../../components/Buttons/ActionRenderer";
 import { useDeleteUpdatelistProduct } from "../../../hooks/updatelists/useMutationUpdateList";
+import { useEffect, useState } from "react";
+import { useExportCSV } from "../../../hooks/exports/useExportQuery";
 
 const UpdateListSingleView = () => {
   const navigate = useNavigate();
   const { updateListId } = useParams();
+
+  const [exportData, setExportData] = useState<boolean>(false);
+  const exportCSV = useExportCSV(`updatelists/${updateListId}`, {
+    enabled: exportData,
+  });
+
+  useEffect(() => {
+    setExportData(false);
+  }, [exportCSV.isSuccess]);
 
   const { data, isPending, isError } = useUpdateList(updateListId ?? "");
   const deleteMutation = useDeleteUpdatelistProduct();
@@ -128,9 +139,11 @@ const UpdateListSingleView = () => {
           },
           {
             color: "blue",
-            type: "link",
+            type: "button",
             Icon: FaDownload,
-            route: `/dashboard/download/updatelists/${updateListId}`,
+            handler: () => {
+              setExportData(true);
+            },
             text: "Scarica",
           },
         ]}

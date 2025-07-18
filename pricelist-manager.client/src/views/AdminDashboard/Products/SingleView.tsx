@@ -25,15 +25,7 @@ const SingleProductView = () => {
     );
   }
 
-  const actions: Action[] = [
-    {
-      color: "blue",
-      type: "link",
-      Icon: FaDownload,
-      route: `/dashboard/download/products/${productId}`,
-      text: "Scarica",
-    },
-  ];
+  const actions: Action[] = [];
 
   if (isAdmin() || user?.company.id === data?.company.id) {
     actions.unshift({

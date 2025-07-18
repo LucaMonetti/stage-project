@@ -88,7 +88,6 @@ function TopBar() {
                   Icon={FaUser}
                   color="red"
                   text="Logout"
-                  className="flex items-center gap-2"
                 />
               </div>
             </div>
