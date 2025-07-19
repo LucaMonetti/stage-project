@@ -48,7 +48,6 @@ namespace pricelist_manager.Server.Controllers.V1
                 return BadRequest("File is required.");
             }
 
-            // Optional: Validate file type
             if (!Path.GetExtension(file.FileName).Equals(".csv", StringComparison.OrdinalIgnoreCase))
             {
                 return BadRequest("Only .csv files are allowed.");
@@ -92,7 +91,7 @@ namespace pricelist_manager.Server.Controllers.V1
                     return BadRequest("No records found in the CSV file.");
                 }
 
-                await ProductRepository.ImportProductsAsync(ProductMapping.MapToProducts(records, pricelist, currentUserId), pricelist.CompanyId);
+                await ProductRepository.ImportProductsAsync(ProductMapping.MapToProducts(records, pricelist, currentUserId));
                 return Ok();
             }
             catch (BadDataException ex)
