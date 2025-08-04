@@ -91,7 +91,7 @@ namespace pricelist_manager.Server.Controllers.V1
                     return BadRequest("No records found in the CSV file.");
                 }
 
-                await ProductRepository.ImportProductsAsync(ProductMapping.MapToProducts(records, pricelist, currentUserId));
+                await ProductRepository.ImportProductsAsync(ProductMapping.MapToProducts(records, pricelist, currentUserId), pricelist.CompanyId);
                 return Ok();
             }
             catch (BadDataException ex)

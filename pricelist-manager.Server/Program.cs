@@ -175,7 +175,7 @@ namespace pricelist_manager.Server
                             PostalCode = "00000",
                             Province = "Default",
                             Phone = "0000000000",
-                            LogoUri = "",
+                            LogoUri = "/src/assets/companies/default.png",
                             InterfaceColor = "#000000"
                         };
 
@@ -189,6 +189,7 @@ namespace pricelist_manager.Server
                             Email = "admin@admin.com",
                             FirstName = "Admin",
                             LastName = "Admin",
+                            PhoneNumber = "0000000000",
                             CompanyId = defaultCompany.Id,
                             EmailConfirmed = true
                         };
@@ -200,7 +201,6 @@ namespace pricelist_manager.Server
                             await userManager.AddToRoleAsync(adminUser, "Admin");
                             Console.WriteLine("Default admin user created successfully!");
                             Console.WriteLine("Email: admin@admin.com");
-                            Console.WriteLine("Password: Admin123!");
                         }
                         else
                         {

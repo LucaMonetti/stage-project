@@ -125,7 +125,7 @@ const CreateUserForm = () => {
         method={"POST"}
         mutation={mutation}
         onSuccess={() => {
-          navigate("/dashboard/pricelists");
+          navigate("/dashboard/users");
         }}
       />
     </div>

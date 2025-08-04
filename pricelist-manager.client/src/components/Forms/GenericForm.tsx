@@ -24,6 +24,7 @@ import type { Product } from "../../models/Product";
 import isEqual from "lodash.isequal";
 import type { UseMutationResult, UseQueryResult } from "@tanstack/react-query";
 import BasicLoader from "../Loader/BasicLoader";
+import FileInput from "./FileInput";
 
 type InferredZodSchema<T extends FieldValues> = z.ZodType<T, any, any>;
 
@@ -72,6 +73,11 @@ interface TextAreaInput<T extends FieldValues> extends BaseInput<T> {
   maxLength?: number;
 }
 
+interface FileInput<T extends FieldValues> extends BaseInput<T> {
+  type: "file";
+  accept: string[];
+}
+
 interface SearchableInput<T extends FieldValues> extends BaseInput<T> {
   type: "searchable";
   maxLength?: number;
@@ -84,7 +90,8 @@ export type InputConfig<T extends FieldValues> =
   | SimpleInput<T>
   | NumberInput<T>
   | SearchableInput<T>
-  | TextAreaInput<T>;
+  | TextAreaInput<T>
+  | FileInput<T>;
 
 interface FieldSet<T extends FieldValues> {
   title: string;
@@ -208,6 +215,15 @@ function RenderInputField<T extends FieldValues>(
     case "textarea":
       return (
         <Textarea key={key} isDisabled={input.isDisabled} {...commonProps} />
+      );
+    case "file":
+      return (
+        <FileInput
+          key={key}
+          isDisabled={input.isDisabled}
+          {...commonProps}
+          accept={input.accept}
+        />
       );
   }
 }
