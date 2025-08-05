@@ -4,7 +4,7 @@
     {
     }
 
-    public class PaginationParameters : QueryParameters
+    public class PaginationParams : QueryParameters
     {
         private const int MaxPageSize = 50;
         private int _pageSize = 10;
@@ -23,7 +23,7 @@
 
     public static partial class QueryableExtensions
     {
-        public static IQueryable<T> ApplyPagination<T>(this IQueryable<T> source, PaginationParameters pagination)
+        public static IQueryable<T> ApplyPagination<T>(this IQueryable<T> source, PaginationParams pagination)
         {
             if (pagination == null)
             {

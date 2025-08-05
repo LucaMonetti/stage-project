@@ -11,7 +11,7 @@
 
     public class ProductQueryParams : QueryParameters
     {
-        public PaginationParameters Pagination { get; set; } = new PaginationParameters();
+        public PaginationParams Pagination { get; set; } = new PaginationParams();
         public ProductFiltersQueryParams? Filters { get; set; } = new ProductFiltersQueryParams();
     }
 }

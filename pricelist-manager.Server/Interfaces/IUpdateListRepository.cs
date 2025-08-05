@@ -9,8 +9,8 @@ namespace pricelist_manager.Server.Interfaces
     {
         Task<PagedList<UpdateList>> GetAllAsync(UpdateListQueryParams requestParams);
         Task<PagedList<Product>> GetAvailableProducts(int id, ProductQueryParams requestParams);
-        Task<ICollection<ProductToUpdateList>> GetProductsByList(int id, UpdateListQueryParams requestParams);
-        Task<ICollection<ProductToUpdateList>> GetProductsByList(int id);
+        Task<PagedList<ProductToUpdateList>> GetProductsByList(int id, UpdateListQueryParams requestParams);
+        Task<ICollection<ProductToUpdateList>> GetAllProductsByList(int id);
         Task<ProductToUpdateList> GetProductByCode(int updatelistId, string productId);
         Task<ICollection<ProductToUpdateList>> GetProductsByStatus(int updateListId, Status status);
         Task<PagedList<UpdateList>> GetByCompanyAsync(string companyId, UpdateListQueryParams requestParams);

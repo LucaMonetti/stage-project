@@ -7,7 +7,7 @@
 
     public class PricelistQueryParams : QueryParameters
     {
-        public PaginationParameters Pagination { get; set; } = new PaginationParameters();
+        public PaginationParams Pagination { get; set; } = new PaginationParams();
         public PricelistFilterQueryParams? Filters { get; set; } = new PricelistFilterQueryParams();
     }
 }

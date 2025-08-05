@@ -23,6 +23,32 @@ const UpdateListSingleView = () => {
   const { updateListId } = useParams();
   const { isAdmin, user } = useAuth();
 
+  // To Update Products pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handlePageSizeChange = (newPageSize: number) => {
+    setPageSize(newPageSize);
+    setCurrentPage(1); // Reset to first page when changing page size
+  };
+
+  // Updated Products pagination state
+  const [currentPageUpdated, setCurrentPageUpdated] = useState(1);
+  const [pageSizeUpdated, setPageSizeUpdated] = useState(10);
+
+  const handleUpdatedProductPageChange = (page: number) => {
+    setCurrentPageUpdated(page);
+  };
+
+  const handleUpdateProductPageSizeChange = (newPageSize: number) => {
+    setPageSizeUpdated(newPageSize);
+    setCurrentPageUpdated(1); // Reset to first page when changing page size
+  };
+
   const [exportData, setExportData] = useState<boolean>(false);
   const exportCSV = useExportCSV(`updatelists/${updateListId}`, {
     enabled: exportData,
@@ -40,13 +66,20 @@ const UpdateListSingleView = () => {
     isLoading: isToUpdateProductsLoading,
     isError: isToUpdateProductsError,
     error: toUpdateProductsError,
-  } = useProductsByStatus(updateListId ?? "", Status.Pending);
+  } = useProductsByStatus(updateListId ?? "", Status.Pending, {
+    CurrentPage: currentPage,
+    PageSize: pageSize,
+  });
+
   const {
     data: updatedProducts,
     isLoading: isUpdatedProductsLoading,
     isError: isUpdatedProductsError,
     error: updatedProductsError,
-  } = useProductsByStatus(updateListId ?? "", Status.Edited);
+  } = useProductsByStatus(updateListId ?? "", Status.Edited, {
+    CurrentPage: currentPageUpdated,
+    PageSize: pageSizeUpdated,
+  });
 
   let actions: Action[] = [
     {
@@ -172,7 +205,7 @@ const UpdateListSingleView = () => {
             route: `/dashboard/updatelists/${updateListId}/products`,
           },
         ]}
-        data={toUpdateProducts ?? []}
+        data={toUpdateProducts?.items ?? []}
         isPending={isToUpdateProductsLoading}
         isError={isToUpdateProductsError}
         error={toUpdateProductsError}
@@ -183,11 +216,14 @@ const UpdateListSingleView = () => {
           columnId: { ":pid": "id" },
         }}
         keyField="id"
+        pagination={toUpdateProducts?.pagination}
+        onPageChange={handlePageChange}
+        onPageSizeChange={handlePageSizeChange}
       />
 
       <TableWidget
         title="Prodotti aggiornati"
-        data={updatedProducts ?? []}
+        data={updatedProducts?.items ?? []}
         isPending={isUpdatedProductsLoading}
         isError={isUpdatedProductsError}
         error={updatedProductsError}
@@ -198,6 +234,9 @@ const UpdateListSingleView = () => {
           columnId: { ":pid": "id" },
         }}
         keyField="id"
+        pagination={updatedProducts?.pagination}
+        onPageChange={handleUpdatedProductPageChange}
+        onPageSizeChange={handleUpdateProductPageSizeChange}
       />
     </div>
   );

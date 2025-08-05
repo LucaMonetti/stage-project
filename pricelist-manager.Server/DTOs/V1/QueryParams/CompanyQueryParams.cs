@@ -2,6 +2,6 @@
 {
     public class CompanyQueryParams : QueryParameters
     {
-        public PaginationParameters Pagination { get; set; } = new PaginationParameters();
+        public PaginationParams Pagination { get; set; } = new PaginationParams();
     }
 }

@@ -207,6 +207,28 @@ const UpdateListListView = () => {
               handleFilterChange({ companyId: value || undefined });
             },
           },
+          {
+            id: "status",
+            label: "Stato",
+            type: "searchable",
+            placeholder: "Selezionare stato...",
+            fetchData: {
+              isPending: false,
+              data: Object.entries(StatusLabel).map(([value, label]) => ({
+                value,
+                label,
+              })),
+              error: null,
+              isError: false,
+            } as any as UseQueryResult<
+              { value: string; label: string }[],
+              Error
+            >,
+            schema: "status",
+            onChange: (value: any) => {
+              handleFilterChange({ status: value || undefined });
+            },
+          },
         ],
       },
     ],

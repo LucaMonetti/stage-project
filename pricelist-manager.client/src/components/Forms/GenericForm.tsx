@@ -25,6 +25,7 @@ import isEqual from "lodash.isequal";
 import type { UseMutationResult, UseQueryResult } from "@tanstack/react-query";
 import BasicLoader from "../Loader/BasicLoader";
 import FileInput from "./FileInput";
+import type { Status } from "../../types";
 
 type InferredZodSchema<T extends FieldValues> = z.ZodType<T, any, any>;
 
@@ -81,8 +82,11 @@ interface FileInput<T extends FieldValues> extends BaseInput<T> {
 interface SearchableInput<T extends FieldValues> extends BaseInput<T> {
   type: "searchable";
   maxLength?: number;
-  schema: "pricelist" | "product" | "company";
-  fetchData: UseQueryResult<Pricelist[] | Product[] | Company[], Error>;
+  schema: "pricelist" | "product" | "company" | "status";
+  fetchData: UseQueryResult<
+    Pricelist[] | Product[] | Company[] | { value: string; label: string }[],
+    Error
+  >;
   onChange?: (value: string) => void;
 }
 
@@ -208,6 +212,24 @@ function RenderInputField<T extends FieldValues>(
               getValue={(p) => p.id}
               isClearable={!input.isDisabled}
               isMulti={true}
+            />
+          );
+        case "status":
+          return (
+            <SearchSelect<T, { value: string; label: string }>
+              key={key}
+              isDisabled={input.isDisabled}
+              {...commonProps}
+              control={control}
+              fetchData={
+                input.fetchData as UseQueryResult<
+                  { value: string; label: string }[]
+                >
+              }
+              onChange={input.onChange ?? undefined}
+              getLabel={(s) => `${s.label}`}
+              getValue={(s) => s.value}
+              isClearable={!input.isDisabled}
             />
           );
       }

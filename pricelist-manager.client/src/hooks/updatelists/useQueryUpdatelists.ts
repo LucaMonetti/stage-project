@@ -61,11 +61,22 @@ const fetchAllUpdateListsPaged = async (
   filters?: UpdateListFilter
 ): Promise<PaginatedResponse<UpdateList>> => {
   const searchParams = new URLSearchParams();
+
+  console.log(
+    "Fetching updatelists with params:",
+    params,
+    "and filters:",
+    filters
+  );
+
   ParsePaginationSearchParams(params, searchParams);
   ParseFiltersSearchParams(filters, searchParams, updatelistFilterConfig);
 
   const response = await fetch(
-    QueryEndpoint.buildUrl("updatelists"),
+    QueryEndpoint.buildUrl(
+      "updatelists" +
+        (searchParams.toString() ? `?${searchParams.toString()}` : "")
+    ),
     apiConfig.get()
   );
   if (!response.ok) {
@@ -119,25 +130,49 @@ export const useUpdateList = (updatelistId: string) => {
 // Fetch a single updatelist by ID from the API
 const fetchProductToUpdatelistByStatus = async (
   updatelistId: string,
-  status: Status
-): Promise<UpdateListProduct[]> => {
+  status: Status,
+  params: PaginationParams
+): Promise<PaginatedResponse<UpdateListProduct>> => {
+  const searchParams = new URLSearchParams();
+
+  ParsePaginationSearchParams(params, searchParams);
+
   const response = await fetch(
     QueryEndpoint.buildUrl(
-      `updatelists/${updatelistId}/products?status=${status}`
+      `updatelists/${updatelistId}/products?${searchParams.toString()}&Filters.Status=${status}`
     ),
     apiConfig.get()
   );
   if (!response.ok) {
     throw new Error("Failed to fetch updatelist");
   }
+
+  const paginationInfo = ParsePaginationHeader(response);
+
   const rawData = await response.json();
-  return UpdateListProductArraySchema.parse(rawData);
+
+  return {
+    items: UpdateListProductArraySchema.parse(rawData),
+    pagination: paginationInfo,
+  };
 };
 
-export const useProductsByStatus = (updatelistId: string, status: Status) => {
-  return useQuery<UpdateListProduct[]>({
-    queryKey: ["updatelists", updatelistId, "products-to-updatelist", status],
-    queryFn: () => fetchProductToUpdatelistByStatus(updatelistId, status),
+export const useProductsByStatus = (
+  updatelistId: string,
+  status: Status,
+  params: PaginationParams
+) => {
+  return useQuery<PaginatedResponse<UpdateListProduct>>({
+    queryKey: [
+      "updatelists",
+      updatelistId,
+      "products-to-updatelist",
+      params?.CurrentPage ?? 1,
+      params?.PageSize ?? 0,
+      status,
+    ],
+    queryFn: () =>
+      fetchProductToUpdatelistByStatus(updatelistId, status, params),
   });
 };
 
@@ -165,7 +200,10 @@ const fetchAllUpdateListsByCompany = async (
   );
 
   const response = await fetch(
-    QueryEndpoint.buildUrl(`companies/${companyId}/updatelists`),
+    QueryEndpoint.buildUrl(
+      `companies/${companyId}/updatelists` +
+        (searchParams.toString() ? `?${searchParams.toString()}` : "")
+    ),
     apiConfig.get()
   );
   if (!response.ok) {

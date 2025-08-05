@@ -75,7 +75,7 @@ namespace pricelist_manager.Server.Controllers.V1
         }
 
         [HttpGet("{id:int}/products")]
-        public async Task<ActionResult<ProductDTO>> GetProductsById(int id, [FromQuery] UpdateListQueryParams requestParams)
+        public async Task<ActionResult<PagedList<ProductDTO>>> GetProductsById(int id, [FromQuery] UpdateListQueryParams requestParams)
         {
             if (!ModelState.IsValid)
             {
@@ -85,6 +85,9 @@ namespace pricelist_manager.Server.Controllers.V1
             try
             {
                 var data = await UpdateListRepository.GetProductsByList(id, requestParams);
+
+                Response.Headers["X-Pagination"] = JsonConvert.SerializeObject(MetadataMapping.MapToMetadata(data));
+
                 return Ok(ProductToUpdateListMappingService.MapToDTOs(data));
             }
             catch (NotFoundException<UpdateList> e)
@@ -163,7 +166,7 @@ namespace pricelist_manager.Server.Controllers.V1
             try
             {
                 // Sync products list
-                var existingProducts = await UpdateListRepository.GetProductsByList(id);
+                var existingProducts = await UpdateListRepository.GetAllProductsByList(id);
                 var existingProductIds = existingProducts.Select(p => p.ProductId).ToHashSet();
 
                 var newProducts = ProductToUpdateListMappingService.MapToModels(dto.Id, dto.ProductIds ?? []);
