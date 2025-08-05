@@ -19,6 +19,10 @@ import { useAllCompanies } from "../../../hooks/companies/useQueryCompanies";
 import { useNavigate } from "react-router";
 import type { Product, ProductFilter } from "../../../models/Product";
 import { useDebounce } from "../../../hooks/useDebounce";
+import {
+  useAllPricelists,
+  useAllPricelistsByCompany,
+} from "../../../hooks/pricelists/useQueryPricelists";
 
 const CreateUpdatelistForm = () => {
   const { user, isAdmin } = useAuth();
@@ -132,6 +136,8 @@ function ProductTable() {
     filters
   );
 
+  const pricelist = useAllPricelists({ company_id: formCompanyId });
+
   useEffect(() => {
     setFilters((prev) => ({
       ...prev,
@@ -165,6 +171,11 @@ function ProductTable() {
     setCurrentPage(1); // Reset to first page when changing page size
   };
 
+  const handleFilterChange = (newFilters: Partial<ProductFilter>) => {
+    setFilters((prev) => ({ ...prev, ...newFilters }));
+    setCurrentPage(1);
+  };
+
   return (
     <GenericTableView
       data={products.data?.items || []}
@@ -179,6 +190,11 @@ function ProductTable() {
       }}
       columns={[
         {
+          id: "id",
+          header: "Codice Prodotto",
+          accessorFn: (item) => item.id,
+        },
+        {
           id: "name",
           header: "Name",
           accessorFn: (item) => item.currentInstance.name,
@@ -186,12 +202,20 @@ function ProductTable() {
         {
           id: "price",
           header: "Price",
-          accessorFn: (item) => item.currentInstance.price,
+          meta: {
+            className: "font-medium text-green-600 whitespace-nowrap",
+          },
+          accessorFn: (row: Product) =>
+            `${row.currentInstance.price.toFixed(2)} €`,
         },
         {
-          id: "description",
-          header: "Description",
-          accessorFn: (item) => item.id,
+          id: "cost",
+          header: "Costo",
+          meta: {
+            className: "font-medium text-red-600 whitespace-nowrap",
+          },
+          accessorFn: (row: Product) =>
+            `${row.currentInstance.cost.toFixed(2)} €`,
         },
       ]}
       selectedItems={selectedItem}
@@ -220,6 +244,17 @@ function ProductTable() {
                 outerClass: "flex-1",
                 onChange: (e) => {
                   setProductCodeInput(e.target.value);
+                },
+              },
+              {
+                id: "pricelistId",
+                label: "Codice Listino",
+                type: "searchable",
+                fetchData: pricelist,
+                schema: "pricelist",
+                placeholder: "Seleziona il listino",
+                onChange: (value: any) => {
+                  handleFilterChange({ pricelist_id: value || undefined });
                 },
               },
             ],

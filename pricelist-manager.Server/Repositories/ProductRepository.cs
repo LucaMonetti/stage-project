@@ -58,6 +58,11 @@ namespace pricelist_manager.Server.Repositories
                 {
                     query = query.Where(p => p.CompanyId == requestParams.Filters.CompanyId);
                 }
+
+                if (requestParams.Filters.PricelistId.HasValue)
+                {
+                    query = query.Where(p => p.PricelistId == requestParams.Filters.PricelistId.Value);
+                }
             }
 
             query = query

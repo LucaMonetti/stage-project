@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router";
 import BasicLoader from "../../Loader/BasicLoader";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import type { FieldValues, Path } from "react-hook-form";
 import {
   flexRender,
@@ -66,23 +66,29 @@ const PaginationControls = ({
 }) => {
   const { currentPage, totalPages, totalCount, pageSize } = pagination;
 
+  console.log(pageSize);
+
   return (
     <div className="flex items-center justify-between px-6 py-3 bg-gray-800 border-t border-gray-700">
       <div className="flex items-center space-x-2">
         <span className="text-sm text-gray-400">Mostra</span>
         <select
-          value={pageSize}
-          onChange={(e) =>
-            onPageSizeChange && onPageSizeChange(Number(e.target.value))
-          }
+          value={pageSize == totalCount ? -1 : pageSize}
+          onChange={(e) => {
+            const newValue = Number(e.target.value);
+            onPageSizeChange && onPageSizeChange(newValue);
+          }}
           className="px-3 py-1 bg-gray-700 border border-gray-600 rounded text-sm"
         >
           <option value={10}>10</option>
           <option value={25}>25</option>
           <option value={50}>50</option>
           <option value={100}>100</option>
+          <option value={-1}>Tutti</option>
         </select>
-        <span className="text-sm text-gray-400">di {totalCount} risultati</span>
+        <span className="text-sm text-gray-400">
+          {pageSize == totalCount ? "i" : "di"} {totalCount} risultati
+        </span>
       </div>
 
       <div className="flex items-center space-x-1">
@@ -148,6 +154,7 @@ function GenericTableView<
   onPageSizeChange,
 }: Prods<T, TFilter>) {
   const navigate = useNavigate();
+  const [selectedAll, setSelectedAll] = useState(false);
 
   const table = useReactTable({
     data: data ?? [],
@@ -155,17 +162,21 @@ function GenericTableView<
     getCoreRowModel: getCoreRowModel(),
   });
 
-  const handleRowSelect = (item: T) => {
-    if (onRowSelect) {
-      onRowSelect(item);
-    }
-  };
-
   const isRowSelected = (item: T) => {
     if (!selectedItems) return false;
     return selectedItems.some(
       (selectedItem) => selectedItem[keyField] === item[keyField]
     );
+  };
+
+  const handleRowSelect = (item: T) => {
+    if (onRowSelect) {
+      onRowSelect(item);
+
+      if (!isRowSelected(item) && selectedAll) {
+        setSelectedAll(false);
+      }
+    }
   };
 
   const getValue = (key: keyof T, row: T) => {
@@ -228,7 +239,11 @@ function GenericTableView<
       {enableCheckbox && (
         <div className="bg-gray-800 rounded p-4 border-2 border-gray-700 my-4">
           <p className="text-sm">
-            {selectedItems?.length ?? 0} Prodott
+            {pagination?.totalCount ?? 0} Element
+            {pagination?.totalCount !== 1 ? "i" : "o"} -{" "}
+            {selectedItems?.length ?? 0} Element
+            {selectedItems?.length !== 1 ? "i " : "o "}
+            Selezionat
             {selectedItems?.length !== 1 ? "i" : "o"}
           </p>
         </div>
@@ -244,16 +259,19 @@ function GenericTableView<
                     <input
                       type="checkbox"
                       className="rounded"
+                      checked={
+                        data && data.length > 0
+                          ? data.every((item) => isRowSelected(item))
+                          : false
+                      }
+                      disabled={!data || data.length === 0}
                       onChange={() => {
                         if (!data) return;
-                        const allSelected =
-                          selectedItems &&
-                          data.every((item) =>
-                            selectedItems.some(
-                              (selected) =>
-                                selected[keyField] === item[keyField]
-                            )
-                          );
+
+                        const allSelected = data.every((item) =>
+                          isRowSelected(item)
+                        );
+
                         if (allSelected) {
                           // Deselect all
                           data.forEach((item) => {
@@ -380,7 +398,7 @@ function GenericTableView<
                   colSpan={columns.length + (enableCheckbox ? 1 : 0)}
                   className="px-6 py-4 text-sm text-gray-500"
                 >
-                  Non sono stati registrati prodotti all'interno del database!
+                  Non sono stati registrati elementi all'interno del database!
                 </td>
               </tr>
             </tbody>

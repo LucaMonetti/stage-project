@@ -267,6 +267,13 @@ function GenericActualForm<T extends FieldValues>({
           onSuccess(responseData);
         }
       },
+      onError: (error) => {
+        methods.setError("root", { type: "server", message: error.message });
+
+        if (errorDiv.current) {
+          errorDiv.current.scrollIntoView({ behavior: "smooth" });
+        }
+      },
     });
   };
 
@@ -284,7 +291,10 @@ function GenericActualForm<T extends FieldValues>({
       id={id}
     >
       {methods.formState.errors.root && (
-        <div className="bg-opacity-10 border border-l-8 border-red-400 p-3 rounded-r-md">
+        <div
+          className="bg-opacity-10 border border-l-8 border-red-400 p-3 rounded-r-md"
+          ref={errorDiv}
+        >
           <div className="flex items-center gap-2">
             <FaExclamation className="text-red-400" />
             <span className="text-red-400">

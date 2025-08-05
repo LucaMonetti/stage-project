@@ -169,12 +169,12 @@ namespace pricelist_manager.Server
                         // Create default company first
                         var defaultCompany = new Company
                         {
-                            Id = "ADMIN001",
-                            Name = "Default Admin Company",
-                            Address = "Default Address",
-                            PostalCode = "00000",
-                            Province = "Default",
-                            Phone = "0000000000",
+                            Id = "PLA",
+                            Name = "Planetel S.p.A.",
+                            Address = "Via Boffalora, 4 – 24048 Treviolo (BG)",
+                            PostalCode = "24048",
+                            Province = "BG",
+                            Phone = "+39 035 204011",
                             LogoUri = "/src/assets/companies/default.png",
                             InterfaceColor = "#000000"
                         };

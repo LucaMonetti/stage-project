@@ -18,7 +18,7 @@ export type Product = z.infer<typeof ProductSchema>;
 export const ProductFilterSchema = z.object({
   companyId: z.string().optional(),
   productCode: z.string().optional(),
-  pricelist_name: z.string().optional(),
+  pricelist_id: z.guid().optional(),
   currentInstance_description: z.string().optional(),
   excludedIds: z.array(z.string()).optional(),
 });

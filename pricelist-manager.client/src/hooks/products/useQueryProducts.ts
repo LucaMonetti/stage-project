@@ -27,6 +27,9 @@ const ProductFilterConfig: FilterConfig<ProductFilter> = {
   companyId: {
     paramName: "Filters.CompanyId",
   },
+  pricelist_id: {
+    paramName: "Filters.PricelistId",
+  },
 };
 
 // Fetch all products from the API

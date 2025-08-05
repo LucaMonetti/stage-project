@@ -20,6 +20,7 @@
         public int Skip => (PageNumber - 1) * PageSize;
         public int Take => PageSize;
     }
+
     public static partial class QueryableExtensions
     {
         public static IQueryable<T> ApplyPagination<T>(this IQueryable<T> source, PaginationParameters pagination)

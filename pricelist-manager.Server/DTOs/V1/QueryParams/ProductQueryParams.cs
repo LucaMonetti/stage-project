@@ -5,6 +5,7 @@
     {
         public string? ProductCode { get; set; }
         public string? CompanyId { get; set; }
+        public Guid? PricelistId { get; set; }
     }
 
 

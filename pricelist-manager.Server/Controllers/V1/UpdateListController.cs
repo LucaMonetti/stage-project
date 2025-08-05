@@ -93,7 +93,7 @@ namespace pricelist_manager.Server.Controllers.V1
             }
         }
         [HttpGet("{id:int}/available-products")]
-        public async Task<ActionResult<ProductDTO>> GetAvailableProductsById(int id, [FromQuery] UpdateListQueryParams requestParams)
+        public async Task<ActionResult<ProductDTO>> GetAvailableProductsById(int id, [FromQuery] ProductQueryParams requestParams)
         {
             if (!ModelState.IsValid)
             {

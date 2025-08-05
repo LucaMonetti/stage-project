@@ -22,6 +22,7 @@ import {
 } from "../../../hooks/products/useQueryProducts";
 import { useDebounce } from "../../../hooks/useDebounce";
 import BasicLoader from "../../../components/Loader/BasicLoader";
+import { useAllPricelists } from "../../../hooks/pricelists/useQueryPricelists";
 
 const AddProductsForm = () => {
   let data: AddProductsUpdateList | undefined = undefined;
@@ -91,13 +92,22 @@ const AddProductsForm = () => {
           externalProvider={true}
           mutation={mutation}
         />
-        <ProductTable updatelistId={updatelist.data?.id ?? -1} />
+        <ProductTable
+          updatelistId={updatelist.data?.id ?? -1}
+          companyId={updatelist.data?.companyId ?? ""}
+        />
       </GenericFormProvider>
     </div>
   );
 };
 
-function ProductTable({ updatelistId }: { updatelistId: number }) {
+function ProductTable({
+  updatelistId,
+  companyId,
+}: {
+  updatelistId: number;
+  companyId: string;
+}) {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [filters, setFilters] = useState<ProductFilter>({});
@@ -122,6 +132,11 @@ function ProductTable({ updatelistId }: { updatelistId: number }) {
     setCurrentPage(1); // Reset to first page when changing page size
   };
 
+  const handleFilterChange = (newFilters: Partial<ProductFilter>) => {
+    setFilters((prev) => ({ ...prev, ...newFilters }));
+    setCurrentPage(1);
+  };
+
   const products = useAvailableProducts(
     updatelistId,
     {
@@ -130,9 +145,11 @@ function ProductTable({ updatelistId }: { updatelistId: number }) {
     },
     filters
   );
+  const methods = useFormContext<AddProductsUpdateList>();
+
+  const pricelist = useAllPricelists({ company_id: companyId });
 
   const [selectedItem, setSelectedItem] = useState<Product[]>([]);
-  const methods = useFormContext<AddProductsUpdateList>();
 
   useEffect(() => {
     const selectedIds = selectedItem.map((item) => item.id);
@@ -153,6 +170,11 @@ function ProductTable({ updatelistId }: { updatelistId: number }) {
       }}
       columns={[
         {
+          id: "id",
+          header: "ID",
+          accessorFn: (item) => item.id,
+        },
+        {
           id: "name",
           header: "Name",
           accessorFn: (item) => item.currentInstance.name,
@@ -160,12 +182,20 @@ function ProductTable({ updatelistId }: { updatelistId: number }) {
         {
           id: "price",
           header: "Price",
-          accessorFn: (item) => item.currentInstance.price,
+          meta: {
+            className: "font-medium text-green-600 whitespace-nowrap",
+          },
+          accessorFn: (row: Product) =>
+            `${row.currentInstance.price.toFixed(2)} €`,
         },
         {
-          id: "description",
-          header: "Description",
-          accessorFn: (item) => item.id,
+          id: "cost",
+          header: "Costo",
+          meta: {
+            className: "font-medium text-red-600 whitespace-nowrap",
+          },
+          accessorFn: (row: Product) =>
+            `${row.currentInstance.cost.toFixed(2)} €`,
         },
       ]}
       selectedItems={selectedItem}
@@ -181,6 +211,38 @@ function ProductTable({ updatelistId }: { updatelistId: number }) {
       onPageChange={handlePageChange}
       onPageSizeChange={handlePageSizeChange}
       pagination={products.data?.pagination}
+      filterConfig={{
+        fieldset: [
+          {
+            title: "Filtri Prodotti",
+            inputs: [
+              {
+                id: "productCode",
+                label: "Codice Prodotto",
+                type: "text",
+                placeholder: "Inserire il codice del prodotto",
+                autocomplete: false,
+                outerClass: "flex-1",
+                onChange: (e) => {
+                  setProductCodeInput(e.target.value);
+                },
+              },
+              {
+                id: "pricelistId",
+                label: "Codice Listino",
+                type: "searchable",
+                fetchData: pricelist,
+                schema: "pricelist",
+                placeholder: "Seleziona il listino",
+                onChange: (value: any) => {
+                  handleFilterChange({ pricelist_id: value || undefined });
+                },
+              },
+            ],
+          },
+        ],
+        endpoint: "products",
+      }}
     />
   );
 }

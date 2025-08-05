@@ -1,6 +1,6 @@
 ProductCode,ProductName,ProductDescription,ProductPrice,ProductCost,ProductMargin,AccountingControl,CDA,SalesItem
-ABC123,Sample Product 1,High-quality electronic device,299.99,150.00,1.25,ELEC001,12345,45632
-XYZ789,Sample Product 2,Professional office supplies,45.50,25.00,1.25,OFFICE002,12345,45633
-DEF456,Sample Product 3,Industrial equipment component,1250.00,800.00,1.25,INDUST003,12345,45631
-GHI012,Sample Product 4,Consumer electronics accessory,89.99,45.00,1.25,ELEC004,12345,45634
-JKL345,Sample Product 5,Maintenance and repair tool,175.25,100.00,1.25,TOOLS005,12345,45635
+ABC128,Sample Product 1,High-quality electronic device,299.99,150.00,1.25,ELEC001,12345,45632
+XYZ718,Sample Product 2,Professional office supplies,45.50,25.00,1.25,OFFICE002,12345,45633
+DEF458,Sample Product 3,Industrial equipment component,1250.00,800.00,1.25,INDUST003,12345,45631
+GHI018,Sample Product 4,Consumer electronics accessory,89.99,45.00,1.25,ELEC004,12345,45634
+JKL348,Sample Product 5,Maintenance and repair tool,175.25,100.00,1.25,TOOLS005,12345,45635

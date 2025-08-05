@@ -141,7 +141,7 @@ namespace pricelist_manager.Server.Repositories
             return res;
         }
 
-        public async Task<PagedList<Product>> GetAvailableProducts(int id, UpdateListQueryParams requestParams)
+        public async Task<PagedList<Product>> GetAvailableProducts(int id, ProductQueryParams requestParams)
         {
             if (!CanConnect())
                 throw new StorageUnavailableException();
@@ -154,8 +154,32 @@ namespace pricelist_manager.Server.Repositories
             .Select(ptul => ptul.ProductId)
             .ToListAsync();
 
-            var availableProducts = Context.Products
-            .Where(p => p.CompanyId == updatelist.CompanyId && !existingIds.Contains(p.Id)).Include(p => p.Versions).ThenInclude(v => v.UpdatedBy).Include(p => p.Pricelist).Include(p => p.Company);
+            var query = Context.Products.AsQueryable();
+
+            if (requestParams.Filters != null)
+            {
+                if (!string.IsNullOrEmpty(requestParams.Filters.ProductCode))
+                {
+                    query = query.Where(p => p.ProductCode.Contains(requestParams.Filters.ProductCode));
+                }
+
+                if (!string.IsNullOrEmpty(requestParams.Filters.CompanyId))
+                {
+                    query = query.Where(p => p.CompanyId == requestParams.Filters.CompanyId);
+                }
+
+                if (requestParams.Filters.PricelistId.HasValue)
+                {
+                    query = query.Where(p => p.PricelistId == requestParams.Filters.PricelistId.Value);
+                }
+            }
+
+            var availableProducts = query
+                .Where(p => p.CompanyId == updatelist.CompanyId && !existingIds.Contains(p.Id))
+                .Include(p => p.Versions)
+                .ThenInclude(v => v.UpdatedBy)
+                .Include(p => p.Pricelist)
+                .Include(p => p.Company);
 
             return await PagedList<Product>.ToPagedList(availableProducts, requestParams.Pagination.PageNumber, requestParams.Pagination.PageSize);
         }
