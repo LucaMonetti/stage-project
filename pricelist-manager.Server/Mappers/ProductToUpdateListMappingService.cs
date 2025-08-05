@@ -22,7 +22,11 @@ namespace pricelist_manager.Server.Mappers
                 Id = product.Product.Id,
                 LatestVersion = product.Product.LatestVersion,
                 Status = product.Status,
-                CurrentInstance = ProductInstanceMappingService.MapToInstanceDTO(product.Product.Versions.First(pi => pi.Version == product.Product.LatestVersion))
+                CurrentInstance = ProductInstanceMappingService.MapToInstanceDTO(product.Product.Versions.First(pi => pi.Version == product.Product.LatestVersion)),
+                PrevInstance = ProductInstanceMappingService.MapToInstanceDTO(
+                    product.Status == Status.Edited ?
+                    product.Product.Versions.First(pi => pi.Version == product.Product.LatestVersion - 1) :
+                    product.Product.Versions.First(pi => pi.Version == product.Product.LatestVersion))
             };
         }
 

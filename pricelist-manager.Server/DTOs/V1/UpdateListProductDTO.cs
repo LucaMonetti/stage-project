@@ -9,5 +9,6 @@ namespace pricelist_manager.Server.DTOs.V1
 
         public Status Status { get; set; }
         public ProductInstanceDTO CurrentInstance { get; set; } = null!;
+        public ProductInstanceDTO PrevInstance { get; set; } = null!;
     }
 }
