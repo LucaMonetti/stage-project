@@ -106,7 +106,7 @@ const CreateUpdatelistForm = () => {
             products: [],
           }}
           onSuccess={() => {
-            navigate("/dashboard/pricelists");
+            navigate("/dashboard/updatelists");
           }}
         />
         <ProductTable />
