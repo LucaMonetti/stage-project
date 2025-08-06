@@ -23,6 +23,7 @@ namespace pricelist_manager.Server.Interfaces
 
         Task<UpdateList> DeleteAsync(int id);
         Task DeleteProductAndUpdateStatus(int updateListId, string productId);
+        Task<bool> ImportUpdateListsAsync(ICollection<UpdateListCsvDTO> dto, int updatelistId, string userId);
 
         Task<ICollection<ProductToUpdateList>> AddProducts(ICollection<ProductToUpdateList> dto);
         Task<ICollection<ProductToUpdateList>> RemoveProducts(ICollection<ProductToUpdateList> dto);

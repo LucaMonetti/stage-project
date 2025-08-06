@@ -37,18 +37,19 @@ namespace pricelist_manager.Server.Mappers
             return [.. products.Select(p => MapToDTO(p))];
         }
 
-        public ProductToUpdateList MapToModel(int updateListId, string productId)
+        public ProductToUpdateList MapToModel(int updateListId, string productId, Status status = Status.Pending)
         {
             return new ProductToUpdateList
             {
                 ProductId = productId.ToUpper(),
                 UpdateListId = updateListId,
+                Status = status
             };
         }
 
-        public ICollection<ProductToUpdateList> MapToModels(int updateListId, ICollection<string> productIds)
+        public ICollection<ProductToUpdateList> MapToModels(int updateListId, ICollection<string> productIds, Status status = Status.Pending)
         {
-            return [.. productIds.Select(ul => MapToModel(updateListId, ul))];
+            return [.. productIds.Select(ul => MapToModel(updateListId, ul, status))];
         }
 
         public ICollection<ProductToUpdateList> MapToModels(AddProductsUpdateListDTO dto)

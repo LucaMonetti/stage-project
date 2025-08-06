@@ -8,7 +8,11 @@ import {
 } from "../../models/FormUpdateList";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { UpdateListSchema, type UpdateList } from "../../models/UpdateList";
-import { Status, type UseEditOptions } from "../../types";
+import {
+  Status,
+  type UseCreateOptions,
+  type UseEditOptions,
+} from "../../types";
 import z from "zod/v4";
 import QueryEndpoint from "../../helpers/queryEndpoint";
 import { apiConfig } from "../../helpers/ApiConfig";
@@ -288,6 +292,46 @@ export const useDeleteUpdatelistProduct = (
         queryKey: ["updatelists"],
         refetchType: "all",
       });
+      options?.onSuccess?.(data);
+    },
+    onError: (err) => {
+      options?.onError?.(err);
+    },
+  });
+};
+
+// Upload CSV function
+const uploadUpdateListProductsCsv = async (
+  updateListId: string,
+  csvFile: File
+): Promise<boolean> => {
+  const formData = new FormData();
+  formData.append("file", csvFile);
+
+  const response = await fetch(
+    QueryEndpoint.buildUrl(`import/updatelists/${updateListId}`),
+    apiConfig.postFormData(formData)
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to upload CSV file");
+  }
+
+  return true;
+};
+
+// Custom hook for CSV upload mutation
+export const useUploadUpdateListProductsCsv = (
+  options?: UseCreateOptions<boolean>
+) => {
+  const queryClient = useQueryClient();
+
+  return useMutation<boolean, Error, { updateListId: string; csvFile: File }>({
+    mutationFn: ({ updateListId, csvFile }) =>
+      uploadUpdateListProductsCsv(updateListId, csvFile),
+    onSuccess: (data) => {
+      // Invalidate products queries to refresh the data
+      queryClient.invalidateQueries({ queryKey: ["updatelists"] });
       options?.onSuccess?.(data);
     },
     onError: (err) => {

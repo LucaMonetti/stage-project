@@ -1,36 +1,28 @@
 import { useForm, type SubmitHandler } from "react-hook-form";
-import { ProductCSVSchema, type ProductCSV } from "../../models/ProductCSV";
+import {
+  ProductCSVSchema,
+  type BaseCSV,
+  type ProductCSV,
+} from "../../models/ProductCSV";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useUploadProductsCsv } from "../../hooks/products/useMutationProduct";
+import { type ZodType } from "zod/v4";
 
-const CsvForm = ({
-  pricelistId,
+function CsvForm<T extends BaseCSV>({
+  id,
   onSuccess,
+  onSubmit,
+  schema,
 }: {
-  pricelistId: string;
+  id: string;
   onSuccess?: (data: any) => void;
-}) => {
+  onSubmit: SubmitHandler<T>;
+  schema: ZodType<any, T, any>;
+}) {
   const methods = useForm({
     mode: "onSubmit",
-    resolver: zodResolver(ProductCSVSchema),
+    resolver: zodResolver(schema),
   });
-
-  const mutation = useUploadProductsCsv();
-
-  const onSubmit: SubmitHandler<ProductCSV> = (data) => {
-    console.log("Submitting CSV data:", data);
-
-    mutation?.mutate(
-      { pricelistId, csvFile: data.csvFile },
-      {
-        onSuccess: (data) => {
-          if (onSuccess) {
-            onSuccess(data);
-          }
-        },
-      }
-    );
-  };
 
   // Add this to debug
   const onError = (errors: any) => {
@@ -69,6 +61,6 @@ const CsvForm = ({
       </button>
     </form>
   );
-};
+}
 
 export default CsvForm;

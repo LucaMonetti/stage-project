@@ -9,12 +9,16 @@ import {
   type CreateProduct,
 } from "../../../models/FormProduct";
 import { type Pricelist } from "../../../models/Pricelist";
-import { useCreateProduct } from "../../../hooks/products/useMutationProduct";
+import {
+  useCreateProduct,
+  useUploadProductsCsv,
+} from "../../../hooks/products/useMutationProduct";
 import { useAllPricelists } from "../../../hooks/pricelists/useQueryPricelists";
 import type { UseQueryResult } from "@tanstack/react-query";
 import { useAuth } from "../../../components/Authentication/AuthenticationProvider";
 import { useNavigate, useSearchParams } from "react-router";
 import CsvForm from "../../../components/Forms/CsvForm";
+import { ProductCSVSchema, type ProductCSV } from "../../../models/ProductCSV";
 
 const CreateProductForm = () => {
   const { user, isAdmin } = useAuth();
@@ -22,6 +26,8 @@ const CreateProductForm = () => {
 
   const [searchParams] = useSearchParams();
   const pricelistId = searchParams.get("pricelistId");
+
+  const csvMutation = useUploadProductsCsv();
 
   let pricelists: UseQueryResult<Pricelist[], Error>;
 
@@ -186,10 +192,18 @@ const CreateProductForm = () => {
             <hr className="flex-1 border-gray-700" />
           </div>
 
-          <CsvForm
-            pricelistId={pricelistId ?? ""}
-            onSuccess={() => {
-              navigate(`/dashboard/pricelists/${pricelistId}`);
+          <CsvForm<ProductCSV>
+            id={pricelistId ?? ""}
+            schema={ProductCSVSchema}
+            onSubmit={(data) => {
+              csvMutation?.mutate(
+                { pricelistId, csvFile: data.csvFile },
+                {
+                  onSuccess: () => {
+                    navigate(`/dashboard/pricelists/${pricelistId}`);
+                  },
+                }
+              );
             }}
           />
         </>

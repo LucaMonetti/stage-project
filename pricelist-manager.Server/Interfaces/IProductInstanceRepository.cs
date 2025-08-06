@@ -11,9 +11,10 @@ namespace pricelist_manager.Server.Interfaces
         /// <exception cref="StorageUnavailableException">The database is not available</exception>
         /// <exception cref="NotFoundException">The ProductInstance doesn't exists.</exception>
         public Task<ProductInstance> GetByVersionAsync(string productId, int version);
-        
+
         /// <exception cref="StorageUnavailableException">The database is not available</exception>
         /// <exception cref="AlreadyExistsException">The Company already exists.</exception>
         public Task<ProductInstance> CreateAsync(ProductInstance productInstance);
+        public Task<ICollection<ProductInstance>> CreateListAsync(ICollection<ProductInstance> productInstances);
     }
 }

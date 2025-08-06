@@ -7,11 +7,13 @@ namespace pricelist_manager.Server.Interfaces
     {
         ProductInstanceDTO MapToInstanceDTO(ProductInstance product);
 
-        public ProductInstance MapToProductInstance(CreateProductDTO dto, string companyId, string userId);
-        public ProductInstance MapToProductInstance(UpdateProductDTO dto, int version, string userId);
-        public ProductInstance MapToProductInstance(ProductCsvDTO dto, Pricelist pricelist, string userId);
-        public ProductInstance MapToProductInstance(ProductInstanceDTO dto);
+        ProductInstance MapToProductInstance(CreateProductDTO dto, string companyId, string userId);
+        ProductInstance MapToProductInstance(UpdateProductDTO dto, int version, string userId);
+        ProductInstance MapToProductInstance(UpdateListCsvDTO dto, ProductInstance previousInstance, string userId);
+        ProductInstance MapToProductInstance(ProductCsvDTO dto, Pricelist pricelist, string userId);
+        ProductInstance MapToProductInstance(ProductInstanceDTO dto);
 
         ICollection<ProductInstanceDTO> MapToInstanceDTOs(ICollection<ProductInstance> products);
+        ICollection<ProductInstance> MapToProductInstances(ICollection<(UpdateListCsvDTO dto, ProductInstance previousInstance)> products, string userId);
     }
 }

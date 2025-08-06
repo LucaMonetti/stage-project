@@ -42,5 +42,14 @@ namespace pricelist_manager.Server.Repositories
             return data.Entity;
         }
 
+        public async Task<ICollection<ProductInstance>> CreateListAsync(ICollection<ProductInstance> productInstances)
+        {
+            if (!CanConnect()) throw new StorageUnavailableException();
+
+            await Context.ProductInstances.AddRangeAsync(productInstances);
+            await Context.SaveChangesAsync();
+
+            return productInstances;
+        }
     }
 }

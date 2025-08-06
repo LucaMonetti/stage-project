@@ -35,7 +35,7 @@ namespace pricelist_manager.Server.Interfaces
 
         /// <exception cref="StorageUnavailableException">The database is not available</exception>
         /// <exception cref="NotFoundException">The Product doesn't exists.</exception>
-        Task<PagedList<Product>> GetByCompany(string company, ProductQueryParams requestParams);
+        Task<PagedList<Product>> GetByCompany(string company, ProductQueryParams? requestParams);
 
         /// <exception cref="StorageUnavailableException">The database is not available</exception>
         /// <exception cref="AlreadyExistsException">The Product already exists.</exception>
@@ -44,6 +44,10 @@ namespace pricelist_manager.Server.Interfaces
         /// <exception cref="StorageUnavailableException">The database is not available</exception>
         /// <exception cref="NotFoundException">The Product doesn't exists.</exception>
         Task<Product> UpdateAsync(Product entity);
+
+        /// <exception cref="StorageUnavailableException">The database is not available</exception>
+        /// <exception cref="NotFoundException">The Product doesn't exists.</exception>
+        Task<ICollection<Product>> UpdateListAsync(ICollection<Product> entities);
 
         /// <exception cref="StorageUnavailableException">The database is not available</exception>
         /// <exception cref="NotFoundException">The Product doesn't exists.</exception>

@@ -54,6 +54,27 @@ namespace pricelist_manager.Server.Mappers
             };
         }
 
+        public ProductInstance MapToProductInstance(UpdateListCsvDTO dto, ProductInstance previousInstance, string userId)
+        {
+            ArgumentNullException.ThrowIfNull(dto);
+            ArgumentNullException.ThrowIfNull(previousInstance);
+
+            return new ProductInstance
+            {
+                ProductId = dto.ProductId.ToUpper(),
+                Description = string.IsNullOrEmpty(dto.Description) ? previousInstance.Description : dto.Description,
+                Name = string.IsNullOrEmpty(dto.Name) ? previousInstance.Name : dto.Name,
+                Price = dto.Price ?? previousInstance.Price,
+                Version = previousInstance.Version + 1,
+                CDA = string.IsNullOrEmpty(dto.CDA) ? previousInstance.CDA : dto.CDA,
+                Cost = dto.Cost ?? previousInstance.Cost,
+                AccountingControl = string.IsNullOrEmpty(dto.AccountingControl) ? previousInstance.AccountingControl : dto.AccountingControl,
+                SalesItem = string.IsNullOrEmpty(dto.SalesItem) ? previousInstance.SalesItem : dto.SalesItem,
+                Margin = dto.Margin ?? previousInstance.Margin,
+                UserId = userId
+            };
+        }
+
         public ProductInstance MapToProductInstance(ProductInstanceDTO dto)
         {
             ArgumentNullException.ThrowIfNull(dto);
@@ -122,6 +143,13 @@ namespace pricelist_manager.Server.Mappers
                 Margin = csvDto.Margin,
                 UserId = userId
             };
+        }
+
+        public ICollection<ProductInstance> MapToProductInstances(ICollection<(UpdateListCsvDTO dto, ProductInstance previousInstance)> products, string userId)
+        {
+            ArgumentNullException.ThrowIfNull(products);
+
+            return products.Select(p => MapToProductInstance(p.dto, p.previousInstance, userId)).ToList();
         }
     }
 }

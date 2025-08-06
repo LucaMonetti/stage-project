@@ -150,7 +150,7 @@ namespace pricelist_manager.Server.Repositories
             return await PagedList<Product>.ToPagedList(query, requestParams.Pagination.PageNumber, requestParams.Pagination.PageSize);
         }
 
-        public async Task<PagedList<Product>> GetByCompany(string companyId, ProductQueryParams requestParams)
+        public async Task<PagedList<Product>> GetByCompany(string companyId, ProductQueryParams? requestParams)
         {
             if (!CanConnect()) throw new StorageUnavailableException();
 
@@ -161,7 +161,7 @@ namespace pricelist_manager.Server.Repositories
                             .Include(p => p.Pricelist)
                             .Include(p => p.Company);
 
-            return await PagedList<Product>.ToPagedList(query, requestParams.Pagination.PageNumber, requestParams.Pagination.PageSize);
+            return await PagedList<Product>.ToPagedList(query, requestParams?.Pagination.PageNumber ?? 1, requestParams?.Pagination.PageSize ?? -1);
         }
 
         public async Task<Product> CreateAsync(Product entity)
@@ -244,6 +244,26 @@ namespace pricelist_manager.Server.Repositories
             var res = await Context.SaveChangesAsync();
 
             return res > 0;
+        }
+
+        public async Task<ICollection<Product>> UpdateListAsync(ICollection<Product> entities)
+        {
+            if (!CanConnect()) throw new StorageUnavailableException();
+
+            var entitiesToUpdate = new List<Product>();
+
+            foreach (var entity in entities)
+            {
+                if (await existsIdAsync(entity.Id))
+                {
+                    entitiesToUpdate.Add(entity);
+                }
+            }
+
+            Context.Products.UpdateRange(entitiesToUpdate);
+            await Context.SaveChangesAsync();
+
+            return entitiesToUpdate;
         }
     }
 }

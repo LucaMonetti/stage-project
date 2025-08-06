@@ -12,5 +12,9 @@
         /// Clear the current tracking status.
         /// </summary>
         public void ClearTracking();
+
+        public void BeginTransaction();
+        public void CommitTransaction();
+        public void RollbackTransaction();
     }
 }

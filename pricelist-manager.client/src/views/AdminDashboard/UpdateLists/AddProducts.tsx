@@ -8,28 +8,40 @@ import GenericForm, {
   GenericFormProvider,
   type Config,
 } from "../../../components/Forms/GenericForm";
-import { useParams } from "react-router";
-import { useState, useEffect, useRef } from "react";
+import { useNavigate, useParams } from "react-router";
+import { useState, useEffect } from "react";
 import { useFormContext } from "react-hook-form";
 import GenericTableView from "../../../components/Dashboard/Tables/GenericTableView";
 import { type Product, type ProductFilter } from "../../../models/Product";
 import { useUpdateList } from "../../../hooks/updatelists/useQueryUpdatelists";
-import { useEditUpdateListProducts } from "../../../hooks/updatelists/useMutationUpdateList";
 import {
-  useAllProductsByCompany,
-  useAllProductsPaginated,
-  useAvailableProducts,
-} from "../../../hooks/products/useQueryProducts";
+  useEditUpdateListProducts,
+  useUploadUpdateListProductsCsv,
+} from "../../../hooks/updatelists/useMutationUpdateList";
+import { useAvailableProducts } from "../../../hooks/products/useQueryProducts";
 import { useDebounce } from "../../../hooks/useDebounce";
 import BasicLoader from "../../../components/Loader/BasicLoader";
 import { useAllPricelists } from "../../../hooks/pricelists/useQueryPricelists";
+import CsvForm from "../../../components/Forms/CsvForm";
+import {
+  UpdateListCSVSchema,
+  type UpdateListCSV,
+} from "../../../models/ProductCSV";
 
 const AddProductsForm = () => {
+  const navigate = useNavigate();
   let data: AddProductsUpdateList | undefined = undefined;
 
   const { updateListId } = useParams();
+
+  if (!updateListId) {
+    navigate("/404");
+    return;
+  }
+
   const updatelist = useUpdateList(updateListId ?? "");
   const mutation = useEditUpdateListProducts();
+  const csvMutation = useUploadUpdateListProductsCsv();
 
   if (updatelist.isPending) {
     return (
@@ -97,6 +109,27 @@ const AddProductsForm = () => {
           companyId={updatelist.data?.companyId ?? ""}
         />
       </GenericFormProvider>
+
+      <div className="my-8 flex items-center w-4/5 mx-auto">
+        <hr className="flex-1 border-gray-700" />
+        <span className="px-4 text-gray-400 text-sm">oppure</span>
+        <hr className="flex-1 border-gray-700" />
+      </div>
+
+      <CsvForm<UpdateListCSV>
+        id={updateListId ?? ""}
+        schema={UpdateListCSVSchema}
+        onSubmit={(data) => {
+          csvMutation?.mutate(
+            { updateListId, csvFile: data.csvFile },
+            {
+              onSuccess: () => {
+                navigate(`/dashboard/updatelists/${updateListId}`);
+              },
+            }
+          );
+        }}
+      />
     </div>
   );
 };

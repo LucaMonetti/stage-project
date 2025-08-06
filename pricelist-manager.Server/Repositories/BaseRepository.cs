@@ -12,6 +12,11 @@ namespace pricelist_manager.Server.Repositories
             Context = dataContext;
         }
 
+        public void BeginTransaction()
+        {
+            Context.Database.BeginTransaction();
+        }
+
         public bool CanConnect()
         {
             return Context.Database.CanConnect();
@@ -20,6 +25,16 @@ namespace pricelist_manager.Server.Repositories
         public void ClearTracking()
         {
             Context.ChangeTracker.Clear();
+        }
+
+        public void CommitTransaction()
+        {
+            Context.Database.CommitTransaction();
+        }
+
+        public void RollbackTransaction()
+        {
+            Context.Database.RollbackTransaction();
         }
     }
 }

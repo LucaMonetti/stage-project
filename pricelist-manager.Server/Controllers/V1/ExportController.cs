@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using pricelist_manager.Server.Exceptions;
 using pricelist_manager.Server.Interfaces;
+using pricelist_manager.Server.Mappers;
 using pricelist_manager.Server.Models;
 using pricelist_manager.Server.Repositories;
 using System.Collections;
@@ -24,11 +25,14 @@ namespace pricelist_manager.Server.Controllers.V1
         private readonly IPricelistRepository PricelistRepository;
         private readonly IUpdateListRepository UpdateListRepository;
 
-        public ExportController(ICompanyRepository companyRepository, IPricelistRepository pricelistRepository, IUpdateListRepository updateListRepository)
+        private readonly IProductToUpdateListMappingService ProductToUpdateListMappingService;
+
+        public ExportController(ICompanyRepository companyRepository, IPricelistRepository pricelistRepository, IUpdateListRepository updateListRepository, IProductToUpdateListMappingService productToUpdateListMappingService)
         {
             UpdateListRepository = updateListRepository;
             CompanyRepository = companyRepository;
             PricelistRepository = pricelistRepository;
+            ProductToUpdateListMappingService = productToUpdateListMappingService;
         }
 
         [HttpGet("companies/{companyId}")]
@@ -72,6 +76,7 @@ namespace pricelist_manager.Server.Controllers.V1
                                         PricelistId = pricelist.Id,
                                         PricelistName = pricelist.Name,
                                         PricelistDescription = pricelist.Description,
+                                        TotalProducts = pricelist.Products?.Count ?? 0,
                                     });
                                 }
                             }
@@ -89,7 +94,7 @@ namespace pricelist_manager.Server.Controllers.V1
 
                             cw.WriteRecords(exportData);
                         }
-                        return File(ms.ToArray(), "text/csv", $"export_company_{companyId}_{DateTime.UtcNow}.csv");
+                        return File(ms.ToArray(), "text/csv", $"export_company_{companyId}_{DateTime.UtcNow:yyyy_MM_dd_HH:mm}.csv");
                     }
                 }
             }
@@ -203,8 +208,11 @@ namespace pricelist_manager.Server.Controllers.V1
 
                             if (data.ProductsToUpdateLists != null && data.ProductsToUpdateLists.Any())
                             {
-                                foreach (var product in data.ProductsToUpdateLists)
+                                foreach (var productData in data.ProductsToUpdateLists)
                                 {
+
+                                    var product = ProductToUpdateListMappingService.MapToDTO(productData);
+
                                     exportData.Add(new
                                     {
                                         // UpdateList fields
@@ -214,16 +222,18 @@ namespace pricelist_manager.Server.Controllers.V1
                                         Company = data.CompanyId,
 
                                         // Product fields
-                                        ProductId = product.Product.Id,
-                                        ProductVersion = product.Product.LatestVersion,
-                                        ProductName = product.Product.CurrentInstance?.Name,
-                                        ProductDescription = product.Product.CurrentInstance?.Description,
-                                        ProductPrice = product.Product.CurrentInstance?.Price,
-                                        ProductCost = product.Product.CurrentInstance?.Cost,
-                                        ProductMargin = product.Product.CurrentInstance?.Margin,
-                                        ProductAccountingControl = product.Product.CurrentInstance?.AccountingControl,
-                                        ProductSalesItem = product.Product.CurrentInstance?.SalesItem,
-                                        ProductCDA = product.Product.CurrentInstance?.CDA,
+                                        ProductId = product.Id,
+                                        ProductVersion = product.CurrentInstance.Version,
+                                        ProductName = product.CurrentInstance?.Name,
+                                        ProductDescription = product.CurrentInstance?.Description,
+                                        PreviousProductPrice = product.PrevInstance?.Price,
+                                        CurrentProductPrice = product.CurrentInstance?.Price,
+                                        PreviousProductCost = product.PrevInstance?.Cost,
+                                        CurrentProductCost = product.CurrentInstance?.Cost,
+                                        ProductMargin = product.CurrentInstance?.Margin,
+                                        ProductAccountingControl = product.CurrentInstance?.AccountingControl,
+                                        ProductSalesItem = product.CurrentInstance?.SalesItem,
+                                        ProductCDA = product.CurrentInstance?.CDA,
                                         ProductStatus = product.Status
                                     });
                                 }
