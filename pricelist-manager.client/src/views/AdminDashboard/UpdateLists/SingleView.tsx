@@ -161,6 +161,103 @@ const UpdateListSingleView = () => {
             <ActionRenderer
               actions={[
                 {
+                  Icon: FaPencil,
+                  type: "button",
+                  color: "blue",
+                  handler: () => {
+                    navigate(
+                      `/dashboard/edit/products/${id}?editUpdateList=${updateListId}`
+                    );
+                  },
+                },
+                {
+                  Icon: FaTrash,
+                  type: "button",
+                  color: "red",
+                  modalConfig: {
+                    title: "Eliminare la lista?",
+                    description: "Sei sicuro di voler eliminare questa lista?",
+                  },
+                  handler: async () => {
+                    deleteMutation.mutate({
+                      updateListId: updateListId ?? "",
+                      productId: id,
+                    });
+                  },
+                },
+              ]}
+            />
+          </div>
+        );
+      },
+    },
+  ] satisfies CustomColumnDef<UpdateListProduct>[];
+
+  const updatedProductCols = [
+    {
+      accessorKey: "id",
+      header: "Codice Prodotto",
+      meta: {
+        className: "whitespace-nowrap",
+      },
+    },
+    {
+      accessorKey: "currentInstance.name",
+      header: "Nome Prodotto",
+    },
+    {
+      accessorKey: "prevInstance.price",
+      header: "Prezzo Precedente",
+      meta: {
+        className: "font-medium whitespace-nowrap",
+      },
+      accessorFn: (row: UpdateListProduct) =>
+        `${
+          row.prevInstance?.price.toFixed(2) ??
+          row.currentInstance.price.toFixed(2)
+        } €`,
+    },
+    {
+      accessorKey: "currentInstance.price",
+      header: "Prezzo",
+      meta: {
+        className: "font-medium text-green-600 whitespace-nowrap",
+      },
+      accessorFn: (row: UpdateListProduct) =>
+        `${row.currentInstance.price.toFixed(2)} €`,
+    },
+    {
+      accessorKey: "prevInstance.cost",
+      header: "Costo Precedente",
+      meta: {
+        className: "font-medium whitespace-nowrap",
+      },
+      accessorFn: (row: UpdateListProduct) =>
+        `${
+          row.prevInstance?.cost.toFixed(2) ??
+          row.currentInstance.cost.toFixed(2)
+        } €`,
+    },
+    {
+      accessorKey: "currentInstance.cost",
+      header: "Costo",
+      meta: {
+        className: "font-medium text-red-600 whitespace-nowrap",
+      },
+      accessorFn: (row: UpdateListProduct) =>
+        `${row.currentInstance.cost.toFixed(2)} €`,
+    },
+    {
+      accessorKey: "actions",
+      header: "Actions",
+      cell: ({ row }) => {
+        const { id } = row.original;
+
+        return (
+          <div className="flex gap-4">
+            <ActionRenderer
+              actions={[
+                {
                   Icon: FaTrash,
                   type: "button",
                   color: "red",
@@ -211,7 +308,7 @@ const UpdateListSingleView = () => {
         error={toUpdateProductsError}
         columns={productCols}
         config={{
-          baseUrl: `/dashboard/edit/products/:pid?editUpdateList=${updateListId}`,
+          baseUrl: `/dashboard/products/:pid`,
           enableLink: true,
           columnId: { ":pid": "id" },
         }}
@@ -227,7 +324,7 @@ const UpdateListSingleView = () => {
         isPending={isUpdatedProductsLoading}
         isError={isUpdatedProductsError}
         error={updatedProductsError}
-        columns={productCols}
+        columns={updatedProductCols}
         config={{
           baseUrl: "/dashboard/products/:pid",
           enableLink: true,

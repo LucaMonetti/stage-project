@@ -7,6 +7,7 @@ export const UpdateListProduct = z.object({
   id: z.string(),
   latestVersion: z.number(),
   currentInstance: ProductInstanceSchema,
+  prevInstance: ProductInstanceSchema.optional(),
   status: z.enum(Status),
 });
 
