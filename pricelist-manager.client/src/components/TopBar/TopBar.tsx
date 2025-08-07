@@ -42,7 +42,6 @@ function TopBar() {
       <div className="max-w-8xl px-8 mx-auto flex justify-between items-center h-16">
         <nav>
           <ul className="flex gap-3">
-            <MenuLink url="/" title="Home" />
             <MenuLink url="/dashboard" title="Dashboard" />
           </ul>
         </nav>

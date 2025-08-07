@@ -7,17 +7,20 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useUploadProductsCsv } from "../../hooks/products/useMutationProduct";
 import { type ZodType } from "zod/v4";
+import { Link } from "react-router";
 
 function CsvForm<T extends BaseCSV>({
   id,
   onSuccess,
   onSubmit,
   schema,
+  downloadUrl,
 }: {
   id: string;
   onSuccess?: (data: any) => void;
   onSubmit: SubmitHandler<T>;
   schema: ZodType<any, T, any>;
+  downloadUrl?: string;
 }) {
   const methods = useForm({
     mode: "onSubmit",
@@ -50,6 +53,19 @@ function CsvForm<T extends BaseCSV>({
               multiple={false}
             />
           </div>
+
+          {downloadUrl && (
+            <p className="block text-sm font-medium text-gray-300 mb-2">
+              Scarica il template csv cliccando{" "}
+              <a
+                href={downloadUrl}
+                download
+                className="text-blue-500 hover:underline"
+              >
+                qui
+              </a>
+            </p>
+          )}
         </div>
       </div>
 

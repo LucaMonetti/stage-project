@@ -52,19 +52,7 @@ const AddProductsForm = () => {
   }
 
   const config = {
-    fieldset: [
-      {
-        title: "Informazioni Generali",
-        inputs: [
-          {
-            id: "id",
-            label: "Id",
-            type: "text",
-            isDisabled: true,
-          },
-        ],
-      },
-    ],
+    fieldset: [],
     endpoint: `updatelists/${updateListId}/products`,
   } satisfies Config<AddProductsUpdateList>;
 
@@ -129,6 +117,7 @@ const AddProductsForm = () => {
             }
           );
         }}
+        downloadUrl="/csvTemplates/updatelist_import.csv"
       />
     </div>
   );

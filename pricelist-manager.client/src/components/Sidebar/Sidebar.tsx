@@ -21,7 +21,7 @@ const Sidebar = ({ topLinks, bottomLinks }: Props) => {
         ))}
       </ul>
 
-      {bottomLinks && (
+      {/* {bottomLinks && (
         <ul className="flex flex-col gap-4">
           {bottomLinks.map((link, index) => (
             <li key={index}>
@@ -29,7 +29,7 @@ const Sidebar = ({ topLinks, bottomLinks }: Props) => {
             </li>
           ))}
         </ul>
-      )}
+      )} */}
     </aside>
   );
 };

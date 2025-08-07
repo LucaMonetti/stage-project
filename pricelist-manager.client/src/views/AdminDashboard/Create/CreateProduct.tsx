@@ -205,6 +205,7 @@ const CreateProductForm = () => {
                 }
               );
             }}
+            downloadUrl="/csvTemplates/product_import.csv"
           />
         </>
       )}
