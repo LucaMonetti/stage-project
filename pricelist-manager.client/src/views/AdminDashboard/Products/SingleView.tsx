@@ -31,9 +31,6 @@ const SingleProductView = () => {
   }
 
   useEffect(() => {
-    if (!(isAdmin() || user?.company.id === data?.company.id))
-      navigate("/auth/login");
-
     if (isError) {
       navigate("/error/404");
     }
