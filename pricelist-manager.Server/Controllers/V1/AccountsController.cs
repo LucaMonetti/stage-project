@@ -162,6 +162,46 @@ namespace pricelist_manager.Server.Controllers.V1
             }
         }
 
+        [HttpPut("{id:guid}/password")]
+        public async Task<IActionResult> ChangePassword(Guid id, [FromBody] ChangePasswordDTO dto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            // Get current user from JWT token
+            var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(currentUserId))
+            {
+                return Unauthorized("Invalid token");
+            }
+
+            var loggedUser = await UserManager.FindByIdAsync(currentUserId);
+
+            if (loggedUser == null || !(loggedUser.Id == id.ToString() || User.IsInRole("Admin")))
+            {
+                return Unauthorized();
+            }
+
+            var (user, roles) = await UserRepository.GetById(id.ToString());
+            if (user == null)
+            {
+                return NotFound("User not found");
+            }
+
+            var result = await UserManager.ChangePasswordAsync(user, dto.OldPassword, dto.NewPassword);
+            if (!result.Succeeded)
+            {
+                return BadRequest(result.Errors);
+            }
+
+            await Logger.LogAsync(user, currentUserId, DatabaseOperationType.Update);
+
+            return Ok(UserMapping.MapToDTO(user, roles));
+        }
+
         [HttpPost("add-role")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> AddRole([FromBody] string role)

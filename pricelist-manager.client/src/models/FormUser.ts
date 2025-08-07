@@ -30,11 +30,11 @@ export const ChangePasswordSchema = z
     id: z.guid(),
     oldPassword: z.string().min(1, "Necessario inserire la vecchia password."),
     newPassword: z.string().min(1, "Necessario inserire la nuova password."),
-    confirmNewPassword: z
+    confirmPassword: z
       .string()
       .min(1, "Necessario confermare la nuova password."),
   })
-  .refine((data) => data.newPassword === data.confirmNewPassword, {
+  .refine((data) => data.newPassword === data.confirmPassword, {
     message: "Le nuove password non coincidono.",
   });
 

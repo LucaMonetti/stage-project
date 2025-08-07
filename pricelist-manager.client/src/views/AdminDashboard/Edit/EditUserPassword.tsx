@@ -50,7 +50,7 @@ const EditUserPasswordForm = () => {
             },
           },
           {
-            id: "confirmNewPassword",
+            id: "confirmPassword",
             label: "Conferma Nuova Password",
             type: "password",
             placeholder: "Confermare la nuova password per l'Utente.",
@@ -75,7 +75,7 @@ const EditUserPasswordForm = () => {
       id: editUser.data.id,
       oldPassword: "",
       newPassword: "",
-      confirmNewPassword: "",
+      confirmPassword: "",
     };
   }
 
