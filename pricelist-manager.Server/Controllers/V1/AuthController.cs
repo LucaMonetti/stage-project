@@ -58,45 +58,57 @@ namespace pricelist_manager.Server.Controllers.V1
                 return BadRequest(ModelState);
             }
 
-            var user = UserMapping.MapToUser(dto);
-
-            using var transition = await Context.Database.BeginTransactionAsync();
-
-            var res = await UserManager.CreateAsync(user, dto.Password);
-
-            if (res.Errors.Any())
-            {
-                await transition.RollbackAsync();
-                return BadRequest(res.Errors);
-            }
-
-            if (!await RoleManager.RoleExistsAsync(Roles.USER))
-            {
-                var role = new IdentityRole(Roles.USER);
-                res = await RoleManager.CreateAsync(role);
-
-                if (res.Errors.Any())
-                {
-                    await transition.RollbackAsync();
-                    return BadRequest(res.Errors);
-                }
-            }
-
-            // Add Roles
-            res = await UserManager.AddToRoleAsync(user, Roles.USER);
-
-            if (res.Errors.Any())
-            {
-                await transition.RollbackAsync();
-                return BadRequest(res.Errors);
-            }
-
             // Get current user from JWT token
             var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
             if (string.IsNullOrEmpty(currentUserId))
             {
                 return Unauthorized("Invalid token");
+            }
+
+            var (_, loggedRoles) = await UserRepository.GetById(currentUserId);
+
+            if (!loggedRoles.Contains("Admin"))
+            {
+                return StatusCode(403, new
+                {
+                    error = "Forbidden",
+                    message = "You can only create users if you are an Admin."
+                });
+            }
+
+
+            var user = UserMapping.MapToUser(dto);
+
+            using var transition = await Context.Database.BeginTransactionAsync();
+
+            var resCreateUser = await UserManager.CreateAsync(user, dto.Password);
+
+            if (resCreateUser.Errors.Any())
+            {
+                await transition.RollbackAsync();
+                return BadRequest(resCreateUser.Errors);
+            }
+
+            if (!await RoleManager.RoleExistsAsync(Roles.USER))
+            {
+                var role = new IdentityRole(Roles.USER);
+                var resCreateRole = await RoleManager.CreateAsync(role);
+
+                if (resCreateRole.Errors.Any())
+                {
+                    await transition.RollbackAsync();
+                    return BadRequest(resCreateRole.Errors);
+                }
+            }
+
+            // Add Roles
+            var resAddToRole = await UserManager.AddToRoleAsync(user, Roles.USER);
+
+            if (resAddToRole.Errors.Any())
+            {
+                await transition.RollbackAsync();
+                return BadRequest(resAddToRole.Errors);
             }
 
             await Logger.LogAsync(user, currentUserId, DatabaseOperationType.Create);

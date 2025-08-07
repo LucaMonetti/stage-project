@@ -26,15 +26,17 @@ namespace pricelist_manager.Server.Controllers.V1
         private readonly IProductMappingService ProductMappingService;
         private readonly IUpdateListMappingService UpdateListMappingService;
         private readonly IMetadataMappingService MetadataMapping;
+        private readonly IUserRepository UserRepository;
 
         private readonly ILoggerRepository<UpdateList> Logger;
 
-        public UpdateListController(IUpdateListRepository updateListRepository, IProductRepository productRepository, IUpdateListMappingService updateListMappingService, IProductToUpdateListMappingService productToUpdateListMappingService, IMetadataMappingService metadataMapping, IProductMappingService productMappingService, ILoggerRepository<UpdateList> logger)
+        public UpdateListController(IUpdateListRepository updateListRepository, IProductRepository productRepository, IUpdateListMappingService updateListMappingService, IProductToUpdateListMappingService productToUpdateListMappingService, IMetadataMappingService metadataMapping, IProductMappingService productMappingService, ILoggerRepository<UpdateList> logger, IUserRepository userRepository)
         {
             UpdateListRepository = updateListRepository;
             ProductRepository = productRepository;
             Logger = logger;
             UpdateListMappingService = updateListMappingService;
+            UserRepository = userRepository;
             ProductToUpdateListMappingService = productToUpdateListMappingService;
             MetadataMapping = metadataMapping;
             ProductMappingService = productMappingService;
@@ -46,6 +48,25 @@ namespace pricelist_manager.Server.Controllers.V1
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
+            }
+
+            // Get current user from JWT token
+            var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(currentUserId))
+            {
+                return Unauthorized("Invalid token");
+            }
+
+            var (loggedUser, _) = await UserRepository.GetById(currentUserId);
+
+            if (loggedUser == null)
+            {
+                return StatusCode(403, new
+                {
+                    error = "Forbidden",
+                    message = "You need to be logged in to access this resource."
+                });
             }
 
             var data = await UpdateListRepository.GetAllAsync(requestParams);
@@ -61,6 +82,25 @@ namespace pricelist_manager.Server.Controllers.V1
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
+            }
+
+            // Get current user from JWT token
+            var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(currentUserId))
+            {
+                return Unauthorized("Invalid token");
+            }
+
+            var (loggedUser, _) = await UserRepository.GetById(currentUserId);
+
+            if (loggedUser == null)
+            {
+                return StatusCode(403, new
+                {
+                    error = "Forbidden",
+                    message = "You need to be logged in to access this resource."
+                });
             }
 
             try
@@ -82,6 +122,25 @@ namespace pricelist_manager.Server.Controllers.V1
                 return BadRequest(ModelState);
             }
 
+            // Get current user from JWT token
+            var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(currentUserId))
+            {
+                return Unauthorized("Invalid token");
+            }
+
+            var (loggedUser, _) = await UserRepository.GetById(currentUserId);
+
+            if (loggedUser == null)
+            {
+                return StatusCode(403, new
+                {
+                    error = "Forbidden",
+                    message = "You need to be logged in to access this resource."
+                });
+            }
+
             try
             {
                 var data = await UpdateListRepository.GetProductsByList(id, requestParams);
@@ -101,6 +160,25 @@ namespace pricelist_manager.Server.Controllers.V1
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
+            }
+
+            // Get current user from JWT token
+            var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(currentUserId))
+            {
+                return Unauthorized("Invalid token");
+            }
+
+            var (loggedUser, _) = await UserRepository.GetById(currentUserId);
+
+            if (loggedUser == null)
+            {
+                return StatusCode(403, new
+                {
+                    error = "Forbidden",
+                    message = "You need to be logged in to access this resource."
+                });
             }
 
             try
@@ -125,31 +203,45 @@ namespace pricelist_manager.Server.Controllers.V1
                 return BadRequest(ModelState);
             }
 
+            // Get current user from JWT token
+            var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(currentUserId))
+            {
+                return Unauthorized("Invalid token");
+            }
+
+            var (loggedUser, loggedRoles) = await UserRepository.GetById(currentUserId);
+
+            if (loggedUser == null && !(loggedRoles.Contains("Admin") || loggedUser!.CompanyId == dto.CompanyId))
+            {
+                return StatusCode(403, new
+                {
+                    error = "Forbidden",
+                    message = "You need to be part of the company or an admin to create this updatelist."
+                });
+            }
+
             try
             {
-                // Get current user from JWT token
-                var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-                if (string.IsNullOrEmpty(currentUserId))
-                {
-                    return Unauthorized("Invalid token");
-                }
-
                 // Create UpdateList
                 var item = await UpdateListRepository.CreateAsync(UpdateListMappingService.MapToUpdateList(dto));
                 await Logger.LogAsync(item, currentUserId, DatabaseOperationType.Create);
 
                 // Add Products To List
-                var res = await UpdateListRepository.AddProducts(ProductToUpdateListMappingService.MapToModels(item.Id, dto.Products ?? []));
-                await Logger.LogAsync(item, currentUserId, DatabaseOperationType.UpdateInnerProducts);
+                if (dto.Products != null && dto.Products.Count != 0)
+                {
+                    var res = await UpdateListRepository.AddProducts(ProductToUpdateListMappingService.MapToModels(item.Id, dto.Products ?? []));
+                    await Logger.LogAsync(item, currentUserId, DatabaseOperationType.UpdateInnerProducts);
+                }
 
                 return base.Ok(UpdateListMappingService.MapToDTO(item));
             }
-            catch (Exceptions.AlreadyExistException<UpdateList> e)
+            catch (AlreadyExistException<UpdateList> e)
             {
                 return base.Conflict(e.Message);
             }
-            catch (Exceptions.AlreadyExistException<ProductToUpdateList> e)
+            catch (AlreadyExistException<ProductToUpdateList> e)
             {
                 return base.Conflict(e.Message);
             }
@@ -165,6 +257,27 @@ namespace pricelist_manager.Server.Controllers.V1
 
             try
             {
+                UpdateList updatelist = await UpdateListRepository.GetByIdAsync(id);
+
+                // Get current user from JWT token
+                var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                if (string.IsNullOrEmpty(currentUserId))
+                {
+                    return Unauthorized("Invalid token");
+                }
+
+                var (loggedUser, loggedRoles) = await UserRepository.GetById(currentUserId);
+
+                if (loggedUser == null && !(loggedRoles.Contains("Admin") || loggedUser!.CompanyId == updatelist.CompanyId))
+                {
+                    return StatusCode(403, new
+                    {
+                        error = "Forbidden",
+                        message = "You need to be part of the company or an admin to update this product from the updatelist."
+                    });
+                }
+
                 // Sync products list
                 var existingProducts = await UpdateListRepository.GetAllProductsByList(id);
                 var existingProductIds = existingProducts.Select(p => p.ProductId).ToHashSet();
@@ -180,7 +293,6 @@ namespace pricelist_manager.Server.Controllers.V1
 
                 // Update status of update list
                 var products = await UpdateListRepository.GetProductsByStatus(id, Status.Pending);
-                var updatelist = await UpdateListRepository.GetByIdAsync(id);
 
                 if (products.Count != 0 && updatelist.Status != Status.Pending)
                 {
@@ -188,23 +300,19 @@ namespace pricelist_manager.Server.Controllers.V1
                     await UpdateListRepository.UpdateAsync(updatelist);
                 }
 
-                // Get current user from JWT token
-                var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-                if (string.IsNullOrEmpty(currentUserId))
-                {
-                    return Unauthorized("Invalid token");
-                }
-
                 await Logger.LogAsync(updatelist, currentUserId, DatabaseOperationType.UpdateInnerProducts);
 
                 return base.Ok(UpdateListMappingService.MapToDTO(updatelist));
             }
-            catch (Exceptions.AlreadyExistException<UpdateList> e)
+            catch (NotFoundException<UpdateList> e)
+            {
+                return NotFound(e.Message);
+            }
+            catch (AlreadyExistException<UpdateList> e)
             {
                 return base.Conflict(e.Message);
             }
-            catch (Exceptions.AlreadyExistException<ProductToUpdateList> e)
+            catch (AlreadyExistException<ProductToUpdateList> e)
             {
                 return base.Conflict(e.Message);
             }
@@ -223,8 +331,6 @@ namespace pricelist_manager.Server.Controllers.V1
                 // Check if the update list exists
                 var updatelist = await UpdateListRepository.GetByIdAsync(id);
 
-                await UpdateListRepository.DeleteProductAndUpdateStatus(id, dto.ProductId);
-
                 // Get current user from JWT token
                 var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
@@ -232,6 +338,19 @@ namespace pricelist_manager.Server.Controllers.V1
                 {
                     return Unauthorized("Invalid token");
                 }
+
+                var (loggedUser, loggedRoles) = await UserRepository.GetById(currentUserId);
+
+                if (loggedUser == null && !(loggedRoles.Contains("Admin") || loggedUser!.CompanyId == updatelist.CompanyId))
+                {
+                    return StatusCode(403, new
+                    {
+                        error = "Forbidden",
+                        message = "You need to be part of the company or an admin to delete this product from the updatelist."
+                    });
+                }
+
+                await UpdateListRepository.DeleteProductAndUpdateStatus(id, dto.ProductId);
 
                 await Logger.LogAsync(updatelist, currentUserId, DatabaseOperationType.UpdateInnerProducts);
 
@@ -268,11 +387,7 @@ namespace pricelist_manager.Server.Controllers.V1
 
             try
             {
-                var item = await UpdateListRepository.GetByIdAsync(id);
-
-                var model = UpdateListMappingService.MapToUpdateList(item, dto);
-
-                var res = await UpdateListRepository.UpdateAsync(model);
+                var updatelist = await UpdateListRepository.GetByIdAsync(id);
 
                 // Get current user from JWT token
                 var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -282,9 +397,24 @@ namespace pricelist_manager.Server.Controllers.V1
                     return Unauthorized("Invalid token");
                 }
 
+                var (loggedUser, loggedRoles) = await UserRepository.GetById(currentUserId);
+
+                if (loggedUser == null && !(loggedRoles.Contains("Admin") || loggedUser!.CompanyId == updatelist.CompanyId))
+                {
+                    return StatusCode(403, new
+                    {
+                        error = "Forbidden",
+                        message = "You need to be part of the company or an admin to update this updatelist."
+                    });
+                }
+
+                var model = UpdateListMappingService.MapToUpdateList(updatelist, dto);
+
+                var res = await UpdateListRepository.UpdateAsync(model);
+
                 await Logger.LogAsync(res, currentUserId, DatabaseOperationType.Update);
 
-                return Ok(item);
+                return Ok(updatelist);
             }
             catch (NotFoundException<UpdateList> e)
             {
@@ -308,11 +438,7 @@ namespace pricelist_manager.Server.Controllers.V1
 
             try
             {
-                var item = await UpdateListRepository.GetByIdAsync(id);
-
-                var model = UpdateListMappingService.MapToUpdateList(item, dto);
-
-                var res = await UpdateListRepository.UpdateAsync(model);
+                var updatelist = await UpdateListRepository.GetByIdAsync(id);
 
                 // Get current user from JWT token
                 var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -321,6 +447,21 @@ namespace pricelist_manager.Server.Controllers.V1
                 {
                     return Unauthorized("Invalid token");
                 }
+
+                var (loggedUser, loggedRoles) = await UserRepository.GetById(currentUserId);
+
+                if (loggedUser == null && !(loggedRoles.Contains("Admin") || loggedUser!.CompanyId == updatelist.CompanyId))
+                {
+                    return StatusCode(403, new
+                    {
+                        error = "Forbidden",
+                        message = "You need to be part of the company or an admin to update this updatelist."
+                    });
+                }
+
+                var model = UpdateListMappingService.MapToUpdateList(updatelist, dto);
+
+                var res = await UpdateListRepository.UpdateAsync(model);
 
                 await Logger.LogAsync(res, currentUserId, DatabaseOperationType.Update);
 
@@ -342,17 +483,30 @@ namespace pricelist_manager.Server.Controllers.V1
 
             try
             {
+                UpdateList updatelist = await UpdateListRepository.GetByIdAsync(id);
+
+                // Get current user from JWT token
+                var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                if (string.IsNullOrEmpty(currentUserId))
+                {
+                    return Unauthorized("Invalid token");
+                }
+
+                var (loggedUser, loggedRoles) = await UserRepository.GetById(currentUserId);
+
+                if (loggedUser == null && !(loggedRoles.Contains("Admin") || loggedUser!.CompanyId == updatelist.CompanyId))
+                {
+                    return StatusCode(403, new
+                    {
+                        error = "Forbidden",
+                        message = "You need to be part of the company or an admin to delete this updatelist."
+                    });
+                }
+
                 var item = await UpdateListRepository.DeleteAsync(id);
 
                 // Todo: Disable instead of delete
-
-                // // Get current user from JWT token
-                // var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-                // if (string.IsNullOrEmpty(currentUserId))
-                // {
-                //     return Unauthorized("Invalid token");
-                // }
 
                 // await Logger.LogAsync(item, currentUserId, DatabaseOperationType.Delete);
 

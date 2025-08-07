@@ -48,6 +48,7 @@ namespace pricelist_manager.Server.Controllers.V1
         }
 
         [HttpGet("{userId}")]
+        [Authorize]
         public async Task<ActionResult<UserDTO>> GetById(string userId)
         {
             if (!ModelState.IsValid)
@@ -57,6 +58,15 @@ namespace pricelist_manager.Server.Controllers.V1
 
             try
             {
+                // Get current user from JWT token
+                var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var (user, _) = await UserRepository.GetById(currentUserId ?? "");
+
+                if (string.IsNullOrEmpty(currentUserId) || user == null)
+                {
+                    return Unauthorized("Invalid token");
+                }
+
                 var data = await UserRepository.GetById(userId);
                 return Ok(UserMapping.MapToDTO(data.user, data.roles));
             }
@@ -96,9 +106,9 @@ namespace pricelist_manager.Server.Controllers.V1
                 return Unauthorized("Invalid token");
             }
 
-            // Check if user is admin or editing their own account
-            var isAdmin = User.IsInRole("Admin");
-            if (!isAdmin && currentUserId != id)
+            var (_, loggedRoles) = await UserRepository.GetById(currentUserId);
+
+            if (!loggedRoles.Contains("Admin") && currentUserId != id)
             {
                 return StatusCode(403, new
                 {
@@ -107,7 +117,7 @@ namespace pricelist_manager.Server.Controllers.V1
                 });
             }
 
-            var (user, roles) = await UserRepository.GetById(id);
+            var (user, _) = await UserRepository.GetById(id);
             if (user == null)
             {
                 return NotFound("User not found");
@@ -178,11 +188,15 @@ namespace pricelist_manager.Server.Controllers.V1
                 return Unauthorized("Invalid token");
             }
 
-            var loggedUser = await UserManager.FindByIdAsync(currentUserId);
+            var (loggedUser, loggedRoles) = await UserRepository.GetById(currentUserId);
 
-            if (loggedUser == null || !(loggedUser.Id == id.ToString() || User.IsInRole("Admin")))
+            if (!(loggedRoles.Contains("Admin") || loggedUser.Id == id.ToString()) || loggedUser == null)
             {
-                return Unauthorized();
+                return StatusCode(403, new
+                {
+                    error = "Forbidden",
+                    message = "You can only edit your own account"
+                });
             }
 
             var (user, roles) = await UserRepository.GetById(id.ToString());
@@ -202,57 +216,57 @@ namespace pricelist_manager.Server.Controllers.V1
             return Ok(UserMapping.MapToDTO(user, roles));
         }
 
-        [HttpPost("add-role")]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> AddRole([FromBody] string role)
-        {
-            if (!await RoleManager.RoleExistsAsync(role))
-            {
-                var result = await RoleManager.CreateAsync(new IdentityRole(role));
-                if (result.Succeeded)
-                {
-                    return Ok(new { message = "Role added successfully" });
-                }
+        // [HttpPost("add-role")]
+        // [Authorize(Roles = "Admin")]
+        // public async Task<IActionResult> AddRole([FromBody] string role)
+        // {
+        //     if (!await RoleManager.RoleExistsAsync(role))
+        //     {
+        //         var result = await RoleManager.CreateAsync(new IdentityRole(role));
+        //         if (result.Succeeded)
+        //         {
+        //             return Ok(new { message = "Role added successfully" });
+        //         }
 
-                return BadRequest(result.Errors);
-            }
+        //         return BadRequest(result.Errors);
+        //     }
 
-            return BadRequest("Role already exists");
-        }
+        //     return BadRequest("Role already exists");
+        // }
 
-        [HttpPost("assign-role")]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> AssignRole([FromBody] UserRoleDTO dto)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+        // [HttpPost("assign-role")]
+        // [Authorize(Roles = "Admin")]
+        // public async Task<IActionResult> AssignRole([FromBody] UserRoleDTO dto)
+        // {
+        //     if (!ModelState.IsValid)
+        //     {
+        //         return BadRequest(ModelState);
+        //     }
 
-            var user = await UserManager.FindByEmailAsync(dto.Email);
-            if (user == null)
-            {
-                return BadRequest("User not found");
-            }
+        //     var user = await UserManager.FindByEmailAsync(dto.Email);
+        //     if (user == null)
+        //     {
+        //         return BadRequest("User not found");
+        //     }
 
-            var result = await UserManager.AddToRoleAsync(user, dto.Role);
-            if (result.Errors.Any())
-            {
-                return BadRequest(result.Errors);
-            }
+        //     var result = await UserManager.AddToRoleAsync(user, dto.Role);
+        //     if (result.Errors.Any())
+        //     {
+        //         return BadRequest(result.Errors);
+        //     }
 
-            // Get current user from JWT token
-            var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        //     // Get current user from JWT token
+        //     var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-            if (string.IsNullOrEmpty(currentUserId))
-            {
-                return Unauthorized("Invalid token");
-            }
+        //     if (string.IsNullOrEmpty(currentUserId))
+        //     {
+        //         return Unauthorized("Invalid token");
+        //     }
 
-            await Logger.LogAsync(user, currentUserId, DatabaseOperationType.Update);
+        //     await Logger.LogAsync(user, currentUserId, DatabaseOperationType.Update);
 
-            return Ok(new { message = "Role assigned successfully" });
+        //     return Ok(new { message = "Role assigned successfully" });
 
-        }
+        // }
     }
 }

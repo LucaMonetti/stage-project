@@ -1,4 +1,5 @@
-﻿using Asp.Versioning;
+﻿using System.Security.Claims;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using pricelist_manager.Server.Interfaces;
@@ -32,6 +33,25 @@ namespace pricelist_manager.Server.Controllers.V1
                 return BadRequest(ModelState);
             }
 
+            // Get current user from JWT token
+            var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(currentUserId))
+            {
+                return Unauthorized("Invalid token");
+            }
+
+            var (loggedUser, _) = await UserRepository.GetById(currentUserId);
+
+            if (loggedUser == null)
+            {
+                return StatusCode(403, new
+                {
+                    error = "Forbidden",
+                    message = "You need to be logged in to access this resource."
+                });
+            }
+
             var data = await ProductsRepository.GetStatistics(companyId);
 
             return Ok(data);
@@ -43,6 +63,25 @@ namespace pricelist_manager.Server.Controllers.V1
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
+            }
+
+            // Get current user from JWT token
+            var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(currentUserId))
+            {
+                return Unauthorized("Invalid token");
+            }
+
+            var (loggedUser, _) = await UserRepository.GetById(currentUserId);
+
+            if (loggedUser == null)
+            {
+                return StatusCode(403, new
+                {
+                    error = "Forbidden",
+                    message = "You need to be logged in to access this resource."
+                });
             }
 
             var data = await CompanyRepository.GetStatistics();
@@ -58,6 +97,25 @@ namespace pricelist_manager.Server.Controllers.V1
                 return BadRequest(ModelState);
             }
 
+            // Get current user from JWT token
+            var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(currentUserId))
+            {
+                return Unauthorized("Invalid token");
+            }
+
+            var (loggedUser, _) = await UserRepository.GetById(currentUserId);
+
+            if (loggedUser == null)
+            {
+                return StatusCode(403, new
+                {
+                    error = "Forbidden",
+                    message = "You need to be logged in to access this resource."
+                });
+            }
+
             var data = await UserRepository.GetStatistics();
 
             return Ok(data);
@@ -69,6 +127,25 @@ namespace pricelist_manager.Server.Controllers.V1
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
+            }
+
+            // Get current user from JWT token
+            var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(currentUserId))
+            {
+                return Unauthorized("Invalid token");
+            }
+
+            var (loggedUser, _) = await UserRepository.GetById(currentUserId);
+
+            if (loggedUser == null)
+            {
+                return StatusCode(403, new
+                {
+                    error = "Forbidden",
+                    message = "You need to be logged in to access this resource."
+                });
             }
 
             var data = await PricelistRepository.GetStatistics(companyId);

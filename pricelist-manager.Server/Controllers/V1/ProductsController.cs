@@ -26,7 +26,9 @@ namespace pricelist_manager.Server.Controllers.V1
         private readonly IProductInstanceMappingService ProductInstanceMapping;
         private readonly IMetadataMappingService MetadataMapping;
 
-        public ProductsController(IProductRepository productRepository, IPricelistRepository pricelistRepository, IProductInstanceRepository productInstanceRepository, IProductMappingService productMapping, IProductInstanceMappingService productInstanceMapping, IUpdateListRepository updateListRepository, IMetadataMappingService metadataMapping)
+        private readonly IUserRepository UserRepository;
+
+        public ProductsController(IProductRepository productRepository, IPricelistRepository pricelistRepository, IProductInstanceRepository productInstanceRepository, IProductMappingService productMapping, IProductInstanceMappingService productInstanceMapping, IUpdateListRepository updateListRepository, IMetadataMappingService metadataMapping, IUserRepository userRepository)
         {
             ProductRepository = productRepository;
             PricelistRepository = pricelistRepository;
@@ -35,6 +37,7 @@ namespace pricelist_manager.Server.Controllers.V1
             ProductInstanceMapping = productInstanceMapping;
             UpdateListRepository = updateListRepository;
             MetadataMapping = metadataMapping;
+            UserRepository = userRepository;
         }
 
         [HttpGet]
@@ -42,6 +45,25 @@ namespace pricelist_manager.Server.Controllers.V1
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
+
+            // Get current user from JWT token
+            var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(currentUserId))
+            {
+                return Unauthorized("Invalid token");
+            }
+
+            var (loggedUser, _) = await UserRepository.GetById(currentUserId);
+
+            if (loggedUser == null)
+            {
+                return StatusCode(403, new
+                {
+                    error = "Forbidden",
+                    message = "You need to be logged in to access this resource."
+                });
+            }
 
             var data = await ProductRepository.GetAllAsync(requestParams);
 
@@ -55,6 +77,25 @@ namespace pricelist_manager.Server.Controllers.V1
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
+
+            // Get current user from JWT token
+            var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(currentUserId))
+            {
+                return Unauthorized("Invalid token");
+            }
+
+            var (loggedUser, _) = await UserRepository.GetById(currentUserId);
+
+            if (loggedUser == null)
+            {
+                return StatusCode(403, new
+                {
+                    error = "Forbidden",
+                    message = "You need to be logged in to access this resource."
+                });
+            }
 
             try
             {
@@ -78,6 +119,9 @@ namespace pricelist_manager.Server.Controllers.V1
 
             try
             {
+                // Check the pricelist company
+                Pricelist pricelist = await PricelistRepository.GetByIdAsync(dto.PricelistId);
+
                 // Get current user from JWT token
                 var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
@@ -86,8 +130,18 @@ namespace pricelist_manager.Server.Controllers.V1
                     return Unauthorized("Invalid token");
                 }
 
+                var (loggedUser, loggedRoles) = await UserRepository.GetById(currentUserId);
 
-                Pricelist pricelist = await PricelistRepository.GetByIdAsync(dto.PricelistId);
+                if (loggedUser == null || !(loggedRoles.Contains("Admin") || loggedUser.CompanyId == pricelist.CompanyId))
+                {
+                    return StatusCode(403, new
+                    {
+                        error = "Forbidden",
+                        message = "You need to be part of the company or an Admin to create a product."
+                    });
+                }
+
+                // Create the product
                 Product data = ProductMapping.MapToProduct(dto, pricelist.CompanyId, currentUserId);
 
                 var res = await ProductRepository.CreateAsync(data);
@@ -119,6 +173,9 @@ namespace pricelist_manager.Server.Controllers.V1
 
             try
             {
+                Product oldProd = await ProductRepository.GetByIdAsync(productId);
+                Pricelist pricelist = await PricelistRepository.GetByIdAsync(oldProd.PricelistId);
+
                 // Get current user from JWT token
                 var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
@@ -127,7 +184,16 @@ namespace pricelist_manager.Server.Controllers.V1
                     return Unauthorized("Invalid token");
                 }
 
-                Product oldProd = await ProductRepository.GetByIdAsync(productId);
+                var (loggedUser, loggedRoles) = await UserRepository.GetById(currentUserId);
+
+                if (loggedUser == null || !(loggedRoles.Contains("Admin") || loggedUser.CompanyId == pricelist.CompanyId))
+                {
+                    return StatusCode(403, new
+                    {
+                        error = "Forbidden",
+                        message = "You need to be logged in to access this resource."
+                    });
+                }
 
                 ProductInstance newInstance = ProductInstanceMapping.MapToProductInstance(dto, oldProd.LatestVersion + 1, currentUserId);
 
@@ -170,6 +236,10 @@ namespace pricelist_manager.Server.Controllers.V1
             {
                 return Conflict(e.Message);
             }
+            catch (NotFoundException<Pricelist> e)
+            {
+                return NotFound(e.Message);
+            }
         }
 
         [HttpDelete("{productId}")]
@@ -182,10 +252,36 @@ namespace pricelist_manager.Server.Controllers.V1
 
             try
             {
+                Product product = await ProductRepository.GetByIdAsync(productId);
+                Pricelist pricelist = await PricelistRepository.GetByIdAsync(product.PricelistId);
+
+                // Get current user from JWT token
+                var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                if (string.IsNullOrEmpty(currentUserId))
+                {
+                    return Unauthorized("Invalid token");
+                }
+
+                var (loggedUser, loggedRoles) = await UserRepository.GetById(currentUserId);
+
+                if (loggedUser == null || !(loggedRoles.Contains("Admin") || loggedUser.CompanyId == pricelist.CompanyId))
+                {
+                    return StatusCode(403, new
+                    {
+                        error = "Forbidden",
+                        message = "You need to be part of the company or an admin to delete this product."
+                    });
+                }
+
                 var res = await ProductRepository.DeleteAsync(productId);
                 return Ok(ProductMapping.MapToDTO(res));
             }
             catch (NotFoundException<Product> e)
+            {
+                return NotFound(e.Message);
+            }
+            catch (NotFoundException<Pricelist> e)
             {
                 return NotFound(e.Message);
             }

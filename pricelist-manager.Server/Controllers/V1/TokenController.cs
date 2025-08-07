@@ -1,4 +1,5 @@
-﻿using Asp.Versioning;
+﻿using System.Security.Claims;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -35,12 +36,31 @@ namespace pricelist_manager.Server.Controllers.V1
                 return BadRequest(ModelState);
             }
 
+            // Get current user from JWT token
+            var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(currentUserId))
+            {
+                return Unauthorized("Invalid token");
+            }
+
+            var (loggedUser, _) = await UserRepository.GetById(currentUserId);
+
+            if (loggedUser == null)
+            {
+                return StatusCode(403, new
+                {
+                    error = "Forbidden",
+                    message = "You need to be logged in to make this action."
+                });
+            }
+
             string accessToken = tokenApi.AccessToken;
             string refreshToken = tokenApi.RefreshToken;
 
             var principal = TokenService.GetPrincipleFromExipiredToken(accessToken);
 
-            var email = principal.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Email)?.Value;
+            var email = principal.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
 
             var user = await UserService.FindByEmailAsync(email ?? "");
 
@@ -77,14 +97,28 @@ namespace pricelist_manager.Server.Controllers.V1
             if (User.Identity == null)
                 return NoContent();
 
-            var username = User.Identity.Name;
-            var user = await UserService.FindByNameAsync(username ?? "");
+            // Get current user from JWT token
+            var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-            if (user is null) return BadRequest();
+            if (string.IsNullOrEmpty(currentUserId))
+            {
+                return Unauthorized("Invalid token");
+            }
 
-            user.RefreshToken = null;
+            var (loggedUser, loggedRoles) = await UserRepository.GetById(currentUserId);
 
-            await UserRepository.UpdateAsync(user);
+            if (loggedUser == null && !loggedRoles.Contains("Admin"))
+            {
+                return StatusCode(403, new
+                {
+                    error = "Forbidden",
+                    message = "You need to be logged as an admin to perform this action."
+                });
+            }
+
+            loggedUser!.RefreshToken = null;
+
+            await UserRepository.UpdateAsync(loggedUser);
 
             return NoContent();
         }

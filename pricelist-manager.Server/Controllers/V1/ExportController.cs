@@ -24,23 +24,45 @@ namespace pricelist_manager.Server.Controllers.V1
         private readonly ICompanyRepository CompanyRepository;
         private readonly IPricelistRepository PricelistRepository;
         private readonly IUpdateListRepository UpdateListRepository;
+        private readonly IUserRepository UserRepository;
 
         private readonly IProductToUpdateListMappingService ProductToUpdateListMappingService;
 
-        public ExportController(ICompanyRepository companyRepository, IPricelistRepository pricelistRepository, IUpdateListRepository updateListRepository, IProductToUpdateListMappingService productToUpdateListMappingService)
+        public ExportController(ICompanyRepository companyRepository, IPricelistRepository pricelistRepository, IUpdateListRepository updateListRepository, IProductToUpdateListMappingService productToUpdateListMappingService, IUserRepository userRepository)
         {
             UpdateListRepository = updateListRepository;
             CompanyRepository = companyRepository;
             PricelistRepository = pricelistRepository;
             ProductToUpdateListMappingService = productToUpdateListMappingService;
+            UserRepository = userRepository;
         }
 
         [HttpGet("companies/{companyId}")]
+        [Authorize]
         public async Task<IActionResult> ExportCompany(string companyId)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
+            }
+
+            // Get current user from JWT token
+            var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(currentUserId))
+            {
+                return Unauthorized("Invalid token");
+            }
+
+            var (loggedUser, _) = await UserRepository.GetById(currentUserId);
+
+            if (loggedUser == null)
+            {
+                return StatusCode(403, new
+                {
+                    error = "Forbidden",
+                    message = "You need to be logged in to download this resource."
+                });
             }
 
             try
@@ -106,11 +128,31 @@ namespace pricelist_manager.Server.Controllers.V1
 
 
         [HttpGet("pricelists/{pricelistId:guid}")]
+        [Authorize]
         public async Task<IActionResult> ExportPricelist(Guid pricelistId)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
+            }
+
+            // Get current user from JWT token
+            var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(currentUserId))
+            {
+                return Unauthorized("Invalid token");
+            }
+
+            var (loggedUser, _) = await UserRepository.GetById(currentUserId);
+
+            if (loggedUser == null)
+            {
+                return StatusCode(403, new
+                {
+                    error = "Forbidden",
+                    message = "You need to be logged in to download this resource."
+                });
             }
 
             try
@@ -182,11 +224,31 @@ namespace pricelist_manager.Server.Controllers.V1
         }
 
         [HttpGet("updatelists/{updatelistId:int}")]
+        [Authorize]
         public async Task<IActionResult> ExportUpdateList(int updatelistId)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
+            }
+
+            // Get current user from JWT token
+            var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(currentUserId))
+            {
+                return Unauthorized("Invalid token");
+            }
+
+            var (loggedUser, _) = await UserRepository.GetById(currentUserId);
+
+            if (loggedUser == null)
+            {
+                return StatusCode(403, new
+                {
+                    error = "Forbidden",
+                    message = "You need to be logged in to download this resource."
+                });
             }
 
             try

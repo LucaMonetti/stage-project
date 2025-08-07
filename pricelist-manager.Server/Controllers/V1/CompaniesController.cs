@@ -53,10 +53,30 @@ namespace pricelist_manager.Server.Controllers.V1
         }
 
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> GetAll([FromQuery] CompanyQueryParams requestParams)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
+
+            // Get current user from JWT token
+            var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(currentUserId))
+            {
+                return Unauthorized("Invalid token");
+            }
+
+            var (loggedUser, _) = await UserRepository.GetById(currentUserId);
+
+            if (loggedUser == null)
+            {
+                return StatusCode(403, new
+                {
+                    error = "Forbidden",
+                    message = "You need to be logged in to access this resource."
+                });
+            }
 
             var data = await CompanyRepository.GetAllAsync(requestParams);
 
@@ -66,11 +86,31 @@ namespace pricelist_manager.Server.Controllers.V1
         }
 
         [HttpGet("{id}")]
+        [Authorize]
         public async Task<IActionResult> GetById(string id)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
+            }
+
+            // Get current user from JWT token
+            var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(currentUserId))
+            {
+                return Unauthorized("Invalid token");
+            }
+
+            var (loggedUser, _) = await UserRepository.GetById(currentUserId);
+
+            if (loggedUser == null)
+            {
+                return StatusCode(403, new
+                {
+                    error = "Forbidden",
+                    message = "You need to be logged in to access this resource."
+                });
             }
 
             try
@@ -85,12 +125,31 @@ namespace pricelist_manager.Server.Controllers.V1
         }
 
         [HttpGet("{id}/accounts")]
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         public async Task<ActionResult<ICollection<UserDTO>>> GetAccountByCompany(string id)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
+            }
+
+            // Get current user from JWT token
+            var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(currentUserId))
+            {
+                return Unauthorized("Invalid token");
+            }
+
+            var (loggedUser, _) = await UserRepository.GetById(currentUserId);
+
+            if (loggedUser == null)
+            {
+                return StatusCode(403, new
+                {
+                    error = "Forbidden",
+                    message = "You need to be logged in to access this resource."
+                });
             }
 
             var data = await UserRepository.GetByCompany(id);
@@ -99,11 +158,31 @@ namespace pricelist_manager.Server.Controllers.V1
         }
 
         [HttpGet("{id}/products")]
+        [Authorize]
         public async Task<ActionResult<PagedList<ProductDTO>>> GetProductsByCompany(string id, [FromQuery] ProductQueryParams requestParams)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
+            }
+
+            // Get current user from JWT token
+            var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(currentUserId))
+            {
+                return Unauthorized("Invalid token");
+            }
+
+            var (loggedUser, _) = await UserRepository.GetById(currentUserId);
+
+            if (loggedUser == null)
+            {
+                return StatusCode(403, new
+                {
+                    error = "Forbidden",
+                    message = "You need to be logged in to access this resource."
+                });
             }
 
             var data = await ProductRepository.GetByCompany(id, requestParams);
@@ -114,11 +193,31 @@ namespace pricelist_manager.Server.Controllers.V1
         }
 
         [HttpGet("{id}/pricelists")]
+        [Authorize]
         public async Task<ActionResult<PagedList<PricelistDTO>>> GetPricelistsByCompany(string id, [FromQuery] PricelistQueryParams requestParams)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
+            }
+
+            // Get current user from JWT token
+            var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(currentUserId))
+            {
+                return Unauthorized("Invalid token");
+            }
+
+            var (loggedUser, _) = await UserRepository.GetById(currentUserId);
+
+            if (loggedUser == null)
+            {
+                return StatusCode(403, new
+                {
+                    error = "Forbidden",
+                    message = "You need to be logged in to access this resource."
+                });
             }
 
             var data = await PricelistRepository.GetByCompanyAsync(id, requestParams);
@@ -129,11 +228,31 @@ namespace pricelist_manager.Server.Controllers.V1
         }
 
         [HttpGet("{id}/updatelists")]
+        [Authorize]
         public async Task<ActionResult<PagedList<UpdateList>>> GetUpdateListsByCompany(string id, [FromQuery] UpdateListQueryParams requestParams)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
+            }
+
+            // Get current user from JWT token
+            var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(currentUserId))
+            {
+                return Unauthorized("Invalid token");
+            }
+
+            var (loggedUser, _) = await UserRepository.GetById(currentUserId);
+
+            if (loggedUser == null)
+            {
+                return StatusCode(403, new
+                {
+                    error = "Forbidden",
+                    message = "You need to be logged in to access this resource."
+                });
             }
 
             var data = await UpdateListRepository.GetByCompanyAsync(id, requestParams);
@@ -152,19 +271,31 @@ namespace pricelist_manager.Server.Controllers.V1
                 return BadRequest(ModelState);
             }
 
+            // Get current user from JWT token
+            var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(currentUserId))
+            {
+                return Unauthorized("Invalid token");
+            }
+
+            var (loggedUser, loggedRoles) = await UserRepository.GetById(currentUserId);
+
+            if (loggedUser == null && !loggedRoles.Contains("Admin"))
+            {
+                return StatusCode(403, new
+                {
+                    error = "Forbidden",
+                    message = "You need to be logged in as an Admin to create a company."
+                });
+            }
+
+            // Validate the DTO
             var data = CompanyMapping.MapToCompany(dto);
 
             try
             {
                 var res = await CompanyRepository.CreateAsync(data);
-
-                // Get current user from JWT token
-                var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-                if (string.IsNullOrEmpty(currentUserId))
-                {
-                    return Unauthorized("Invalid token");
-                }
 
                 await Logger.LogAsync(res, currentUserId, DatabaseOperationType.Create);
 
@@ -177,7 +308,7 @@ namespace pricelist_manager.Server.Controllers.V1
         }
 
         [HttpPut("{id}")]
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         public async Task<IActionResult> Update(string id, [FromBody] Company dto)
         {
             if (id != dto.Id)
@@ -191,17 +322,28 @@ namespace pricelist_manager.Server.Controllers.V1
                 return BadRequest(ModelState);
             }
 
+            // Get current user from JWT token
+            var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(currentUserId))
+            {
+                return Unauthorized("Invalid token");
+            }
+
+            var (loggedUser, loggedRoles) = await UserRepository.GetById(currentUserId);
+
+            if (loggedUser == null || !(loggedRoles.Contains("Admin") && loggedUser.CompanyId == id))
+            {
+                return StatusCode(403, new
+                {
+                    error = "Forbidden",
+                    message = "You need to be part of the company or an Admin to update it."
+                });
+            }
+
             try
             {
                 var res = await CompanyRepository.UpdateAsync(dto);
-
-                // Get current user from JWT token
-                var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-                if (string.IsNullOrEmpty(currentUserId))
-                {
-                    return Unauthorized("Invalid token");
-                }
 
                 await Logger.LogAsync(res, currentUserId, DatabaseOperationType.Update);
 
@@ -222,20 +364,30 @@ namespace pricelist_manager.Server.Controllers.V1
                 return BadRequest(ModelState);
             }
 
+            // Get current user from JWT token
+            var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(currentUserId))
+            {
+                return Unauthorized("Invalid token");
+            }
+
+            var (loggedUser, loggedRoles) = await UserRepository.GetById(currentUserId);
+
+            if (loggedUser == null || !loggedRoles.Contains("Admin"))
+            {
+                return StatusCode(403, new
+                {
+                    error = "Forbidden",
+                    message = "You need to be logged in as an Admin to delete a company."
+                });
+            }
+
             try
             {
                 var res = await CompanyRepository.DeleteAsync(id);
 
                 // Todo: Deactivete instead of delete before enable the logging
-
-                // // Get current user from JWT token
-                // var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-                // if (string.IsNullOrEmpty(currentUserId))
-                // {
-                //     return Unauthorized("Invalid token");
-                // }
-
                 // await Logger.LogAsync(res, currentUserId, DatabaseOperationType.Delete);
 
                 return Ok(CompanyMapping.MapToDTO(res));

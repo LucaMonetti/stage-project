@@ -67,17 +67,28 @@ namespace pricelist_manager.Server.Controllers.V1
 
             var pricelist = await PricelistRepository.GetByIdAsync(pricelistId);
 
-            if (pricelist == null)
-            {
-                return NotFound($"Pricelist with ID {pricelistId} not found.");
-            }
-
             // Get current user from JWT token
             var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
             if (string.IsNullOrEmpty(currentUserId))
             {
                 return Unauthorized("Invalid token");
+            }
+
+            var (loggedUser, loggedRoles) = await UserRepository.GetById(currentUserId);
+
+            if (loggedUser == null || !(loggedRoles.Contains("Admin") || loggedUser.CompanyId == pricelist.CompanyId))
+            {
+                return StatusCode(403, new
+                {
+                    error = "Forbidden",
+                    message = "You need to be part of the company or an Admin to import products into this pricelist."
+                });
+            }
+
+            if (pricelist == null)
+            {
+                return NotFound($"Pricelist with ID {pricelistId} not found.");
             }
 
             try
@@ -154,7 +165,16 @@ namespace pricelist_manager.Server.Controllers.V1
                 return Unauthorized("Invalid token");
             }
 
-            var currentUser = await UserRepository.GetById(currentUserId);
+            var (loggedUser, loggedRoles) = await UserRepository.GetById(currentUserId);
+
+            if (loggedUser == null || !(loggedRoles.Contains("Admin") || loggedUser.CompanyId == updatelist.CompanyId))
+            {
+                return StatusCode(403, new
+                {
+                    error = "Forbidden",
+                    message = "You need to be part of the company or an Admin to import products into this updatelist."
+                });
+            }
 
             try
             {
@@ -250,7 +270,7 @@ namespace pricelist_manager.Server.Controllers.V1
                         }
                         else
                         {
-                            productsUpdated.Add((ProductInstanceMappingService.MapToProductInstance(record, product.Versions.First(v => v.Version == product.LatestVersion), currentUser.user.Id), product));
+                            productsUpdated.Add((ProductInstanceMappingService.MapToProductInstance(record, product.Versions.First(v => v.Version == product.LatestVersion), loggedUser.Id), product));
                             product.LatestVersion++;
                         }
                     }
