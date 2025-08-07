@@ -35,6 +35,7 @@ const fetchAllPricelists = async (
 ): Promise<Pricelist[]> => {
   const searchParams = new URLSearchParams();
   ParseFiltersSearchParams(filter, searchParams, PricelistFilterConfig);
+  ParsePaginationSearchParams({ CurrentPage: 1, PageSize: -1 }, searchParams);
 
   const response = await fetch(
     QueryEndpoint.buildUrl(

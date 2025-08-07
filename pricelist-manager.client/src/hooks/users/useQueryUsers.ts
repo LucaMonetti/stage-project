@@ -19,8 +19,14 @@ import QueryEndpoint from "../../helpers/queryEndpoint";
 
 // Fetch all users from the API
 const fetchAllUsers = async (): Promise<User[]> => {
+  const searchParams = new URLSearchParams();
+  ParsePaginationSearchParams({ CurrentPage: 1, PageSize: -1 }, searchParams);
+
   const response = await fetch(
-    QueryEndpoint.buildUrl("accounts"),
+    QueryEndpoint.buildUrl(
+      "accounts" +
+        (searchParams.toString() ? `?${searchParams.toString()}` : "")
+    ),
     apiConfig.get()
   );
   if (!response.ok) {

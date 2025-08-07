@@ -25,8 +25,14 @@ import { apiConfig } from "../../helpers/ApiConfig";
 
 // Fetch all updatelists from the API
 const fetchAllUpdateLists = async (): Promise<UpdateList[]> => {
+  const searchParams = new URLSearchParams();
+  ParsePaginationSearchParams({ CurrentPage: 1, PageSize: -1 }, searchParams);
+
   const response = await fetch(
-    QueryEndpoint.buildUrl("updatelists"),
+    QueryEndpoint.buildUrl(
+      "updatelists" +
+        (searchParams.toString() ? `?${searchParams.toString()}` : "")
+    ),
     apiConfig.get()
   );
   if (!response.ok) {

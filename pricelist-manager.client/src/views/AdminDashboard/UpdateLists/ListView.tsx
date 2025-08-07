@@ -111,9 +111,7 @@ const UpdateListListView = () => {
         return (
           <span
             className={`relative py-2 px-4 pl-6 uppercase whitespace-nowrap text-sm border rounded ${
-              value == Status.Deleted
-                ? "border-red-500 before:bg-red-500"
-                : value == Status.Edited
+              value == Status.Edited
                 ? "border-green-500 before:bg-green-500"
                 : value == Status.Pending
                 ? "border-amber-500 before:bg-amber-500"

@@ -129,6 +129,7 @@ const fetchAllProducts = async (
 ): Promise<Product[]> => {
   const searchParams = new URLSearchParams();
   ParseFiltersSearchParams(filters, searchParams, ProductFilterConfig);
+  ParsePaginationSearchParams({ CurrentPage: 1, PageSize: -1 }, searchParams);
 
   const response = await fetch(
     QueryEndpoint.buildUrl(

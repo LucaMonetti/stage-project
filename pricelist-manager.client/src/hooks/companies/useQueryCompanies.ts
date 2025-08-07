@@ -22,8 +22,14 @@ import { apiConfig } from "../../helpers/ApiConfig";
 
 // Fetch all products from the API
 const fetchAllCompanies = async (): Promise<Company[]> => {
+  const searchParams = new URLSearchParams();
+  ParsePaginationSearchParams({ CurrentPage: 1, PageSize: -1 }, searchParams);
+
   const response = await fetch(
-    QueryEndpoint.buildUrl("companies"),
+    QueryEndpoint.buildUrl(
+      "companies" +
+        (searchParams.toString() ? `?${searchParams.toString()}` : "")
+    ),
     apiConfig.get()
   );
   if (!response.ok) {
