@@ -4,7 +4,7 @@ import MenuLink from "./MenuLink";
 
 import { useState, useRef, useEffect } from "react";
 import ActionButton from "../Buttons/ActionButton";
-import { FaUser } from "react-icons/fa6";
+import { FaPencil, FaUser } from "react-icons/fa6";
 
 function TopBar() {
   const { isAuthenticated, user, logout } = useAuth();
@@ -58,31 +58,33 @@ function TopBar() {
 
         {isAuthenticated ? (
           <div className="flex gap-4 items-center">
-            <p>
-              Ciao,{" "}
-              <Link
-                to={`/dashboard/users/${user?.id}`}
-                className="text-blue-400 relative after:absolute after:bg-blue-400 after:w-0 after:h-0.5 after:-bottom-1 after:left-0 hover:after:w-full after:transition-all cursor-pointer "
-              >
-                {user?.username}
-              </Link>
-            </p>
             <div className="relative group" ref={dropdownRef}>
-              <span
-                className="block bg-gray-400 border-2 border-gray-300 w-9 aspect-square rounded-full"
-                onClick={() => {
-                  console.log("Pressed!");
-                  setShowDrop(!showDrop);
-                }}
-              ></span>
-
+              <p>
+                Benvenuto,{" "}
+                <span
+                  onClick={() => {
+                    setShowDrop(!showDrop);
+                  }}
+                  className="text-blue-400 relative after:absolute after:bg-blue-400 after:w-0 after:h-0.5 after:-bottom-1 after:left-0 hover:after:w-full after:transition-all cursor-pointer "
+                >
+                  {user?.username}
+                </span>
+              </p>
               <div
-                className={`absolute z-50 p-6 rounded bg-gray-900 border-2 border-gray-700 ${
+                className={`absolute z-50 p-6 rounded bg-gray-900 border-2 border-gray-700 flex flex-col gap-4 ${
                   showDrop
                     ? "top-16 right-0"
                     : "top-0 right-0 opacity-0 pointer-events-none"
                 }`}
               >
+                <ActionButton
+                  callback={() =>
+                    navigate(`/dashboard/edit/users/${user?.id}/password`)
+                  }
+                  Icon={FaPencil}
+                  color="blue"
+                  text="Cambio Password"
+                />
                 <ActionButton
                   callback={handleLogout}
                   Icon={FaUser}

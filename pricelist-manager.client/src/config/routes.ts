@@ -25,6 +25,7 @@ import EditUpdatelistForm from "../views/AdminDashboard/Edit/EditUpdatelist";
 import AddProductsForm from "../views/AdminDashboard/UpdateLists/AddProducts";
 import Login from "../views/Auth/Login";
 import DashboardView from "../views/Dashboard/Dashboard";
+import EditUserPasswordForm from "../views/AdminDashboard/Edit/EditUserPassword";
 
 const router = createBrowserRouter([
   {
@@ -89,7 +90,16 @@ const router = createBrowserRouter([
               },
               {
                 path: "users/:userId",
-                Component: EditUserForm,
+                children: [
+                  {
+                    index: true,
+                    Component: EditUserForm,
+                  },
+                  {
+                    path: "password",
+                    Component: EditUserPasswordForm,
+                  },
+                ],
               },
               {
                 path: "updatelists/:updateListId",

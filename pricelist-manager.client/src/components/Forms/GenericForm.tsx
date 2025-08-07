@@ -62,7 +62,7 @@ interface NumberInput<T extends FieldValues> extends BaseInput<T> {
 }
 
 interface SimpleInput<T extends FieldValues> extends BaseInput<T> {
-  type: "text" | "email" | "password" | "url" | "color";
+  type: "text" | "email" | "password" | "url" | "color" | "hidden";
   maxLength?: number;
   onChange?: ChangeEventHandler<
     HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
@@ -312,7 +312,7 @@ function GenericActualForm<T extends FieldValues>({
       method={method}
       id={id}
     >
-      {methods.formState.errors.root && (
+      {(methods.formState.errors.root || methods.formState.errors[""]) && (
         <div
           className="bg-opacity-10 border border-l-8 border-red-400 p-3 rounded-r-md"
           ref={errorDiv}
@@ -320,7 +320,12 @@ function GenericActualForm<T extends FieldValues>({
           <div className="flex items-center gap-2">
             <FaExclamation className="text-red-400" />
             <span className="text-red-400">
-              {methods.formState.errors.root.message}
+              {methods.formState.errors.root &&
+                methods.formState.errors.root.message}
+            </span>
+            <span className="text-red-400">
+              {methods.formState.errors[""] &&
+                methods.formState.errors[""].message?.toString()}
             </span>
           </div>
         </div>
@@ -344,7 +349,6 @@ function GenericActualForm<T extends FieldValues>({
           })}
         </Fieldset>
       ))}
-
       {config.submitButton && (
         <button
           type="submit"

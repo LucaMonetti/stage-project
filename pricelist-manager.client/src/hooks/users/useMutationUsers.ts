@@ -1,4 +1,6 @@
 import {
+  type ChangePassword,
+  ChangePasswordSchema,
   type CreateUser,
   CreateUserSchema,
   type EditUser,
@@ -77,6 +79,48 @@ export const useEditUser = (options?: UseEditOptions<User>) => {
 
   return useMutation<User, Error, EditUser>({
     mutationFn: (data) => editUser(data.id, data),
+    onSuccess: (data) => {
+      // Invalidate queries to ensure the cache is updated
+      queryClient.invalidateQueries({ queryKey: ["users", data.id] });
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+      options?.onSuccess?.(data);
+    },
+    onError: (err) => {
+      options?.onError?.(err);
+    },
+  });
+};
+
+// Edit user password
+const editUserPassword = async (
+  id: string,
+  updateData: ChangePassword
+): Promise<User> => {
+  const parsedData = ChangePasswordSchema.safeParse(updateData);
+
+  if (!parsedData.success) {
+    throw new Error("Invalid user password data for update");
+  }
+
+  const response = await fetch(
+    QueryEndpoint.buildUrl(`accounts/${id}/password`),
+    apiConfig.put(parsedData.data)
+  );
+
+  if (!response.ok) {
+    throw new Error(`Failed to change password for user with ID: ${id}`);
+  }
+
+  const rawData = await response.json();
+  return UserSchema.parse(rawData);
+};
+
+// Custom hook to encapsulate the useMutation logic for editing user password
+export const useEditUserPassword = (options?: UseEditOptions<User>) => {
+  const queryClient = useQueryClient();
+
+  return useMutation<User, Error, ChangePassword>({
+    mutationFn: (data) => editUserPassword(data.id, data),
     onSuccess: (data) => {
       // Invalidate queries to ensure the cache is updated
       queryClient.invalidateQueries({ queryKey: ["users", data.id] });

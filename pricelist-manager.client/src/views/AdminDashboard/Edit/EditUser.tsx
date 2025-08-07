@@ -77,15 +77,6 @@ const EditUserForm = () => {
               required: "Necessario inserire l'email dell'Utente.",
             },
           },
-          {
-            id: "password",
-            label: "Password",
-            type: "password",
-            placeholder: "Inserire una password per l'Utente.",
-            registerOptions: {
-              required: "Necessario inserire una password.",
-            },
-          },
         ],
       },
     ],
@@ -107,7 +98,6 @@ const EditUserForm = () => {
       lastName: editUser.data.lastName,
       phone: editUser.data.phone,
       username: editUser.data.username,
-      password: "",
     };
   }
 
