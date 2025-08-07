@@ -14,13 +14,11 @@ export type AllowedColors = "blue" | "purple" | "yellow" | "green" | "red";
 export const Status = {
   Edited: 0,
   Pending: 1,
-  Deleted: 2,
 } as const;
 
 export const StatusLabel: Record<Status, string> = {
   "0": "Completata",
   "1": "In Corso",
-  "2": "Eliminata",
 };
 
 export type Status = (typeof Status)[keyof typeof Status];

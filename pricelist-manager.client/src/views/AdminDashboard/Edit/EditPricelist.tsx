@@ -26,13 +26,13 @@ const EditPricelistForm = () => {
           {
             id: "id",
             label: "ID",
-            type: "text",
+            type: "hidden",
             isDisabled: true,
           },
           {
             id: "companyId",
             label: "Codice Azienda",
-            type: "text",
+            type: "hidden",
             isDisabled: true,
           },
           {

@@ -31,7 +31,7 @@ const EditUpdatelistForm = () => {
           {
             id: "id",
             label: "Id",
-            type: "text",
+            type: "hidden",
             isDisabled: true,
           },
           {

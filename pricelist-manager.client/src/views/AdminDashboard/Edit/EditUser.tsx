@@ -23,7 +23,7 @@ const EditUserForm = () => {
           {
             id: "companyId",
             label: "Codice Azienda",
-            type: "text",
+            type: "hidden",
             isDisabled: true,
             placeholder: "Inserire il dell'Azienda per cui lavora l'utente.",
           },

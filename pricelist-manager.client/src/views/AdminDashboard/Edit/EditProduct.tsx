@@ -30,26 +30,21 @@ const EditProductForm = () => {
   const config = {
     fieldset: [
       {
-        title: "Informazioni Generali",
+        title: "Informazioni Articolo",
         inputs: [
           {
             id: "pricelistId",
             label: "Listino",
-            type: "text",
+            type: "hidden",
             isDisabled: true,
           },
           {
             id: "productCode",
             label: "Codice Prodotto",
-            type: "text",
+            type: "hidden",
             isDisabled: true,
             placeholder: "Inserire il codice del prodotto",
           },
-        ],
-      },
-      {
-        title: "Informazioni Articolo",
-        inputs: [
           {
             id: "name",
             label: "Nome",

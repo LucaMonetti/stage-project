@@ -22,7 +22,7 @@ const config = {
         {
           id: "id",
           label: "Codice Azienda",
-          type: "text",
+          type: "hidden",
           isDisabled: true,
           placeholder: "Inserire il Codice dell'Azienda",
           registerOptions: {
