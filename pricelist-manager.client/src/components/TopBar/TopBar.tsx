@@ -48,7 +48,7 @@ function TopBar() {
 
         {user && (
           <img
-            src={user.company.logoUri}
+            src="/images/PLA-Logo.png"
             alt={`Logo dell'azienda ${user.company.name}`}
             className="max-h-5"
             loading="eager"

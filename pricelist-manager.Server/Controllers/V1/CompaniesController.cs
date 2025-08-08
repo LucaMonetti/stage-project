@@ -13,6 +13,7 @@ using pricelist_manager.Server.Repositories;
 using System.Globalization;
 using System.Security.Claims;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using SixLabors.ImageSharp;
 
 namespace pricelist_manager.Server.Controllers.V1
 {
@@ -264,7 +265,8 @@ namespace pricelist_manager.Server.Controllers.V1
 
         [HttpPost]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Create([FromBody] CreateCompanyDTO dto)
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> Create([FromForm] CreateCompanyDTO dto)
         {
             if (!ModelState.IsValid)
             {
@@ -290,11 +292,50 @@ namespace pricelist_manager.Server.Controllers.V1
                 });
             }
 
-            // Validate the DTO
-            var data = CompanyMapping.MapToCompany(dto);
-
             try
             {
+
+                // Handle logo upload if provided
+                if (dto.Logo != null)
+                {
+                    // Validate image format
+                    if (!dto.Logo.ContentType.Equals("image/png", StringComparison.OrdinalIgnoreCase))
+                    {
+                        return BadRequest("Logo must be a PNG image.");
+                    }
+
+                    // Validate image dimensions
+                    using var stream = dto.Logo.OpenReadStream();
+                    using var image = await Image.LoadAsync(stream);
+
+                    if (image.Height <= 230)
+                    {
+                        return BadRequest("Logo height must be greater than 230 pixels.");
+                    }
+
+                    // Save the image
+                    var publicImagesPath = Path.Combine(Directory.GetCurrentDirectory(), "public", "images");
+
+                    // Create directory if it doesn't exist
+                    if (!Directory.Exists(publicImagesPath))
+                    {
+                        Directory.CreateDirectory(publicImagesPath);
+                    }
+
+                    var fileName = $"{dto.Id}-Logo.png";
+                    var filePath = Path.Combine(publicImagesPath, fileName);
+
+                    // Reset stream position
+                    stream.Position = 0;
+
+                    // Save the image as PNG
+                    await image.SaveAsPngAsync(filePath);
+
+                    dto.LogoUri = "/images/" + fileName;
+                }
+
+                // Validate the DTO
+                var data = CompanyMapping.MapToCompany(dto);
                 var res = await CompanyRepository.CreateAsync(data);
 
                 await Logger.LogAsync(res, currentUserId, DatabaseOperationType.Create);

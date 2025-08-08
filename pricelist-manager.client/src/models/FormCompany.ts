@@ -18,7 +18,9 @@ export const EditCompanySchema = z.object({
       1,
       "Necessario inserire un recapito telefonico in fomato internazionale!"
     ),
-  logoUri: z.string().optional(),
+  logo: z.instanceof(FileList).refine((filelist) => filelist.length > 0, {
+    message: "Necessario inserire un logo per l'Azienda!",
+  }),
   interfaceColor: z
     .string()
     .min(

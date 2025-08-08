@@ -19,13 +19,24 @@ const createCompany = async (
 ): Promise<Company> => {
   const parsedData = CreateCompanySchema.safeParse(createCompanyData);
 
+  const formData = new FormData();
+  formData.append("id", parsedData.data?.id || "");
+  formData.append("name", parsedData.data?.name || "");
+  formData.append("postalCode", parsedData.data?.postalCode || "");
+  formData.append("address", parsedData.data?.address || "");
+  formData.append("province", parsedData.data?.province || "");
+  formData.append("phone", parsedData.data?.phone || "");
+  formData.append("logo", parsedData.data?.logo[0] || new Blob());
+  formData.append("interfaceColor", parsedData.data?.interfaceColor || "");
+
   if (!parsedData.success) {
+    console.error("Invalid company data", parsedData);
     throw new Error("Invalid company data");
   }
 
   const response = await fetch(
     QueryEndpoint.buildUrl("companies"),
-    apiConfig.post(parsedData.data)
+    apiConfig.postFormData(formData)
   );
 
   if (!response.ok) {

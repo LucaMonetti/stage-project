@@ -89,9 +89,10 @@ const CreateCompanyForm = () => {
         title: "Personalizzazione Interfaccia",
         inputs: [
           {
-            id: "logoUri",
+            id: "logo",
             label: "Indirizzo Logo Azienda",
-            type: "text",
+            type: "file",
+            accept: [".png"],
           },
           {
             id: "interfaceColor",
