@@ -104,3 +104,44 @@ export const useEditCompany = (options?: UseEditOptions<Company>) => {
     },
   });
 };
+
+// Delete Company
+const deleteCompany = async (
+  companyId: string
+): Promise<{ companyId: string }> => {
+  const response = await fetch(
+    QueryEndpoint.buildUrl(`companies/${companyId}`),
+    apiConfig.delete()
+  );
+
+  if (!response.ok) {
+    throw new Error(`Failed to DELETE company ${companyId}`);
+  }
+
+  return { companyId: companyId };
+};
+
+// Custom hook to encapsulate the useMutation logic for editing updatelist
+export const useDeleteCompany = (
+  options?: UseEditOptions<{ companyId: string }>
+) => {
+  const queryClient = useQueryClient();
+
+  return useMutation<{ companyId: string }, Error, { companyId: string }>({
+    mutationKey: ["companies", "delete"],
+    mutationFn: (data) => deleteCompany(data.companyId),
+    onSuccess: (data) => {
+      queryClient.removeQueries({
+        queryKey: ["companies", data.companyId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["companies"],
+        refetchType: "all",
+      });
+      options?.onSuccess?.(data);
+    },
+    onError: (err) => {
+      options?.onError?.(err);
+    },
+  });
+};

@@ -1,7 +1,5 @@
-import { FaPlus, FaTrash } from "react-icons/fa6";
-import ActionRenderer, {
-  type Action,
-} from "../../../components/Buttons/ActionRenderer";
+import { FaPlus } from "react-icons/fa6";
+import ActionRenderer from "../../../components/Buttons/ActionRenderer";
 import GenericTableView from "../../../components/Dashboard/Tables/GenericTableView";
 import {
   type Pricelist,
@@ -13,7 +11,6 @@ import type { Config } from "../../../components/Forms/GenericForm";
 import { useAllPricelistsPaginated } from "../../../hooks/pricelists/useQueryPricelists";
 import { useDebounce } from "../../../hooks/useDebounce";
 import { useAllCompanies } from "../../../hooks/companies/useQueryCompanies";
-import { useDeletePricelist } from "../../../hooks/pricelists/useMutationPricelists";
 
 const PricelistListView = () => {
   const [currentPage, setCurrentPage] = useState(1);

@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 import { useAuth } from "../Authentication/AuthenticationProvider";
 import MenuLink from "./MenuLink";
 

@@ -1,4 +1,4 @@
-import type { ProductLite } from "../../../models/Product";
+import type { ProductLite } from "../../../models/ProductLite";
 import type { FetchData } from "../../../types";
 import BasicLoader from "../../Loader/BasicLoader";
 

@@ -85,7 +85,7 @@ const config = {
       title: "Personalizzazione Interfaccia",
       inputs: [
         {
-          id: "logoUri",
+          id: "logo",
           label: "Indirizzo Logo Azienda",
           type: "text",
         },
@@ -116,7 +116,7 @@ const EditCompanyForm = () => {
       address: company.data?.address,
       interfaceColor: company.data?.interfaceColor,
       name: company.data?.name,
-      logoUri: company.data?.logoUri,
+      logo: new FileList(),
       phone: company.data?.phone,
       postalCode: company.data?.postalCode,
       province: company.data?.province,

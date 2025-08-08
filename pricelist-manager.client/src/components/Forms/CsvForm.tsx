@@ -1,23 +1,13 @@
 import { useForm, type SubmitHandler } from "react-hook-form";
-import {
-  ProductCSVSchema,
-  type BaseCSV,
-  type ProductCSV,
-} from "../../models/ProductCSV";
+import { type BaseCSV } from "../../models/ProductCSV";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useUploadProductsCsv } from "../../hooks/products/useMutationProduct";
 import { type ZodType } from "zod/v4";
-import { Link } from "react-router";
 
 function CsvForm<T extends BaseCSV>({
-  id,
-  onSuccess,
   onSubmit,
   schema,
   downloadUrl,
 }: {
-  id: string;
-  onSuccess?: (data: any) => void;
   onSubmit: SubmitHandler<T>;
   schema: ZodType<any, T, any>;
   downloadUrl?: string;

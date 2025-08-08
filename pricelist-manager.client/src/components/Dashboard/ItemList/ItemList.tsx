@@ -23,13 +23,6 @@ const headerVariant = {
   green: "text-green-600",
 };
 
-const bodyVariant = {
-  blue: "text-blue-300",
-  purple: "text-purple-300",
-  yellow: "text-yellow-200",
-  green: "text-green-300",
-};
-
 function ItemList<T extends any[]>({
   title,
   data,

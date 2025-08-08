@@ -1,16 +1,7 @@
-import {
-  useAllCompanies,
-  useAllCompaniesPaginated,
-} from "../../../hooks/companies/useQueryCompanies";
-import {
-  useAllPricelists,
-  useAllPricelistsPaginated,
-} from "../../../hooks/pricelists/useQueryPricelists";
+import { useAllCompaniesPaginated } from "../../../hooks/companies/useQueryCompanies";
+import { useAllPricelistsPaginated } from "../../../hooks/pricelists/useQueryPricelists";
 import { useAllProductsPaginated } from "../../../hooks/products/useQueryProducts";
-import {
-  useAllUsers,
-  useAllUsersPaginated,
-} from "../../../hooks/users/useQueryUsers";
+import { useAllUsersPaginated } from "../../../hooks/users/useQueryUsers";
 import ItemList from "./ItemList";
 
 const ItemListGroupAdmin = () => {

@@ -1,6 +1,5 @@
 import { createBrowserRouter } from "react-router";
 import BaseLayout from "../views/BaseLayout";
-import HomeView from "../views/Index";
 import DashboardLayout from "../views/Dashboard/DashboardLayout";
 import CreateProductForm from "../views/AdminDashboard/Create/CreateProduct";
 import ProductsListView from "../views/AdminDashboard/Products/ListView";
@@ -26,6 +25,7 @@ import AddProductsForm from "../views/AdminDashboard/UpdateLists/AddProducts";
 import Login from "../views/Auth/Login";
 import DashboardView from "../views/Dashboard/Dashboard";
 import EditUserPasswordForm from "../views/AdminDashboard/Edit/EditUserPassword";
+import HomeView from "../views/Index";
 
 const router = createBrowserRouter([
   {

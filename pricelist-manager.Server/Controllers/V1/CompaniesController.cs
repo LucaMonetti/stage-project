@@ -424,18 +424,51 @@ namespace pricelist_manager.Server.Controllers.V1
                 });
             }
 
+            ProductRepository.BeginTransaction();
+
             try
             {
+                Company company = await CompanyRepository.GetByIdAsync(id);
+
+                this.DeletePricelists(company.Pricelists);
+
                 var res = await CompanyRepository.DeleteAsync(id);
 
                 // Todo: Deactivete instead of delete before enable the logging
                 // await Logger.LogAsync(res, currentUserId, DatabaseOperationType.Delete);
 
-                return Ok(CompanyMapping.MapToDTO(res));
+                return Ok(CompanyMapping.MapToDTO(company));
             }
             catch (NotFoundException<Company> e)
             {
                 return NotFound(e.Message);
+            }
+            catch (Exception e)
+            {
+                ProductRepository.RollbackTransaction();
+                return StatusCode(500, new
+                {
+                    error = "Deletion Error",
+                    message = e.Message
+                });
+            }
+        }
+
+        private async void DeletePricelists(ICollection<Pricelist> pricelists)
+        {
+            foreach (var pricelist in pricelists)
+            {
+                // Delete ProductsToUpdateList
+                foreach (var product in pricelist.Products)
+                {
+                    // Delete ProductsToUpdateList
+                    await UpdateListRepository.DeleteProduct(product.Id);
+                }
+
+                PricelistRepository.ClearTracking();
+
+                // Delete Pricelist
+                await PricelistRepository.DeleteAsync(pricelist.Id);
             }
         }
     }

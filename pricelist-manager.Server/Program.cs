@@ -246,8 +246,6 @@ namespace pricelist_manager.Server
 
             app.MapControllers();
 
-            app.MapFallbackToFile("/index.html");
-
             await app.RunAsync();
         }
     }

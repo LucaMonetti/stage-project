@@ -193,7 +193,6 @@ const CreateProductForm = () => {
           </div>
 
           <CsvForm<ProductCSV>
-            id={pricelistId ?? ""}
             schema={ProductCSVSchema}
             onSubmit={(data) => {
               csvMutation?.mutate(

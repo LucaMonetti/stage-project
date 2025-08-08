@@ -19,10 +19,7 @@ import { useAllCompanies } from "../../../hooks/companies/useQueryCompanies";
 import { useNavigate } from "react-router";
 import type { Product, ProductFilter } from "../../../models/Product";
 import { useDebounce } from "../../../hooks/useDebounce";
-import {
-  useAllPricelists,
-  useAllPricelistsByCompany,
-} from "../../../hooks/pricelists/useQueryPricelists";
+import { useAllPricelists } from "../../../hooks/pricelists/useQueryPricelists";
 
 const CreateUpdatelistForm = () => {
   const { user, isAdmin } = useAuth();

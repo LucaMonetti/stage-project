@@ -6,9 +6,7 @@ import GenericForm, {
 import { FaPlus } from "react-icons/fa6";
 import {
   ChangePasswordSchema,
-  EditUserSchema,
   type ChangePassword,
-  type EditUser,
 } from "../../../models/FormUser";
 import { useNavigate, useParams } from "react-router";
 import { useUser } from "../../../hooks/users/useQueryUsers";

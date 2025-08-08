@@ -10,7 +10,7 @@ type Props = {
   bottomLinks?: LinkProps[];
 };
 
-const Sidebar = ({ topLinks, bottomLinks }: Props) => {
+const Sidebar = ({ topLinks }: Props) => {
   return (
     <aside className="min-w-64 p-8 h-[calc(100vh-64px)] flex flex-col justify-between border-transparent border-r-gray-700 border-2 fixed top-16">
       <ul className="flex flex-col gap-4">

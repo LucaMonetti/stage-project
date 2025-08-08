@@ -1,6 +1,4 @@
-import type { IconType } from "react-icons/lib";
 import WidgetBase, { type QueryDimensions } from "./WidgetBase";
-import SimpleIconButton from "../../Buttons/SimpleButton";
 import { FaTag } from "react-icons/fa6";
 import type { Action } from "../../Buttons/ActionRenderer";
 import ActionRenderer from "../../Buttons/ActionRenderer";

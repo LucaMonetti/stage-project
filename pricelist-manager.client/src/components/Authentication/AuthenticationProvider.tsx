@@ -8,7 +8,6 @@ import {
 import { jwtDecode } from "jwt-decode";
 import type { User } from "../../models/User";
 import { useUser } from "../../hooks/users/useQueryUsers";
-import BasicLoader from "../Loader/BasicLoader";
 
 interface AuthContextType {
   user: User | undefined;

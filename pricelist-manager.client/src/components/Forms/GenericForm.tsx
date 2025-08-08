@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ChangeEventHandler } from "react";
+import { useEffect, useRef, type ChangeEventHandler } from "react";
 import Fieldset from "./Fieldset";
 import Input from "./Input";
 import Textarea from "./Textarea";
@@ -25,7 +25,6 @@ import isEqual from "lodash.isequal";
 import type { UseMutationResult, UseQueryResult } from "@tanstack/react-query";
 import BasicLoader from "../Loader/BasicLoader";
 import FileInput from "./FileInput";
-import type { Status } from "../../types";
 
 type InferredZodSchema<T extends FieldValues> = z.ZodType<T, any, any>;
 
@@ -271,11 +270,8 @@ function GenericActualForm<T extends FieldValues>({
   isRow = false,
   mutation,
   onSuccess,
-  clearOnSubmit = false,
-  resetValues = {} as T,
 }: Props<T>) {
   const errorDiv = useRef<HTMLDivElement>(null);
-  const [isLoading, setIsLoading] = useState(false);
   const methods = useFormContext<T>();
 
   const onSubmit: SubmitHandler<T> = (data) => {

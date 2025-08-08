@@ -1,4 +1,3 @@
-import type { FetchData } from "../../../types";
 import SimpleIconButton from "../../Buttons/SimpleButton";
 import BasicLoader from "../../Loader/BasicLoader";
 

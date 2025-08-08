@@ -5,12 +5,7 @@ import InfoWidget from "../../../components/SinglePage/Widgets/InfoWidget";
 import TableWidget from "../../../components/SinglePage/Widgets/TableWidget";
 import DefinitionListWidget from "../../../components/SinglePage/Widgets/DefinitionListWidget";
 import { useCompany } from "../../../hooks/companies/useQueryCompanies";
-import { useAllProductsByCompany } from "../../../hooks/products/useQueryProducts";
-import {
-  useAllPricelists,
-  useAllPricelistsByCompany,
-  useAllPricelistsPaginated,
-} from "../../../hooks/pricelists/useQueryPricelists";
+import { useAllPricelistsPaginated } from "../../../hooks/pricelists/useQueryPricelists";
 import { useAuth } from "../../../components/Authentication/AuthenticationProvider";
 import { useEffect, useState } from "react";
 import type { PricelistFilter } from "../../../models/Pricelist";
@@ -28,7 +23,7 @@ const SingleCompanyView = () => {
   const [filters, setFilters] = useState<PricelistFilter>({
     company_id: companyId,
   });
-  const [nameInput, setNameInput] = useState("");
+  const [nameInput, _] = useState("");
   const [exportData, setExportData] = useState<boolean>(false);
 
   const debouncedNameInput = useDebounce(nameInput, 800);

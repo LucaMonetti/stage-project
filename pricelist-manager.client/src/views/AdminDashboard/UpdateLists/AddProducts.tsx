@@ -105,7 +105,6 @@ const AddProductsForm = () => {
       </div>
 
       <CsvForm<UpdateListCSV>
-        id={updateListId ?? ""}
         schema={UpdateListCSVSchema}
         onSubmit={(data) => {
           csvMutation?.mutate(

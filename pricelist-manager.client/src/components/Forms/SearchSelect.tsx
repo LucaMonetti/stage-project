@@ -1,5 +1,4 @@
 import { FaExclamation } from "react-icons/fa6";
-import type { FetchData } from "../../types";
 import AsyncSelect from "react-select/async";
 import {
   Controller,
@@ -8,12 +7,7 @@ import {
   type Path,
   type RegisterOptions,
 } from "react-hook-form";
-import {
-  useCallback,
-  useEffect,
-  useState,
-  type ChangeEventHandler,
-} from "react";
+import { useEffect, useState } from "react";
 import type { UseQueryResult } from "@tanstack/react-query";
 
 const customStyles = (hasError: boolean) => ({
@@ -112,7 +106,6 @@ function SearchSelect<T extends FieldValues, OptionItem>({
   isDisabled = false,
   onChange: customOnChange,
   isClearable = true,
-  isMulti: isMultiValue = false,
 }: Props<T, OptionItem>) {
   const [groupedOptions, setGroupedOptions] = useState<GroupedOptions[]>([]);
 

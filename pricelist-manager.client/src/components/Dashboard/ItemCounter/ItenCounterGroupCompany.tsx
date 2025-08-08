@@ -1,7 +1,5 @@
 import {
-  usePricelistStatistics,
   usePricelistStatisticsByCompany,
-  useProductStatistics,
   useProductStatisticsByCompany,
 } from "../../../hooks/statistics/useQueryStatistics";
 import { useAuth } from "../../Authentication/AuthenticationProvider";

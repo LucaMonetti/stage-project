@@ -7,10 +7,7 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend,
   ResponsiveContainer,
-  BarChart,
-  Bar,
 } from "recharts";
 import { useEffect, useState } from "react";
 
@@ -133,9 +130,8 @@ function GraphWidget<T, DataType extends { y: any; x: any }>({
             padding={{ left: 30, right: 30 }}
             type="category"
             scale="point"
-            tickFormatter={(value, index) => {
+            tickFormatter={(value) => {
               const currentDate = new Date(value);
-              const prevDate = index > 0 ? new Date(data[index - 1]?.y) : null;
 
               // Show label only if it's the first day of the month or if the month changed
               if (currentDate.getDate() == 1) {
