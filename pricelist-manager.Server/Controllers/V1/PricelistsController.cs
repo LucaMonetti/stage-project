@@ -25,6 +25,7 @@ namespace pricelist_manager.Server.Controllers.V1
     {
         private readonly IPricelistRepository PricelistRepository;
         private readonly IProductRepository ProductRepository;
+        private readonly IUpdateListRepository UpdateListRepository;
 
         private readonly IProductMappingService ProductMapping;
         private readonly IPricelistMappingService PricelistMapping;
@@ -34,7 +35,7 @@ namespace pricelist_manager.Server.Controllers.V1
 
         private readonly ILoggerRepository<Pricelist> Logger;
 
-        public PricelistsController(IPricelistRepository pricelistRepository, IProductRepository productRepository, IPricelistMappingService pricelistMappingService, IProductMappingService productMappingService, IMetadataMappingService metadataMapping, ILoggerRepository<Pricelist> logger, IUserRepository userRepository)
+        public PricelistsController(IPricelistRepository pricelistRepository, IProductRepository productRepository, IPricelistMappingService pricelistMappingService, IProductMappingService productMappingService, IMetadataMappingService metadataMapping, ILoggerRepository<Pricelist> logger, IUserRepository userRepository, IUpdateListRepository updateListRepository)
         {
             PricelistRepository = pricelistRepository;
             ProductRepository = productRepository;
@@ -43,6 +44,7 @@ namespace pricelist_manager.Server.Controllers.V1
             PricelistMapping = pricelistMappingService;
             MetadataMapping = metadataMapping;
             UserRepository = userRepository;
+            UpdateListRepository = updateListRepository;
         }
 
         [HttpGet]
@@ -283,19 +285,41 @@ namespace pricelist_manager.Server.Controllers.V1
                 });
             }
 
+            ProductRepository.BeginTransaction();
+
             try
             {
+
+                foreach (var product in pricelist.Products)
+                {
+                    // Delete ProductsToUpdateList
+                    await UpdateListRepository.DeleteProduct(product.Id);
+
+                }
+
+                ProductRepository.ClearTracking();
+                
+                ProductRepository.CommitTransaction();
+
                 var res = await PricelistRepository.DeleteAsync(id);
 
                 // Todo: Deactivate instead of delete
-
                 // await Logger.LogAsync(res, currentUserId, DatabaseOperationType.Delete);
 
-                return Ok(PricelistMapping.MapToDTO(res));
+                return Ok(PricelistMapping.MapToDTO(pricelist));
             }
             catch (NotFoundException<Company> e)
             {
                 return NotFound(e.Message);
+            } 
+            catch (Exception e)
+            {
+                ProductRepository.RollbackTransaction();
+                return StatusCode(500, new
+                {
+                    error = "Deletion Error",
+                    message = e.Message
+                });
             }
         }
     }

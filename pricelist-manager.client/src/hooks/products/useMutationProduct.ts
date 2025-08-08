@@ -164,12 +164,7 @@ export const useDeleteProduct = (
     mutationFn: (data) => deleteProduct(data.productId),
     onSuccess: (data) => {
       queryClient.removeQueries({
-        queryKey: [
-          "products",
-          data.productId,
-          "products-to-updatelist",
-          data.productId,
-        ],
+        queryKey: ["products", data.productId],
       });
       queryClient.invalidateQueries({
         queryKey: ["products"],

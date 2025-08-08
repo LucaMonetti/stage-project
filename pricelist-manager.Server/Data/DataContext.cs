@@ -73,7 +73,7 @@ namespace pricelist_manager.Server.Data
             builder.Entity<Product>()
                 .HasOne(p => p.Pricelist)
                 .WithMany(c => c.Products)
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.Cascade);
 
             // UpdateList - ProductToUpdateList - Product
 

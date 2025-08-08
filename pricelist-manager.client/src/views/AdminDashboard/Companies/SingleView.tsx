@@ -1,6 +1,6 @@
 import { Link, useNavigate, useParams } from "react-router";
 import BasicLoader from "../../../components/Loader/BasicLoader";
-import { FaPencil, FaDownload, FaPlus } from "react-icons/fa6";
+import { FaPencil, FaDownload, FaPlus, FaTrash } from "react-icons/fa6";
 import InfoWidget from "../../../components/SinglePage/Widgets/InfoWidget";
 import TableWidget from "../../../components/SinglePage/Widgets/TableWidget";
 import DefinitionListWidget from "../../../components/SinglePage/Widgets/DefinitionListWidget";
@@ -16,6 +16,10 @@ import { useEffect, useState } from "react";
 import type { PricelistFilter } from "../../../models/Pricelist";
 import { useDebounce } from "../../../hooks/useDebounce";
 import { useExportCSV } from "../../../hooks/exports/useExportQuery";
+import ActionRenderer, {
+  type Action,
+} from "../../../components/Buttons/ActionRenderer";
+import { useDeletePricelist } from "../../../hooks/pricelists/useMutationPricelists";
 
 const SingleCompanyView = () => {
   const { companyId } = useParams();
@@ -69,6 +73,8 @@ const SingleCompanyView = () => {
     },
     filters
   );
+
+  const deleteMutation = useDeletePricelist();
 
   useEffect(() => {
     if (!(isAdmin() || user?.company.id === company?.id))
@@ -169,6 +175,38 @@ const SingleCompanyView = () => {
                 <span>
                   {value.length} {value.length === 1 ? "prodotto" : "prodotti"}
                 </span>
+              );
+            },
+          },
+          {
+            accessorKey: "actions",
+            header: "Azioni",
+            cell: ({ row }) => {
+              const { id } = row.original;
+
+              const deleteAction: Action = {
+                Icon: FaTrash,
+                type: "button",
+                color: "red",
+                modalConfig: {
+                  title: "Eliminare la lista?",
+                  description: "Sei sicuro di voler eliminare questa lista?",
+                },
+                handler: async () => {
+                  deleteMutation.mutate({ pricelistId: id });
+                },
+              };
+
+              let actions: Action[] = [];
+
+              if (isAdmin() || user?.company.id === companyId) {
+                actions.push(deleteAction);
+              }
+
+              return (
+                <div className="flex gap-4">
+                  <ActionRenderer actions={actions} />
+                </div>
               );
             },
           },

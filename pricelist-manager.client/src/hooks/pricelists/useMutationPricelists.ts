@@ -94,3 +94,44 @@ export const useEditPricelist = (options?: UseEditOptions<Pricelist>) => {
     },
   });
 };
+
+// Delete Pricelist
+const deletePricelist = async (
+  pricelistId: string
+): Promise<{ pricelistId: string }> => {
+  const response = await fetch(
+    QueryEndpoint.buildUrl(`pricelists/${pricelistId}`),
+    apiConfig.delete()
+  );
+
+  if (!response.ok) {
+    throw new Error(`Failed to DELETE pricelist ${pricelistId}`);
+  }
+
+  return { pricelistId: pricelistId };
+};
+
+// Custom hook to encapsulate the useMutation logic for editing updatelist
+export const useDeletePricelist = (
+  options?: UseEditOptions<{ pricelistId: string }>
+) => {
+  const queryClient = useQueryClient();
+
+  return useMutation<{ pricelistId: string }, Error, { pricelistId: string }>({
+    mutationKey: ["pricelists", "delete"],
+    mutationFn: (data) => deletePricelist(data.pricelistId),
+    onSuccess: (data) => {
+      queryClient.removeQueries({
+        queryKey: ["pricelists", data.pricelistId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["pricelists"],
+        refetchType: "all",
+      });
+      options?.onSuccess?.(data);
+    },
+    onError: (err) => {
+      options?.onError?.(err);
+    },
+  });
+};
