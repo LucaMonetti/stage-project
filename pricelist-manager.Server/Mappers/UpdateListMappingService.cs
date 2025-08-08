@@ -28,7 +28,6 @@ namespace pricelist_manager.Server.Mappers
                 CompanyId = updateList.CompanyId,
                 Status = updateList.Status,
                 Name = updateList.Name,
-                Products = ProductToUpdateListMappingService.MapToDTOs(updateList.ProductsToUpdateLists),
                 TotalProducts = updateList.ProductsToUpdateLists.Count,
                 EditedProducts = updateList.ProductsToUpdateLists
                                             .Where(p => p.Status == Status.Edited)

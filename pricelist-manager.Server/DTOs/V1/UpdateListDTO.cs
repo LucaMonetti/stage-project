@@ -19,6 +19,5 @@ namespace pricelist_manager.Server.DTOs.V1
     }
     public class UpdateListDTO : UpdateListLiteDTO
     {
-        public virtual ICollection<UpdateListProductDTO> Products { get; set; } = [];
     }
 }

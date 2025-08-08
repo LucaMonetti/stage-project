@@ -15,7 +15,6 @@ export const UpdateListSchema = z.object({
   status: z.enum(Status),
   totalProducts: z.number(),
   editedProducts: z.number(),
-  products: UpdateListProductArraySchema,
 });
 
 export const UpdateListArraySchema = z.array(UpdateListSchema);

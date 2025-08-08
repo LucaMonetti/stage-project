@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from "react-router";
 import BasicLoader from "../../../components/Loader/BasicLoader";
-import { FaPencil, FaDownload, FaPlus } from "react-icons/fa6";
+import { FaPencil, FaDownload, FaPlus, FaTrash } from "react-icons/fa6";
 import InfoWidget from "../../../components/SinglePage/Widgets/InfoWidget";
 import TableWidget from "../../../components/SinglePage/Widgets/TableWidget";
 import { usePricelist } from "../../../hooks/pricelists/useQueryPricelists";
@@ -9,6 +9,8 @@ import { useAuth } from "../../../components/Authentication/AuthenticationProvid
 import type { Action } from "../../../components/Buttons/ActionRenderer";
 import { useEffect, useState } from "react";
 import { useExportCSV } from "../../../hooks/exports/useExportQuery";
+import { useDeleteProduct } from "../../../hooks/products/useMutationProduct";
+import ActionRenderer from "../../../components/Buttons/ActionRenderer";
 
 const SinglePricelistView = () => {
   const navigate = useNavigate();
@@ -60,6 +62,8 @@ const SinglePricelistView = () => {
       navigate("/error/404");
     }
   }, [user, data, isError]);
+
+  const deleteMutation = useDeleteProduct();
 
   if (isPending) {
     return (
@@ -129,6 +133,38 @@ const SinglePricelistView = () => {
             cell: ({ getValue }) => {
               const value = getValue() as number;
               return `${value.toFixed(2)} €`;
+            },
+          },
+          {
+            accessorKey: "actions",
+            header: "Azioni",
+            cell: ({ row }) => {
+              const { id } = row.original;
+
+              const deleteAction: Action = {
+                Icon: FaTrash,
+                type: "button",
+                color: "red",
+                modalConfig: {
+                  title: "Eliminare la lista?",
+                  description: "Sei sicuro di voler eliminare questa lista?",
+                },
+                handler: async () => {
+                  deleteMutation.mutate({ productId: id });
+                },
+              };
+
+              let actions: Action[] = [];
+
+              if (isAdmin() || user?.company.id === data?.company.id) {
+                actions.push(deleteAction);
+              }
+
+              return (
+                <div className="flex gap-4">
+                  <ActionRenderer actions={actions} />
+                </div>
+              );
             },
           },
         ]}

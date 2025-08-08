@@ -274,8 +274,29 @@ namespace pricelist_manager.Server.Controllers.V1
                     });
                 }
 
-                var res = await ProductRepository.DeleteAsync(productId);
-                return Ok(ProductMapping.MapToDTO(res));
+                ProductRepository.BeginTransaction();
+                
+                try
+                {
+                    // Delete ProductsToUpdateList
+                    await UpdateListRepository.DeleteProduct(productId);
+
+                    ProductRepository.ClearTracking();
+
+                    var res = await ProductRepository.DeleteAsync(productId);
+                } catch (Exception e)
+                {
+                    ProductRepository.RollbackTransaction();
+                    return StatusCode(500, new
+                    {
+                        error = "Deletion Error",
+                        message = e.Message
+                    });
+                }
+
+                ProductRepository.CommitTransaction();
+
+                return Ok(ProductMapping.MapToDTO(product));
             }
             catch (NotFoundException<Product> e)
             {

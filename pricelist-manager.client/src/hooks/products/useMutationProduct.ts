@@ -136,3 +136,49 @@ export const useUploadProductsCsv = (options?: UseCreateOptions<boolean>) => {
     },
   });
 };
+
+// Delete product
+const deleteProduct = async (
+  productId: string
+): Promise<{ productId: string }> => {
+  const response = await fetch(
+    QueryEndpoint.buildUrl(`products/${productId}`),
+    apiConfig.delete()
+  );
+
+  if (!response.ok) {
+    throw new Error(`Failed to DELETE product ${productId}`);
+  }
+
+  return { productId: productId };
+};
+
+// Custom hook to encapsulate the useMutation logic for editing updatelist
+export const useDeleteProduct = (
+  options?: UseEditOptions<{ productId: string }>
+) => {
+  const queryClient = useQueryClient();
+
+  return useMutation<{ productId: string }, Error, { productId: string }>({
+    mutationKey: ["products", "delete"],
+    mutationFn: (data) => deleteProduct(data.productId),
+    onSuccess: (data) => {
+      queryClient.removeQueries({
+        queryKey: [
+          "products",
+          data.productId,
+          "products-to-updatelist",
+          data.productId,
+        ],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["products"],
+        refetchType: "all",
+      });
+      options?.onSuccess?.(data);
+    },
+    onError: (err) => {
+      options?.onError?.(err);
+    },
+  });
+};

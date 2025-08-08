@@ -291,10 +291,10 @@ namespace pricelist_manager.Server.Repositories
 
             try
             {
-                // 1. Remove the product (single query with joins if needed)
+                // Remove the product
                 var removedCount = await Context.ProductsToUpdateLists
                     .Where(p => p.UpdateListId == updateListId && p.ProductId == productId)
-                    .ExecuteDeleteAsync(); // EF Core 7+ bulk delete
+                    .ExecuteDeleteAsync();
 
                 if (removedCount == 0)
                 {
@@ -318,6 +318,37 @@ namespace pricelist_manager.Server.Repositories
             {
                 await transaction.RollbackAsync();
                 throw;
+            }
+        }
+
+        public async Task DeleteProduct(string productId)
+        {
+            if (!CanConnect()) throw new StorageUnavailableException();
+
+            var updateLists = await Context.ProductsToUpdateLists.Where(ptul => ptul.ProductId == productId).ToListAsync();
+
+            foreach (var updateList in updateLists)
+            {
+                // Remove the product
+                var removedCount = await Context.ProductsToUpdateLists
+                    .Where(p => p.UpdateListId == updateList.UpdateListId && p.ProductId == productId)
+                    .ExecuteDeleteAsync();
+
+                if (removedCount == 0)
+                {
+                    throw new NotFoundException<ProductToUpdateList>($"Product {productId} not found in update list {updateList.UpdateListId}");
+                }
+
+                // 2. Check remaining pending products and update status in one query
+                var pendingCount = await Context.ProductsToUpdateLists
+                    .CountAsync(p => p.UpdateListId == updateList.UpdateListId && p.Status == Status.Pending);
+
+                if (pendingCount == 0)
+                {
+                    await Context.UpdateLists
+                        .Where(ul => ul.Id == updateList.UpdateListId && ul.Status != Status.Edited)
+                        .ExecuteUpdateAsync(ul => ul.SetProperty(u => u.Status, Status.Edited));
+                }
             }
         }
 
