@@ -59,5 +59,22 @@ namespace pricelist_manager.Server.Mappers
 
             return new PagedList<CompanyDTO>([.. companies.Select(c => MapToDTO(c))], companies.TotalCount, companies.CurrentPage, companies.PageSize);
         }
+
+        public Company MapToCompany(UpdateCompanyDTO dto, string logoUri)
+        {
+            ArgumentNullException.ThrowIfNull(dto);
+
+            return new Company
+            {
+                Id = dto.Id.ToUpper(),
+                Name = dto.Name,
+                Address = dto.Address,
+                InterfaceColor = dto.InterfaceColor,
+                LogoUri = logoUri,
+                Phone = dto.Phone,
+                PostalCode = dto.PostalCode,
+                Province = dto.Province
+            };
+        }
     }
 }

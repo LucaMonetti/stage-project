@@ -8,6 +8,7 @@ namespace pricelist_manager.Server.Interfaces
     {
         CompanyDTO MapToDTO(Company company);
         Company MapToCompany(CreateCompanyDTO dto);
+        Company MapToCompany(UpdateCompanyDTO dto, string logoUri);
 
         PagedList<CompanyDTO> MapToDTOs(PagedList<Company> companies);
     }

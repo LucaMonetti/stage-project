@@ -10,6 +10,7 @@ using pricelist_manager.Server.DTOs.V1;
 using pricelist_manager.Server.Exceptions;
 using pricelist_manager.Server.Helpers;
 using pricelist_manager.Server.Interfaces;
+using pricelist_manager.Server.Mappers;
 using pricelist_manager.Server.Models;
 using System.Data;
 using System.IdentityModel.Tokens.Jwt;
@@ -115,7 +116,7 @@ namespace pricelist_manager.Server.Controllers.V1
 
             // Success Response
             await transition.CommitAsync();
-            return Ok(new { message = "User registered successfully!" });
+            return Ok(UserMapping.MapToDTO(user, [Roles.USER]));
         }
 
         [HttpPost("login")]

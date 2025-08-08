@@ -350,7 +350,7 @@ namespace pricelist_manager.Server.Controllers.V1
 
         [HttpPut("{id}")]
         [Authorize]
-        public async Task<IActionResult> Update(string id, [FromBody] Company dto)
+        public async Task<IActionResult> Update(string id, [FromBody] UpdateCompanyDTO dto)
         {
             if (id != dto.Id)
             {
@@ -373,7 +373,7 @@ namespace pricelist_manager.Server.Controllers.V1
 
             var (loggedUser, loggedRoles) = await UserRepository.GetById(currentUserId);
 
-            if (loggedUser == null || !(loggedRoles.Contains("Admin") && loggedUser.CompanyId == id))
+            if (loggedUser == null || !(loggedRoles.Contains("Admin") || loggedUser.CompanyId == id))
             {
                 return StatusCode(403, new
                 {
@@ -384,7 +384,8 @@ namespace pricelist_manager.Server.Controllers.V1
 
             try
             {
-                var res = await CompanyRepository.UpdateAsync(dto);
+                var company = await CompanyRepository.GetByIdAsync(dto.Id);
+                var res = await CompanyRepository.UpdateAsync(CompanyMapping.MapToCompany(dto, company.LogoUri));
 
                 await Logger.LogAsync(res, currentUserId, DatabaseOperationType.Update);
 

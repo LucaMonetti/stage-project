@@ -23,9 +23,6 @@ namespace pricelist_manager.Server.DTOs.V1
         [Length(2, 30)]
         public required string Phone { get; set; }
 
-        [Length(2, 200)]
-        public string LogoUri { get; set; } = string.Empty;
-
         [Length(7, 7)]
         public required string InterfaceColor { get; set; } = string.Empty;
     }

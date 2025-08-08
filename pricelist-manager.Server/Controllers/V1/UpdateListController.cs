@@ -302,7 +302,7 @@ namespace pricelist_manager.Server.Controllers.V1
 
                 await Logger.LogAsync(updatelist, currentUserId, DatabaseOperationType.UpdateInnerProducts);
 
-                return base.Ok(UpdateListMappingService.MapToDTO(updatelist));
+                return Ok(UpdateListMappingService.MapToDTO(updatelist));
             }
             catch (NotFoundException<UpdateList> e)
             {
@@ -414,7 +414,7 @@ namespace pricelist_manager.Server.Controllers.V1
 
                 await Logger.LogAsync(res, currentUserId, DatabaseOperationType.Update);
 
-                return Ok(updatelist);
+                return Ok(UpdateListMappingService.MapToDTO(updatelist));
             }
             catch (NotFoundException<UpdateList> e)
             {

@@ -85,6 +85,8 @@ namespace pricelist_manager.Server.Repositories
         {
             if (!CanConnect()) throw new StorageUnavailableException();
 
+            ClearTracking();
+
             if (!ExistsId(entity.Id)) throw new NotFoundException<Company>(entity.Id);
 
             Context.Update(entity);

@@ -45,6 +45,8 @@ namespace pricelist_manager.Server
                 options.SignIn.RequireConfirmedPhoneNumber = false;
                 options.SignIn.RequireConfirmedAccount = false;
                 options.SignIn.RequireConfirmedEmail = false;
+
+                options.User.RequireUniqueEmail = true;
             })
                 .AddEntityFrameworkStores<DataContext>()
                 .AddDefaultTokenProviders();

@@ -18,9 +18,6 @@ export const EditCompanySchema = z.object({
       1,
       "Necessario inserire un recapito telefonico in fomato internazionale!"
     ),
-  logo: z.instanceof(FileList).refine((filelist) => filelist.length > 0, {
-    message: "Necessario inserire un logo per l'Azienda!",
-  }),
   interfaceColor: z
     .string()
     .min(
@@ -34,7 +31,11 @@ export const EditCompanyArraySchema = z.array(EditCompanySchema);
 export type EditCompany = z.infer<typeof EditCompanySchema>;
 
 // Create Company
-export const CreateCompanySchema = EditCompanySchema;
+export const CreateCompanySchema = EditCompanySchema.extend({
+  logo: z.instanceof(FileList).refine((filelist) => filelist.length > 0, {
+    message: "Necessario inserire un logo per l'Azienda!",
+  }),
+});
 
 export const CreateCompanyArraySchema = z.array(CreateCompanySchema);
 
