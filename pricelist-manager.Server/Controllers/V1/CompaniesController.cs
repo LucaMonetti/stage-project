@@ -37,6 +37,9 @@ namespace pricelist_manager.Server.Controllers.V1
 
         private readonly ILoggerRepository<Company> Logger;
 
+        private readonly string TargetFolder = Path.Combine(Directory.GetCurrentDirectory(), "public", "uploads");
+        private const int MinHeight = 230;
+
         public CompaniesController(ICompanyRepository companyRepository, IUserRepository userRepository, IProductRepository productRepository, IPricelistRepository pricelistRepository, ICompanyMappingService companyMapping, IProductMappingService productMapping, IPricelistMappingService pricelistMapping, IUserMappingService userMapping, IMetadataMappingService metadataMapping, IUpdateListRepository updateListRepository, IUpdateListMappingService updateListMapping, ILoggerRepository<Company> logger)
         {
             CompanyRepository = companyRepository;
@@ -308,22 +311,21 @@ namespace pricelist_manager.Server.Controllers.V1
                     using var stream = dto.Logo.OpenReadStream();
                     using var image = await Image.LoadAsync(stream);
 
-                    if (image.Height <= 230)
+                    if (image.Height <= MinHeight)
                     {
-                        return BadRequest("Logo height must be greater than 230 pixels.");
+                        return BadRequest($"Logo height must be greater than {MinHeight} pixels.");
                     }
 
                     // Save the image
-                    var publicImagesPath = Path.Combine(Directory.GetCurrentDirectory(), "public", "images");
 
                     // Create directory if it doesn't exist
-                    if (!Directory.Exists(publicImagesPath))
+                    if (!Directory.Exists(TargetFolder))
                     {
-                        Directory.CreateDirectory(publicImagesPath);
+                        Directory.CreateDirectory(TargetFolder);
                     }
 
                     var fileName = $"{dto.Id}-Logo.png";
-                    var filePath = Path.Combine(publicImagesPath, fileName);
+                    var filePath = Path.Combine(TargetFolder, fileName);
 
                     // Reset stream position
                     stream.Position = 0;
@@ -331,7 +333,7 @@ namespace pricelist_manager.Server.Controllers.V1
                     // Save the image as PNG
                     await image.SaveAsPngAsync(filePath);
 
-                    dto.LogoUri = "/images/" + fileName;
+                    dto.LogoUri = "api/uploads/" + fileName;
                 }
 
                 // Validate the DTO
